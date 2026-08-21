@@ -1,0 +1,3 @@
+<resources>
+    <style name="Theme.MotoristaCalc" parent="Theme.MaterialComponents.DayNight.NoActionBar" />
+</resources>
