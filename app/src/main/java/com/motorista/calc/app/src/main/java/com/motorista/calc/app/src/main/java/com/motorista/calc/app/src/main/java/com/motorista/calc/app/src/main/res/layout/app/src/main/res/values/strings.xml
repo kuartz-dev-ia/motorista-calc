@@ -1,4 +1,0 @@
-<resources>
-    <string name="app_name">Motorista Calc</string>
-    <string name="accessibility_service_description">Lê a tela do app de corrida para calcular automaticamente se a corrida vale a pena (R$/km, R$/hora).</string>
-</resources>
