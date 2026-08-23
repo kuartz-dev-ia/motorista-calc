@@ -1,4 +1,4 @@
-    package com.motorista.calc
+package com.motorista.calc
 
 import android.accessibilityservice.AccessibilityService
 import android.content.Intent
@@ -14,6 +14,10 @@ class RideAccessibilityService : AccessibilityService() {
     private val executor = Executors.newSingleThreadExecutor()
     private var ultimoTextoProcessado: String = ""
 
+    // Segunda camada de segurança: mesmo que o Android deixe passar eventos de
+    // outros apps (varia por fabricante), a gente ignora aqui no código também.
+    private val pacotesPermitidos = setOf("com.ubercab.driver", "com.app99.driver")
+
     override fun onServiceConnected() {
         super.onServiceConnected()
         Log.d(TAG, "Serviço de acessibilidade conectado")
@@ -21,6 +25,10 @@ class RideAccessibilityService : AccessibilityService() {
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
         event ?: return
+
+        val pacoteDoEvento = event.packageName?.toString()
+        if (pacoteDoEvento !in pacotesPermitidos) return
+
         val rootNode = rootInActiveWindow ?: return
 
         val textoTela = StringBuilder()
@@ -30,8 +38,6 @@ class RideAccessibilityService : AccessibilityService() {
         if (texto == ultimoTextoProcessado || texto.isBlank()) return
         ultimoTextoProcessado = texto
 
-        // DEBUG: salva SEMPRE o último texto de tela capturado (mesmo que não pareça
-        // corrida), pra você conseguir ver/copiar na tela de configurações.
         val prefsDebug = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
         prefsDebug.edit().putString(PREF_ULTIMO_TEXTO, texto).apply()
 
