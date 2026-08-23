@@ -1,10 +1,10 @@
+
 package com.motorista.calc
 
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
-import android.text.TextUtils
 import android.view.accessibility.AccessibilityManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.getSystemService
@@ -27,8 +27,9 @@ class MainActivity : AppCompatActivity() {
         val edtPrecoCombustivel = findViewById<android.widget.EditText>(R.id.edtPrecoCombustivel)
         val btnSalvar = findViewById<android.widget.Button>(R.id.btnSalvar)
         val txtStatus = findViewById<android.widget.TextView>(R.id.txtStatus)
+        val btnVerDebug = findViewById<android.widget.Button>(R.id.btnVerDebug)
+        val txtDebug = findViewById<android.widget.TextView>(R.id.txtDebug)
 
-        // Preenche os campos com os valores salvos (ou padrões)
         edtMinKm.setText(prefs.getFloat(RideAccessibilityService.PREF_MIN_KM, 1.50f).toString())
         edtMinHora.setText(prefs.getFloat(RideAccessibilityService.PREF_MIN_HORA, 25.0f).toString())
         edtConsumo.setText(prefs.getFloat(RideAccessibilityService.PREF_CONSUMO, 12.0f).toString())
@@ -55,6 +56,11 @@ class MainActivity : AppCompatActivity() {
                 apply()
             }
             android.widget.Toast.makeText(this, "Configurações salvas", android.widget.Toast.LENGTH_SHORT).show()
+        }
+
+        btnVerDebug.setOnClickListener {
+            val texto = prefs.getString(RideAccessibilityService.PREF_ULTIMO_TEXTO, null)
+            txtDebug.text = texto ?: "Nenhum texto capturado ainda. Abra o app de corrida e deixe uma tela de solicitação aparecer, depois volte aqui e toque de novo."
         }
 
         atualizarStatus(txtStatus)
