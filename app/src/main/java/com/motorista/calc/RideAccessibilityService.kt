@@ -1,4 +1,4 @@
-package com.motorista.calc
+    package com.motorista.calc
 
 import android.accessibilityservice.AccessibilityService
 import android.content.Intent
@@ -29,6 +29,11 @@ class RideAccessibilityService : AccessibilityService() {
 
         if (texto == ultimoTextoProcessado || texto.isBlank()) return
         ultimoTextoProcessado = texto
+
+        // DEBUG: salva SEMPRE o último texto de tela capturado (mesmo que não pareça
+        // corrida), pra você conseguir ver/copiar na tela de configurações.
+        val prefsDebug = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+        prefsDebug.edit().putString(PREF_ULTIMO_TEXTO, texto).apply()
 
         if (!TriggerPatterns.pareceTelaDeCorrida(texto)) return
 
@@ -126,5 +131,6 @@ class RideAccessibilityService : AccessibilityService() {
         const val PREF_MIN_KM = "minimo_valor_km"
         const val PREF_MIN_HORA = "minimo_valor_hora"
         const val PREF_SALVAR_PRINT = "salvar_print"
+        const val PREF_ULTIMO_TEXTO = "ultimo_texto_capturado"
     }
 }
