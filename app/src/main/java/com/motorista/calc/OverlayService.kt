@@ -12,6 +12,12 @@ import android.view.WindowManager
 import android.widget.LinearLayout
 import android.widget.TextView
 
+/**
+ * Desenha um overlay flutuante no estilo "semáforo": colunas com R$/km, R$/hora
+ * e nota do passageiro. O overlay é PURAMENTE VISUAL (FLAG_NOT_TOUCHABLE) —
+ * nenhum toque nele é interceptado, então nunca bloqueia o botão "Aceitar"
+ * do Uber/99 por baixo, nem qualquer outro botão da tela.
+ */
 class OverlayService : Service() {
 
     private var windowManager: WindowManager? = null
@@ -60,7 +66,6 @@ class OverlayService : Service() {
         }
 
         val linhaTopo = TextView(this).apply {
-            val valorKm = valorKmCalc ?: valorKmExibido
             text = buildString {
                 append(if (valeAPena) "✅ VALE A PENA" else "⚠️ NÃO COMPENSA")
                 surge?.let { append("  ⚡%.1fx".format(it)) }
@@ -101,7 +106,9 @@ class OverlayService : Service() {
             WindowManager.LayoutParams.WRAP_CONTENT,
             WindowManager.LayoutParams.WRAP_CONTENT,
             layoutType,
-            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
+            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
+                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
             PixelFormat.TRANSLUCENT
         ).apply {
             gravity = Gravity.TOP or Gravity.CENTER_HORIZONTAL
@@ -113,6 +120,7 @@ class OverlayService : Service() {
         container.postDelayed({ removerOverlayExistente() }, 9000)
     }
 
+    /** Coluna com rótulo, valor e uma bolinha colorida (verde se >= mínimo, vermelho se abaixo). */
     private fun criarColuna(rotulo: String, valorTexto: String, minimoKm: Double, valorReal: Double?): LinearLayout {
         val coluna = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
