@@ -80,11 +80,26 @@ class RideAccessibilityService : AccessibilityService() {
         }
 
         val prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+
+        // Custos fixos mensais rateados por km rodado, pra descontar do lucro líquido.
+        val financiamento = prefs.getFloat(PREF_FINANCIAMENTO, 0f).toDouble()
+        val seguro = prefs.getFloat(PREF_SEGURO, 0f).toDouble()
+        val ipvaAnual = prefs.getFloat(PREF_IPVA, 0f).toDouble()
+        val licenciamentoAnual = prefs.getFloat(PREF_LICENCIAMENTO, 0f).toDouble()
+        val manutencao = prefs.getFloat(PREF_MANUTENCAO, 0f).toDouble()
+        val contasPessoais = prefs.getFloat(PREF_CONTAS_PESSOAIS, 0f).toDouble()
+        val kmMes = prefs.getFloat(PREF_KM_MES, 3000f).toDouble()
+
+        val custoFixoMensal = financiamento + seguro + (ipvaAnual / 12.0) +
+            (licenciamentoAnual / 12.0) + manutencao + contasPessoais
+        val custoFixoPorKm = if (kmMes > 0) custoFixoMensal / kmMes else 0.0
+
         val engine = CalculationEngine(
             precoCombustivelPorLitro = prefs.getFloat(PREF_PRECO_COMBUSTIVEL, 6.10f).toDouble(),
             consumoKmPorLitro = prefs.getFloat(PREF_CONSUMO, 12.0f).toDouble(),
             minimoValorPorKm = prefs.getFloat(PREF_MIN_KM, 1.50f).toDouble(),
-            minimoValorPorHora = prefs.getFloat(PREF_MIN_HORA, 25.0f).toDouble()
+            minimoValorPorHora = prefs.getFloat(PREF_MIN_HORA, 25.0f).toDouble(),
+            custoFixoPorKm = custoFixoPorKm
         )
         val resultado = engine.calcular(ride)
 
@@ -138,5 +153,12 @@ class RideAccessibilityService : AccessibilityService() {
         const val PREF_MIN_HORA = "minimo_valor_hora"
         const val PREF_SALVAR_PRINT = "salvar_print"
         const val PREF_ULTIMO_TEXTO = "ultimo_texto_capturado"
+        const val PREF_FINANCIAMENTO = "financiamento_mensal"
+        const val PREF_SEGURO = "seguro_mensal"
+        const val PREF_IPVA = "ipva_anual"
+        const val PREF_LICENCIAMENTO = "licenciamento_anual"
+        const val PREF_MANUTENCAO = "manutencao_mensal"
+        const val PREF_CONTAS_PESSOAIS = "contas_pessoais_mensal"
+        const val PREF_KM_MES = "km_rodados_mes"
     }
 }
