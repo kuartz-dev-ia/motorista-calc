@@ -1,7 +1,7 @@
-
 package com.motorista.calc
 
 import android.accessibilityservice.AccessibilityService
+import android.accessibilityservice.AccessibilityServiceInfo
 import android.content.Intent
 import android.os.Build
 import android.util.Log
@@ -19,33 +19,42 @@ class RideAccessibilityService : AccessibilityService() {
 
     override fun onServiceConnected() {
         super.onServiceConnected()
+        // Garante que o serviço também consiga ler janelas flutuantes (overlays),
+        // não só a janela que está em foco. É isso que faltava pra pegar a tela
+        // de "nova corrida" do Uber, que aparece como um popup flutuante por cima.
+        serviceInfo = serviceInfo?.apply {
+            flags = flags or AccessibilityServiceInfo.FLAG_RETRIEVE_INTERACTIVE_WINDOWS
+        }
         Log.d(TAG, "Serviço de acessibilidade conectado")
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
         event ?: return
 
-        val pacoteDoEvento = event.packageName?.toString()
-        if (pacoteDoEvento !in pacotesPermitidos) return
+        // Varre TODAS as janelas visíveis na tela (não só a que está em foco),
+        // porque a tela de nova corrida do Uber/99 aparece como popup flutuante
+        // por cima de outros apps.
+        val janelasVisiveis = windows ?: return
 
-        val rootNode = rootInActiveWindow ?: return
+        for (janela in janelasVisiveis) {
+            val root = janela.root ?: continue
+            val pacoteDaJanela = root.packageName?.toString()
+            if (pacoteDaJanela !in pacotesPermitidos) continue
 
-        val textoTela = StringBuilder()
-        coletarTexto(rootNode, textoTela)
-        val texto = textoTela.toString()
+            val textoTela = StringBuilder()
+            coletarTexto(root, textoTela)
+            val texto = textoTela.toString()
 
-        if (texto == ultimoTextoProcessado || texto.isBlank()) return
-        ultimoTextoProcessado = texto
+            if (texto.isBlank() || texto == ultimoTextoProcessado) continue
+            ultimoTextoProcessado = texto
 
-        // DEBUG: registra TODA tela capturada do Uber/99 num histórico (não só as que
-        // "parecem corrida"), pra dar pra diagnosticar mesmo quando o teste de
-        // reconhecimento estiver rejeitando a tela real por engano.
-        registrarDebug(texto)
+            registrarDebug(texto)
 
-        if (!TriggerPatterns.pareceTelaDeCorrida(texto)) return
-
-        Log.d(TAG, "Tela de corrida detectada. Processando...")
-        processarTelaDeCorrida(texto)
+            if (TriggerPatterns.pareceTelaDeCorrida(texto)) {
+                Log.d(TAG, "Tela de corrida detectada. Processando...")
+                processarTelaDeCorrida(texto)
+            }
+        }
     }
 
     /** Mantém um histórico das últimas capturas (mais recente primeiro), pra debug. */
