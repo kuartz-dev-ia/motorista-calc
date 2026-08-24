@@ -1,4 +1,3 @@
-
 package com.motorista.calc
 
 import android.content.Intent
@@ -25,6 +24,13 @@ class MainActivity : AppCompatActivity() {
         val edtMinHora = findViewById<android.widget.EditText>(R.id.edtMinHora)
         val edtConsumo = findViewById<android.widget.EditText>(R.id.edtConsumo)
         val edtPrecoCombustivel = findViewById<android.widget.EditText>(R.id.edtPrecoCombustivel)
+        val edtFinanciamento = findViewById<android.widget.EditText>(R.id.edtFinanciamento)
+        val edtSeguro = findViewById<android.widget.EditText>(R.id.edtSeguro)
+        val edtIpva = findViewById<android.widget.EditText>(R.id.edtIpva)
+        val edtLicenciamento = findViewById<android.widget.EditText>(R.id.edtLicenciamento)
+        val edtManutencao = findViewById<android.widget.EditText>(R.id.edtManutencao)
+        val edtContasPessoais = findViewById<android.widget.EditText>(R.id.edtContasPessoais)
+        val edtKmMes = findViewById<android.widget.EditText>(R.id.edtKmMes)
         val btnSalvar = findViewById<android.widget.Button>(R.id.btnSalvar)
         val txtStatus = findViewById<android.widget.TextView>(R.id.txtStatus)
         val btnVerDebug = findViewById<android.widget.Button>(R.id.btnVerDebug)
@@ -34,6 +40,13 @@ class MainActivity : AppCompatActivity() {
         edtMinHora.setText(prefs.getFloat(RideAccessibilityService.PREF_MIN_HORA, 25.0f).toString())
         edtConsumo.setText(prefs.getFloat(RideAccessibilityService.PREF_CONSUMO, 12.0f).toString())
         edtPrecoCombustivel.setText(prefs.getFloat(RideAccessibilityService.PREF_PRECO_COMBUSTIVEL, 6.10f).toString())
+        edtFinanciamento.setText(prefs.getFloat(RideAccessibilityService.PREF_FINANCIAMENTO, 0f).toString())
+        edtSeguro.setText(prefs.getFloat(RideAccessibilityService.PREF_SEGURO, 0f).toString())
+        edtIpva.setText(prefs.getFloat(RideAccessibilityService.PREF_IPVA, 0f).toString())
+        edtLicenciamento.setText(prefs.getFloat(RideAccessibilityService.PREF_LICENCIAMENTO, 0f).toString())
+        edtManutencao.setText(prefs.getFloat(RideAccessibilityService.PREF_MANUTENCAO, 0f).toString())
+        edtContasPessoais.setText(prefs.getFloat(RideAccessibilityService.PREF_CONTAS_PESSOAIS, 0f).toString())
+        edtKmMes.setText(prefs.getFloat(RideAccessibilityService.PREF_KM_MES, 3000f).toString())
 
         btnAtivarAcessibilidade.setOnClickListener {
             startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
@@ -53,6 +66,13 @@ class MainActivity : AppCompatActivity() {
                 putFloat(RideAccessibilityService.PREF_MIN_HORA, edtMinHora.text.toString().toFloatOrNull() ?: 25.0f)
                 putFloat(RideAccessibilityService.PREF_CONSUMO, edtConsumo.text.toString().toFloatOrNull() ?: 12.0f)
                 putFloat(RideAccessibilityService.PREF_PRECO_COMBUSTIVEL, edtPrecoCombustivel.text.toString().toFloatOrNull() ?: 6.10f)
+                putFloat(RideAccessibilityService.PREF_FINANCIAMENTO, edtFinanciamento.text.toString().toFloatOrNull() ?: 0f)
+                putFloat(RideAccessibilityService.PREF_SEGURO, edtSeguro.text.toString().toFloatOrNull() ?: 0f)
+                putFloat(RideAccessibilityService.PREF_IPVA, edtIpva.text.toString().toFloatOrNull() ?: 0f)
+                putFloat(RideAccessibilityService.PREF_LICENCIAMENTO, edtLicenciamento.text.toString().toFloatOrNull() ?: 0f)
+                putFloat(RideAccessibilityService.PREF_MANUTENCAO, edtManutencao.text.toString().toFloatOrNull() ?: 0f)
+                putFloat(RideAccessibilityService.PREF_CONTAS_PESSOAIS, edtContasPessoais.text.toString().toFloatOrNull() ?: 0f)
+                putFloat(RideAccessibilityService.PREF_KM_MES, edtKmMes.text.toString().toFloatOrNull() ?: 3000f)
                 apply()
             }
             android.widget.Toast.makeText(this, "Configurações salvas", android.widget.Toast.LENGTH_SHORT).show()
