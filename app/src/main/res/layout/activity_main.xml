@@ -18,6 +18,22 @@
             android:layout_marginBottom="16dp" />
 
         <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="🐛 Último texto capturado (debug)"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/txtDebug"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="24dp"
+            android:textIsSelectable="true"
+            android:fontFamily="monospace"
+            android:textSize="11sp" />
+
+        <TextView
             android:id="@+id/txtStatus"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -179,22 +195,6 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:text="Salvar configurações" />
-
-        <Button
-            android:id="@+id/btnVerDebug"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="🐛 Ver último texto capturado (debug)" />
-
-        <TextView
-            android:id="@+id/txtDebug"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:textIsSelectable="true"
-            android:fontFamily="monospace"
-            android:textSize="11sp" />
 
     </LinearLayout>
 </ScrollView>
