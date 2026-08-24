@@ -15,11 +15,18 @@ object TriggerPatterns {
         "exclusivo"
     )
 
+    /**
+     * Considera tela de corrida só quando: tem uma palavra-gatilho, tem um valor em R$,
+     * E tem pelo menos um trecho no formato "X min (Y km)" — isso evita falsos positivos
+     * em telas como "Radar de viagens" (bônus por região), que têm valores em R$ mas não
+     * têm o formato de trecho/perna de uma corrida real.
+     */
     fun pareceTelaDeCorrida(textoTela: String): Boolean {
         val textoLower = textoTela.lowercase()
         val temGatilho = PALAVRAS_GATILHO.any { textoLower.contains(it) }
         val temValor = VALOR_REGEX.containsMatchIn(textoTela)
-        return temGatilho && temValor
+        val temPerna = LEG_REGEX.containsMatchIn(textoTela)
+        return temGatilho && temValor && temPerna
     }
 
     private val VALOR_REGEX = Regex("""R\$\s?([0-9]{1,4}(?:[.,][0-9]{2})?)""")
