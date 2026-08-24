@@ -14,8 +14,6 @@ class RideAccessibilityService : AccessibilityService() {
     private val executor = Executors.newSingleThreadExecutor()
     private var ultimoTextoProcessado: String = ""
 
-    // Segunda camada de segurança: mesmo que o Android deixe passar eventos de
-    // outros apps (varia por fabricante), a gente ignora aqui no código também.
     private val pacotesPermitidos = setOf("com.ubercab.driver", "com.app99.driver")
 
     override fun onServiceConnected() {
@@ -38,13 +36,15 @@ class RideAccessibilityService : AccessibilityService() {
         if (texto == ultimoTextoProcessado || texto.isBlank()) return
         ultimoTextoProcessado = texto
 
-        val prefsDebug = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
-        prefsDebug.edit().putString(PREF_ULTIMO_TEXTO, texto).apply()
+        // DEBUG: só salva o texto quando ele de fato PARECE uma tela de corrida,
+        // pra não ser sobrescrito por lixo de transição de tela (troca de app etc).
+        if (TriggerPatterns.pareceTelaDeCorrida(texto)) {
+            val prefsDebug = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+            prefsDebug.edit().putString(PREF_ULTIMO_TEXTO, texto).apply()
 
-        if (!TriggerPatterns.pareceTelaDeCorrida(texto)) return
-
-        Log.d(TAG, "Tela de corrida detectada. Processando...")
-        processarTelaDeCorrida(texto)
+            Log.d(TAG, "Tela de corrida detectada. Processando...")
+            processarTelaDeCorrida(texto)
+        }
     }
 
     private fun coletarTexto(node: AccessibilityNodeInfo?, out: StringBuilder) {
