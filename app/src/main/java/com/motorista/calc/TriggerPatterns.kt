@@ -15,18 +15,27 @@ object TriggerPatterns {
         "exclusivo"
     )
 
+    // Nomes de categoria de corrida — mais um sinal de que é uma tela de solicitação real.
+    val CATEGORIAS = listOf(
+        "uberx", "uber x", "black", "comfort", "confort", "conforto",
+        "pop", "business", "99pop", "99top", "99comfort", "99moto"
+    )
+
     /**
-     * Considera tela de corrida só quando: tem uma palavra-gatilho, tem um valor em R$,
-     * E tem pelo menos um trecho no formato "X min (Y km)" — isso evita falsos positivos
-     * em telas como "Radar de viagens" (bônus por região), que têm valores em R$ mas não
-     * têm o formato de trecho/perna de uma corrida real.
+     * Considera tela de corrida real quando:
+     * - tem um valor em R$
+     * - tem PELO MENOS DUAS "pernas" (formato "X min (Y km)") — uma pra embarque,
+     *   outra pra desembarque. Telas de bônus/radar não têm duas pernas assim.
+     * - E tem uma palavra-gatilho OU um nome de categoria (Uber X, Black, Comfort...)
      */
     fun pareceTelaDeCorrida(textoTela: String): Boolean {
         val textoLower = textoTela.lowercase()
-        val temGatilho = PALAVRAS_GATILHO.any { textoLower.contains(it) }
         val temValor = VALOR_REGEX.containsMatchIn(textoTela)
-        val temPerna = LEG_REGEX.containsMatchIn(textoTela)
-        return temGatilho && temValor && temPerna
+        val quantidadePernas = LEG_REGEX.findAll(textoTela).count()
+        val temDuasPernas = quantidadePernas >= 2
+        val temGatilho = PALAVRAS_GATILHO.any { textoLower.contains(it) }
+        val temCategoria = CATEGORIAS.any { textoLower.contains(it) }
+        return temValor && temDuasPernas && (temGatilho || temCategoria)
     }
 
     private val VALOR_REGEX = Regex("""R\$\s?([0-9]{1,4}(?:[.,][0-9]{2})?)""")
