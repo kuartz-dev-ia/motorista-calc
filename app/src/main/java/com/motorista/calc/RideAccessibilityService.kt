@@ -1,3 +1,4 @@
+
 package com.motorista.calc
 
 import android.accessibilityservice.AccessibilityService
@@ -36,15 +37,25 @@ class RideAccessibilityService : AccessibilityService() {
         if (texto == ultimoTextoProcessado || texto.isBlank()) return
         ultimoTextoProcessado = texto
 
-        // DEBUG: só salva o texto quando ele de fato PARECE uma tela de corrida,
-        // pra não ser sobrescrito por lixo de transição de tela (troca de app etc).
-        if (TriggerPatterns.pareceTelaDeCorrida(texto)) {
-            val prefsDebug = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
-            prefsDebug.edit().putString(PREF_ULTIMO_TEXTO, texto).apply()
+        // DEBUG: registra TODA tela capturada do Uber/99 num histórico (não só as que
+        // "parecem corrida"), pra dar pra diagnosticar mesmo quando o teste de
+        // reconhecimento estiver rejeitando a tela real por engano.
+        registrarDebug(texto)
 
-            Log.d(TAG, "Tela de corrida detectada. Processando...")
-            processarTelaDeCorrida(texto)
-        }
+        if (!TriggerPatterns.pareceTelaDeCorrida(texto)) return
+
+        Log.d(TAG, "Tela de corrida detectada. Processando...")
+        processarTelaDeCorrida(texto)
+    }
+
+    /** Mantém um histórico das últimas capturas (mais recente primeiro), pra debug. */
+    private fun registrarDebug(texto: String) {
+        val prefsDebug = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+        val hora = java.text.SimpleDateFormat("HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date())
+        val entradaNova = "=== $hora ===\n$texto\n\n"
+        val logAntigo = prefsDebug.getString(PREF_ULTIMO_TEXTO, "") ?: ""
+        val novoLog = (entradaNova + logAntigo).take(8000)
+        prefsDebug.edit().putString(PREF_ULTIMO_TEXTO, novoLog).apply()
     }
 
     private fun coletarTexto(node: AccessibilityNodeInfo?, out: StringBuilder) {
@@ -81,7 +92,6 @@ class RideAccessibilityService : AccessibilityService() {
 
         val prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
 
-        // Custos fixos mensais rateados por km rodado, pra descontar do lucro líquido.
         val financiamento = prefs.getFloat(PREF_FINANCIAMENTO, 0f).toDouble()
         val seguro = prefs.getFloat(PREF_SEGURO, 0f).toDouble()
         val ipvaAnual = prefs.getFloat(PREF_IPVA, 0f).toDouble()
