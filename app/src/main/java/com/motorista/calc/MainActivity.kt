@@ -33,8 +33,6 @@ class MainActivity : AppCompatActivity() {
         val edtKmMes = findViewById<android.widget.EditText>(R.id.edtKmMes)
         val btnSalvar = findViewById<android.widget.Button>(R.id.btnSalvar)
         val txtStatus = findViewById<android.widget.TextView>(R.id.txtStatus)
-        val btnVerDebug = findViewById<android.widget.Button>(R.id.btnVerDebug)
-        val txtDebug = findViewById<android.widget.TextView>(R.id.txtDebug)
 
         edtMinKm.setText(prefs.getFloat(RideAccessibilityService.PREF_MIN_KM, 1.50f).toString())
         edtMinHora.setText(prefs.getFloat(RideAccessibilityService.PREF_MIN_HORA, 25.0f).toString())
@@ -78,17 +76,21 @@ class MainActivity : AppCompatActivity() {
             android.widget.Toast.makeText(this, "Configurações salvas", android.widget.Toast.LENGTH_SHORT).show()
         }
 
-        btnVerDebug.setOnClickListener {
-            val texto = prefs.getString(RideAccessibilityService.PREF_ULTIMO_TEXTO, null)
-            txtDebug.text = texto ?: "Nenhum texto capturado ainda. Abra o app de corrida e deixe uma tela de solicitação aparecer, depois volte aqui e toque de novo."
-        }
-
         atualizarStatus(txtStatus)
+        atualizarDebug()
     }
 
     override fun onResume() {
         super.onResume()
         findViewById<android.widget.TextView>(R.id.txtStatus)?.let { atualizarStatus(it) }
+        atualizarDebug()
+    }
+
+    /** Mostra o último texto capturado automaticamente, sem precisar de botão. */
+    private fun atualizarDebug() {
+        val txtDebug = findViewById<android.widget.TextView>(R.id.txtDebug) ?: return
+        val texto = prefs.getString(RideAccessibilityService.PREF_ULTIMO_TEXTO, null)
+        txtDebug.text = texto ?: "Nenhum texto capturado ainda."
     }
 
     private fun atualizarStatus(txtStatus: android.widget.TextView) {
