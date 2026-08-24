@@ -25,7 +25,8 @@ data class RideResult(
     val valorPorHoraCorrida: Double?,     // considerando só o tempo da corrida
     val valorPorHoraEfetivo: Double?,     // considerando também o deslocamento até o passageiro
     val custoCombustivelEstimado: Double?,
-    val lucroLiquidoEstimado: Double?,
+    val custoFixoEstimado: Double?,       // parcela de financiamento/seguro/IPVA/etc rateada nessa corrida
+    val lucroLiquidoEstimado: Double?,    // valor da corrida - combustível - custos fixos rateados
     val valeAPena: Boolean,
     val motivo: String
 )
@@ -33,15 +34,17 @@ data class RideResult(
 /**
  * Motor de cálculo. Os parâmetros vêm das preferências do usuário (SharedPreferences).
  *
- * Importante sobre R$/hora: usamos o tempo EFETIVO (deslocamento até o passageiro + corrida)
- * como métrica principal de decisão, porque é o tempo real que o motorista fica indisponível
- * para outras corridas — não só o tempo pago da corrida.
+ * custoFixoPorKm: soma de todos os custos fixos mensais (financiamento, seguro, IPVA/12,
+ * licenciamento/12, manutenção programada, contas pessoais) dividida pelos km rodados por
+ * mês. Isso dá quanto de custo fixo "pesa" em cada km rodado, e é descontado do valor da
+ * corrida junto com o combustível pra chegar no ganho líquido real.
  */
 class CalculationEngine(
     private val precoCombustivelPorLitro: Double = 6.10,
     private val consumoKmPorLitro: Double = 12.0,
     private val minimoValorPorKm: Double = 1.50,
-    private val minimoValorPorHora: Double = 25.0
+    private val minimoValorPorHora: Double = 25.0,
+    private val custoFixoPorKm: Double = 0.0
 ) {
 
     fun calcular(ride: RideInfo): RideResult {
@@ -66,8 +69,12 @@ class CalculationEngine(
             (distanciaTotalRodada / consumoKmPorLitro) * precoCombustivelPorLitro
         } else null
 
+        val custoFixoEstimado = if (custoFixoPorKm > 0 && distanciaTotalRodada > 0) {
+            custoFixoPorKm * distanciaTotalRodada
+        } else null
+
         val lucroLiquido = if (valor != null && custoCombustivel != null) {
-            valor - custoCombustivel
+            valor - custoCombustivel - (custoFixoEstimado ?: 0.0)
         } else null
 
         val motivos = mutableListOf<String>()
@@ -82,6 +89,10 @@ class CalculationEngine(
             valeAPena = false
             motivos.add("R$/km abaixo do mínimo (%.2f < %.2f)".format(valorPorKmCalculado, minimoValorPorKm))
         }
+        if (lucroLiquido != null && lucroLiquido <= 0) {
+            valeAPena = false
+            motivos.add("Ganho líquido seria zero ou negativo após combustível e custos fixos (R$ %.2f)".format(lucroLiquido))
+        }
         if (valorPorKmCalculado == null && referenciaHora == null) {
             motivos.add("Dados insuficientes para avaliar")
         }
@@ -95,6 +106,7 @@ class CalculationEngine(
             valorPorHoraCorrida = valorPorHoraCorrida,
             valorPorHoraEfetivo = valorPorHoraEfetivo,
             custoCombustivelEstimado = custoCombustivel,
+            custoFixoEstimado = custoFixoEstimado,
             lucroLiquidoEstimado = lucroLiquido,
             valeAPena = valeAPena,
             motivo = motivos.joinToString("; ")
