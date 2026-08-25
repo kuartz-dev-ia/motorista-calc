@@ -2,7 +2,7 @@ package com.motorista.calc
 
 import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.AccessibilityServiceInfo
-import android.accessibilityservice.AccessibilityWindowInfo
+import android.view.accessibility.AccessibilityWindowInfo
 import android.content.Intent
 import android.os.Build
 import android.os.Handler
