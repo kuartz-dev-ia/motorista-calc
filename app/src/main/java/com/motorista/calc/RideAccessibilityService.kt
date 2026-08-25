@@ -1,8 +1,8 @@
-
 package com.motorista.calc
 
 import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.AccessibilityServiceInfo
+import android.accessibilityservice.AccessibilityWindowInfo
 import android.content.Intent
 import android.os.Build
 import android.os.Handler
@@ -17,8 +17,8 @@ class RideAccessibilityService : AccessibilityService() {
 
     private val executor = Executors.newSingleThreadExecutor()
     private var ultimoTextoProcessado: String = ""
+    private var ultimoResumo: String = ""
 
-    // MODO DIAGNÓSTICO: aceitando qualquer pacote pra registrar de onde vem o popup.
     private val pacotesDoApp = setOf("com.ubercab.driver", "com.app99.driver")
 
     private val handler = Handler(Looper.getMainLooper())
@@ -36,47 +36,74 @@ class RideAccessibilityService : AccessibilityService() {
             flags = flags or AccessibilityServiceInfo.FLAG_RETRIEVE_INTERACTIVE_WINDOWS
         }
         Log.d(TAG, "Serviço de acessibilidade conectado (modo diagnóstico + polling)")
-        // Além de reagir a eventos, varre as janelas ativamente a cada 500ms.
-        // Isso garante que a gente pega o popup mesmo se ele não disparar
-        // nenhum evento de acessibilidade no momento em que aparece.
         handler.post(pollRunnable)
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
-        // A varredura já acontece via polling; aqui só forçamos uma checagem extra
-        // imediata quando algum evento chega, pra reduzir a latência.
         varrerJanelas()
+    }
+
+    private fun tipoDeJanela(tipo: Int): String = when (tipo) {
+        AccessibilityWindowInfo.TYPE_APPLICATION -> "APP"
+        AccessibilityWindowInfo.TYPE_INPUT_METHOD -> "TECLADO"
+        AccessibilityWindowInfo.TYPE_SYSTEM -> "SISTEMA"
+        AccessibilityWindowInfo.TYPE_ACCESSIBILITY_OVERLAY -> "OVERLAY_ACESSIBILIDADE"
+        AccessibilityWindowInfo.TYPE_SPLIT_SCREEN_DIVIDER -> "DIVISOR"
+        AccessibilityWindowInfo.TYPE_MAGNIFICATION_OVERLAY -> "MAGNIFICADOR"
+        else -> "TIPO_$tipo"
     }
 
     private fun varrerJanelas() {
         val janelasVisiveis = windows ?: return
 
+        // RESUMO: lista TODAS as janelas visíveis com tipo, pacote e quantidade de
+        // caracteres de texto (mesmo zero), pra diagnosticar se o popup aparece
+        // como janela vazia ou nem aparece na lista.
+        val resumoPartes = mutableListOf<String>()
+
         for (janela in janelasVisiveis) {
-            val root = janela.root ?: continue
-            val pacoteDaJanela = root.packageName?.toString() ?: "desconhecido"
+            val root = janela.root
+            val pacoteDaJanela = root?.packageName?.toString() ?: "sem-root"
+            val tipo = tipoDeJanela(janela.type)
 
             val textoTela = StringBuilder()
-            coletarTexto(root, textoTela)
+            if (root != null) coletarTexto(root, textoTela)
             val texto = textoTela.toString()
+
+            resumoPartes.add("$tipo/$pacoteDaJanela(${texto.length}c)")
 
             if (texto.isBlank()) continue
 
             val chave = "$pacoteDaJanela::$texto"
-            if (chave == ultimoTextoProcessado) continue
-            ultimoTextoProcessado = chave
-
-            if (texto.contains("R$")) {
-                registrarDebug(pacoteDaJanela, texto)
+            if (chave != ultimoTextoProcessado) {
+                ultimoTextoProcessado = chave
+                if (texto.contains("R$")) {
+                    registrarDebug(pacoteDaJanela, texto)
+                }
+                if (pacoteDaJanela in pacotesDoApp && TriggerPatterns.pareceTelaDeCorrida(texto)) {
+                    Log.d(TAG, "Tela de corrida detectada. Processando...")
+                    processarTelaDeCorrida(texto)
+                }
             }
+        }
 
-            if (pacoteDaJanela in pacotesDoApp && TriggerPatterns.pareceTelaDeCorrida(texto)) {
-                Log.d(TAG, "Tela de corrida detectada. Processando...")
-                processarTelaDeCorrida(texto)
-            }
+        val resumo = resumoPartes.joinToString(" | ")
+        if (resumo != ultimoResumo) {
+            ultimoResumo = resumo
+            registrarResumo(resumo)
         }
     }
 
-    /** Mantém um histórico das últimas capturas (mais recente primeiro), com o pacote de origem, pra debug. */
+    private fun registrarResumo(resumo: String) {
+        val prefsDebug = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+        val hora = java.text.SimpleDateFormat("HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date())
+        val entradaNova = "--- $hora [RESUMO JANELAS] ---\n$resumo\n\n"
+        val logAntigo = prefsDebug.getString(PREF_RESUMO_JANELAS, "") ?: ""
+        val novoLog = (entradaNova + logAntigo).take(6000)
+        prefsDebug.edit().putString(PREF_RESUMO_JANELAS, novoLog).apply()
+    }
+
+    /** Mantém um histórico das últimas capturas com texto (mais recente primeiro), com o pacote de origem, pra debug. */
     private fun registrarDebug(pacote: String, texto: String) {
         val prefsDebug = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
         val hora = java.text.SimpleDateFormat("HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date())
@@ -196,6 +223,7 @@ class RideAccessibilityService : AccessibilityService() {
         const val PREF_MIN_HORA = "minimo_valor_hora"
         const val PREF_SALVAR_PRINT = "salvar_print"
         const val PREF_ULTIMO_TEXTO = "ultimo_texto_capturado"
+        const val PREF_RESUMO_JANELAS = "resumo_janelas"
         const val PREF_FINANCIAMENTO = "financiamento_mensal"
         const val PREF_SEGURO = "seguro_mensal"
         const val PREF_IPVA = "ipva_anual"
