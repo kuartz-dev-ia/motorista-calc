@@ -1,9 +1,12 @@
+
 package com.motorista.calc
 
 import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.AccessibilityServiceInfo
 import android.content.Intent
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
@@ -15,21 +18,37 @@ class RideAccessibilityService : AccessibilityService() {
     private val executor = Executors.newSingleThreadExecutor()
     private var ultimoTextoProcessado: String = ""
 
-    // MODO DIAGNÓSTICO: temporariamente aceitando qualquer pacote, pra descobrir de
-    // qual pacote vem o popup de nova corrida (pode não ser com.ubercab.driver).
+    // MODO DIAGNÓSTICO: aceitando qualquer pacote pra registrar de onde vem o popup.
     private val pacotesDoApp = setOf("com.ubercab.driver", "com.app99.driver")
+
+    private val handler = Handler(Looper.getMainLooper())
+    private val pollingIntervalMs = 500L
+    private val pollRunnable = object : Runnable {
+        override fun run() {
+            varrerJanelas()
+            handler.postDelayed(this, pollingIntervalMs)
+        }
+    }
 
     override fun onServiceConnected() {
         super.onServiceConnected()
         serviceInfo = serviceInfo?.apply {
             flags = flags or AccessibilityServiceInfo.FLAG_RETRIEVE_INTERACTIVE_WINDOWS
         }
-        Log.d(TAG, "Serviço de acessibilidade conectado (modo diagnóstico)")
+        Log.d(TAG, "Serviço de acessibilidade conectado (modo diagnóstico + polling)")
+        // Além de reagir a eventos, varre as janelas ativamente a cada 500ms.
+        // Isso garante que a gente pega o popup mesmo se ele não disparar
+        // nenhum evento de acessibilidade no momento em que aparece.
+        handler.post(pollRunnable)
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
-        event ?: return
+        // A varredura já acontece via polling; aqui só forçamos uma checagem extra
+        // imediata quando algum evento chega, pra reduzir a latência.
+        varrerJanelas()
+    }
 
+    private fun varrerJanelas() {
         val janelasVisiveis = windows ?: return
 
         for (janela in janelasVisiveis) {
@@ -46,8 +65,6 @@ class RideAccessibilityService : AccessibilityService() {
             if (chave == ultimoTextoProcessado) continue
             ultimoTextoProcessado = chave
 
-            // Em modo diagnóstico, registra tudo — mas só o que tiver R$ no texto,
-            // pra não lotar o log com lixo de outros apps (teclado, barra de notificação etc).
             if (texto.contains("R$")) {
                 registrarDebug(pacoteDaJanela, texto)
             }
@@ -163,6 +180,11 @@ class RideAccessibilityService : AccessibilityService() {
 
     override fun onInterrupt() {
         Log.w(TAG, "Serviço de acessibilidade interrompido")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        handler.removeCallbacks(pollRunnable)
     }
 
     companion object {
