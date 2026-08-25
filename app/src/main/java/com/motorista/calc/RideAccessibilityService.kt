@@ -15,53 +15,55 @@ class RideAccessibilityService : AccessibilityService() {
     private val executor = Executors.newSingleThreadExecutor()
     private var ultimoTextoProcessado: String = ""
 
-    private val pacotesPermitidos = setOf("com.ubercab.driver", "com.app99.driver")
+    // MODO DIAGNÓSTICO: temporariamente aceitando qualquer pacote, pra descobrir de
+    // qual pacote vem o popup de nova corrida (pode não ser com.ubercab.driver).
+    private val pacotesDoApp = setOf("com.ubercab.driver", "com.app99.driver")
 
     override fun onServiceConnected() {
         super.onServiceConnected()
-        // Garante que o serviço também consiga ler janelas flutuantes (overlays),
-        // não só a janela que está em foco. É isso que faltava pra pegar a tela
-        // de "nova corrida" do Uber, que aparece como um popup flutuante por cima.
         serviceInfo = serviceInfo?.apply {
             flags = flags or AccessibilityServiceInfo.FLAG_RETRIEVE_INTERACTIVE_WINDOWS
         }
-        Log.d(TAG, "Serviço de acessibilidade conectado")
+        Log.d(TAG, "Serviço de acessibilidade conectado (modo diagnóstico)")
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
         event ?: return
 
-        // Varre TODAS as janelas visíveis na tela (não só a que está em foco),
-        // porque a tela de nova corrida do Uber/99 aparece como popup flutuante
-        // por cima de outros apps.
         val janelasVisiveis = windows ?: return
 
         for (janela in janelasVisiveis) {
             val root = janela.root ?: continue
-            val pacoteDaJanela = root.packageName?.toString()
-            if (pacoteDaJanela !in pacotesPermitidos) continue
+            val pacoteDaJanela = root.packageName?.toString() ?: "desconhecido"
 
             val textoTela = StringBuilder()
             coletarTexto(root, textoTela)
             val texto = textoTela.toString()
 
-            if (texto.isBlank() || texto == ultimoTextoProcessado) continue
-            ultimoTextoProcessado = texto
+            if (texto.isBlank()) continue
 
-            registrarDebug(texto)
+            val chave = "$pacoteDaJanela::$texto"
+            if (chave == ultimoTextoProcessado) continue
+            ultimoTextoProcessado = chave
 
-            if (TriggerPatterns.pareceTelaDeCorrida(texto)) {
+            // Em modo diagnóstico, registra tudo — mas só o que tiver R$ no texto,
+            // pra não lotar o log com lixo de outros apps (teclado, barra de notificação etc).
+            if (texto.contains("R$")) {
+                registrarDebug(pacoteDaJanela, texto)
+            }
+
+            if (pacoteDaJanela in pacotesDoApp && TriggerPatterns.pareceTelaDeCorrida(texto)) {
                 Log.d(TAG, "Tela de corrida detectada. Processando...")
                 processarTelaDeCorrida(texto)
             }
         }
     }
 
-    /** Mantém um histórico das últimas capturas (mais recente primeiro), pra debug. */
-    private fun registrarDebug(texto: String) {
+    /** Mantém um histórico das últimas capturas (mais recente primeiro), com o pacote de origem, pra debug. */
+    private fun registrarDebug(pacote: String, texto: String) {
         val prefsDebug = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
         val hora = java.text.SimpleDateFormat("HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date())
-        val entradaNova = "=== $hora ===\n$texto\n\n"
+        val entradaNova = "=== $hora [$pacote] ===\n$texto\n\n"
         val logAntigo = prefsDebug.getString(PREF_ULTIMO_TEXTO, "") ?: ""
         val novoLog = (entradaNova + logAntigo).take(8000)
         prefsDebug.edit().putString(PREF_ULTIMO_TEXTO, novoLog).apply()
