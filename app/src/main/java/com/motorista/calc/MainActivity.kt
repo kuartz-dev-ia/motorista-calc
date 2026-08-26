@@ -89,14 +89,8 @@ class MainActivity : AppCompatActivity() {
     /** Mostra o último texto capturado automaticamente, sem precisar de botão. */
     private fun atualizarDebug() {
         val txtDebug = findViewById<android.widget.TextView>(R.id.txtDebug) ?: return
-        val textoComRs = prefs.getString(RideAccessibilityService.PREF_ULTIMO_TEXTO, null)
-        val resumoJanelas = prefs.getString(RideAccessibilityService.PREF_RESUMO_JANELAS, null)
-        txtDebug.text = buildString {
-            append("### RESUMO DE JANELAS ###\n")
-            append(resumoJanelas ?: "Nenhum resumo ainda.")
-            append("\n\n### TEXTOS COM R$ ###\n")
-            append(textoComRs ?: "Nenhum texto com R$ capturado ainda.")
-        }
+        val texto = prefs.getString(RideAccessibilityService.PREF_ULTIMO_TEXTO, null)
+        txtDebug.text = texto ?: "Nenhum texto capturado ainda."
     }
 
     private fun atualizarStatus(txtStatus: android.widget.TextView) {
