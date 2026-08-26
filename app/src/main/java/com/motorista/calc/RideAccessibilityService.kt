@@ -2,67 +2,114 @@ package com.motorista.calc
 
 import android.accessibilityservice.AccessibilityService
 import android.content.Intent
+import android.graphics.Bitmap
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.accessibility.AccessibilityEvent
-import android.view.accessibility.AccessibilityNodeInfo
 import androidx.annotation.RequiresApi
+import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.text.TextRecognition
+import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import java.util.concurrent.Executors
 
 class RideAccessibilityService : AccessibilityService() {
 
     private val executor = Executors.newSingleThreadExecutor()
-    private var ultimoTextoProcessado: String = ""
+    private val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
 
-    private val pacotesPermitidos = setOf("com.ubercab.driver", "com.app99.driver")
+    private var ultimoTextoProcessado: String = ""
+    private var capturandoNoMomento = false
+
+    private val handler = Handler(Looper.getMainLooper())
+    private val pollingIntervalMs = 1500L
+    private val pollRunnable = object : Runnable {
+        override fun run() {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                tentarCapturarEOcr()
+            }
+            handler.postDelayed(this, pollingIntervalMs)
+        }
+    }
 
     override fun onServiceConnected() {
         super.onServiceConnected()
-        Log.d(TAG, "Serviço de acessibilidade conectado")
+        Log.d(TAG, "Serviço de acessibilidade conectado (modo print + OCR)")
+        handler.post(pollRunnable)
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
-        event ?: return
+        // O reconhecimento agora roda via print + OCR em polling (função abaixo),
+        // não depende mais deste evento. Método mantido só porque a classe exige.
+    }
 
-        val pacoteDoEvento = event.packageName?.toString()
-        if (pacoteDoEvento !in pacotesPermitidos) return
+    @RequiresApi(Build.VERSION_CODES.R)
+    private fun tentarCapturarEOcr() {
+        if (capturandoNoMomento) return
+        capturandoNoMomento = true
 
-        val rootNode = event.source?.window?.root ?: rootInActiveWindow ?: return
+        takeScreenshot(
+            android.view.Display.DEFAULT_DISPLAY,
+            executor,
+            object : TakeScreenshotCallback {
+                override fun onSuccess(result: ScreenshotResult) {
+                    try {
+                        val bitmapHardware = Bitmap.wrapHardwareBuffer(result.hardwareBuffer, result.colorSpace)
+                        val bitmap = bitmapHardware?.copy(Bitmap.Config.ARGB_8888, false)
+                        result.hardwareBuffer.close()
 
-        val textoTela = StringBuilder()
-        coletarTexto(rootNode, textoTela)
-        val texto = textoTela.toString()
+                        if (bitmap == null) {
+                            capturandoNoMomento = false
+                            return
+                        }
 
-        if (texto == ultimoTextoProcessado || texto.isBlank()) return
+                        val inputImage = InputImage.fromBitmap(bitmap, 0)
+                        recognizer.process(inputImage)
+                            .addOnSuccessListener { visionText ->
+                                processarTextoOcr(visionText.text)
+                                capturandoNoMomento = false
+                            }
+                            .addOnFailureListener { erro ->
+                                Log.e(TAG, "Falha no OCR: ${erro.message}")
+                                capturandoNoMomento = false
+                            }
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Erro processando print: ${e.message}")
+                        capturandoNoMomento = false
+                    }
+                }
+
+                override fun onFailure(errorCode: Int) {
+                    // Código comum: pedimos print rápido demais (limite do sistema).
+                    // Não é grave, só espera o próximo ciclo.
+                    capturandoNoMomento = false
+                }
+            }
+        )
+    }
+
+    private fun processarTextoOcr(texto: String) {
+        if (texto.isBlank() || texto == ultimoTextoProcessado) return
         ultimoTextoProcessado = texto
 
-        // DEBUG: registra todo texto com R$ pra diagnosticar, mesmo que não pareça corrida.
         if (texto.contains("R$")) {
             registrarDebug(texto)
         }
 
         if (!TriggerPatterns.pareceTelaDeCorrida(texto)) return
 
-        Log.d(TAG, "Tela de corrida detectada. Processando...")
+        Log.d(TAG, "Tela de corrida detectada via OCR. Processando...")
         processarTelaDeCorrida(texto)
     }
 
     private fun registrarDebug(texto: String) {
         val prefsDebug = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
         val hora = java.text.SimpleDateFormat("HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date())
-        val entradaNova = "=== $hora ===\n$texto\n\n"
+        val entradaNova = "=== $hora (OCR) ===\n$texto\n\n"
         val logAntigo = prefsDebug.getString(PREF_ULTIMO_TEXTO, "") ?: ""
         val novoLog = (entradaNova + logAntigo).take(8000)
         prefsDebug.edit().putString(PREF_ULTIMO_TEXTO, novoLog).apply()
-    }
-
-    private fun coletarTexto(node: AccessibilityNodeInfo?, out: StringBuilder) {
-        node ?: return
-        node.text?.let { if (it.isNotBlank()) out.append(it).append(" | ") }
-        node.contentDescription?.let { if (it.isNotBlank()) out.append(it).append(" | ") }
-        for (i in 0 until node.childCount) {
-            coletarTexto(node.getChild(i), out)
-        }
     }
 
     private fun processarTelaDeCorrida(texto: String) {
@@ -114,10 +161,6 @@ class RideAccessibilityService : AccessibilityService() {
         Log.d(TAG, "Ride: $ride")
         Log.d(TAG, "Resultado: $resultado")
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && prefs.getBoolean(PREF_SALVAR_PRINT, false)) {
-            capturarPrint()
-        }
-
         val intent = Intent(this, OverlayService::class.java).apply {
             putExtra(OverlayService.EXTRA_VALOR_KM_CALC, resultado.valorPorKmCalculado)
             putExtra(OverlayService.EXTRA_VALOR_KM_EXIBIDO, resultado.valorPorKmExibido)
@@ -131,25 +174,13 @@ class RideAccessibilityService : AccessibilityService() {
         startService(intent)
     }
 
-    @RequiresApi(Build.VERSION_CODES.R)
-    private fun capturarPrint() {
-        takeScreenshot(
-            android.view.Display.DEFAULT_DISPLAY,
-            executor,
-            object : TakeScreenshotCallback {
-                override fun onSuccess(result: ScreenshotResult) {
-                    Log.d(TAG, "Print capturado com sucesso")
-                }
-
-                override fun onFailure(errorCode: Int) {
-                    Log.e(TAG, "Falha ao capturar print: $errorCode")
-                }
-            }
-        )
-    }
-
     override fun onInterrupt() {
         Log.w(TAG, "Serviço de acessibilidade interrompido")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        handler.removeCallbacks(pollRunnable)
     }
 
     companion object {
