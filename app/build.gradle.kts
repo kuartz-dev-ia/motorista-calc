@@ -40,8 +40,7 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("com.google.android.material:material:1.12.0")
 
-    // OCR (ML Kit) removido por enquanto — não é usado na versão atual do parser,
-    // que lê o texto direto da árvore de acessibilidade. Se no futuro precisarmos
-    // ler texto de PRINTS (imagens), adicionamos de volta:
-    // implementation("com.google.mlkit:text-recognition:16.0.1")
+    // OCR on-device: lê texto a partir de PRINTS da tela (necessário porque a tela
+    // de nova corrida não expõe texto pra leitura direta via acessibilidade).
+    implementation("com.google.mlkit:text-recognition:16.0.1")
 }
