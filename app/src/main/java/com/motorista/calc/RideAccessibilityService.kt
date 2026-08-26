@@ -27,7 +27,7 @@ class RideAccessibilityService : AccessibilityService() {
         val pacoteDoEvento = event.packageName?.toString()
         if (pacoteDoEvento !in pacotesPermitidos) return
 
-        val rootNode = rootInActiveWindow ?: return
+        val rootNode = event.source?.window?.root ?: rootInActiveWindow ?: return
 
         val textoTela = StringBuilder()
         coletarTexto(rootNode, textoTela)
