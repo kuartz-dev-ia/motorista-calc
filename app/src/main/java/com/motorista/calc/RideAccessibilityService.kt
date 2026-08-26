@@ -17,7 +17,17 @@ import java.util.concurrent.Executors
 class RideAccessibilityService : AccessibilityService() {
 
     private val executor = Executors.newSingleThreadExecutor()
-    private val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
+
+    // Inicialização "preguiçosa" e protegida: só cria o cliente de OCR quando for
+    // usado de fato, e nunca deixa uma falha aqui derrubar o serviço inteiro.
+    private val recognizer by lazy {
+        try {
+            TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
+        } catch (e: Exception) {
+            Log.e(TAG, "Falha ao criar cliente de OCR: ${e.message}")
+            null
+        }
+    }
 
     private var ultimoTextoProcessado: String = ""
     private var capturandoNoMomento = false
@@ -26,67 +36,88 @@ class RideAccessibilityService : AccessibilityService() {
     private val pollingIntervalMs = 1500L
     private val pollRunnable = object : Runnable {
         override fun run() {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                tentarCapturarEOcr()
+            try {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    tentarCapturarEOcr()
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Erro no ciclo de captura: ${e.message}")
+                capturandoNoMomento = false
+            } finally {
+                handler.postDelayed(this, pollingIntervalMs)
             }
-            handler.postDelayed(this, pollingIntervalMs)
         }
     }
 
     override fun onServiceConnected() {
         super.onServiceConnected()
         Log.d(TAG, "Serviço de acessibilidade conectado (modo print + OCR)")
-        handler.post(pollRunnable)
+        try {
+            handler.post(pollRunnable)
+        } catch (e: Exception) {
+            Log.e(TAG, "Erro ao iniciar polling: ${e.message}")
+        }
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
-        // O reconhecimento agora roda via print + OCR em polling (função abaixo),
-        // não depende mais deste evento. Método mantido só porque a classe exige.
+        // O reconhecimento roda via print + OCR em polling (função abaixo), não
+        // depende deste evento. Método mantido só porque a classe exige.
     }
 
     @RequiresApi(Build.VERSION_CODES.R)
     private fun tentarCapturarEOcr() {
         if (capturandoNoMomento) return
+        val ocr = recognizer ?: return
         capturandoNoMomento = true
 
-        takeScreenshot(
-            android.view.Display.DEFAULT_DISPLAY,
-            executor,
-            object : TakeScreenshotCallback {
-                override fun onSuccess(result: ScreenshotResult) {
-                    try {
-                        val bitmapHardware = Bitmap.wrapHardwareBuffer(result.hardwareBuffer, result.colorSpace)
-                        val bitmap = bitmapHardware?.copy(Bitmap.Config.ARGB_8888, false)
-                        result.hardwareBuffer.close()
+        try {
+            takeScreenshot(
+                android.view.Display.DEFAULT_DISPLAY,
+                executor,
+                object : TakeScreenshotCallback {
+                    override fun onSuccess(result: ScreenshotResult) {
+                        try {
+                            val bitmapHardware = Bitmap.wrapHardwareBuffer(result.hardwareBuffer, result.colorSpace)
+                            val bitmap = bitmapHardware?.copy(Bitmap.Config.ARGB_8888, false)
+                            result.hardwareBuffer.close()
 
-                        if (bitmap == null) {
+                            if (bitmap == null) {
+                                capturandoNoMomento = false
+                                return
+                            }
+
+                            val inputImage = InputImage.fromBitmap(bitmap, 0)
+                            ocr.process(inputImage)
+                                .addOnSuccessListener { visionText ->
+                                    try {
+                                        processarTextoOcr(visionText.text)
+                                    } catch (e: Exception) {
+                                        Log.e(TAG, "Erro processando texto do OCR: ${e.message}")
+                                    } finally {
+                                        capturandoNoMomento = false
+                                    }
+                                }
+                                .addOnFailureListener { erro ->
+                                    Log.e(TAG, "Falha no OCR: ${erro.message}")
+                                    capturandoNoMomento = false
+                                }
+                        } catch (e: Exception) {
+                            Log.e(TAG, "Erro processando print: ${e.message}")
                             capturandoNoMomento = false
-                            return
                         }
+                    }
 
-                        val inputImage = InputImage.fromBitmap(bitmap, 0)
-                        recognizer.process(inputImage)
-                            .addOnSuccessListener { visionText ->
-                                processarTextoOcr(visionText.text)
-                                capturandoNoMomento = false
-                            }
-                            .addOnFailureListener { erro ->
-                                Log.e(TAG, "Falha no OCR: ${erro.message}")
-                                capturandoNoMomento = false
-                            }
-                    } catch (e: Exception) {
-                        Log.e(TAG, "Erro processando print: ${e.message}")
+                    override fun onFailure(errorCode: Int) {
+                        // Código comum: pedimos print rápido demais (limite do sistema).
+                        // Não é grave, só espera o próximo ciclo.
                         capturandoNoMomento = false
                     }
                 }
-
-                override fun onFailure(errorCode: Int) {
-                    // Código comum: pedimos print rápido demais (limite do sistema).
-                    // Não é grave, só espera o próximo ciclo.
-                    capturandoNoMomento = false
-                }
-            }
-        )
+            )
+        } catch (e: Exception) {
+            Log.e(TAG, "Erro ao pedir print: ${e.message}")
+            capturandoNoMomento = false
+        }
     }
 
     private fun processarTextoOcr(texto: String) {
@@ -104,12 +135,16 @@ class RideAccessibilityService : AccessibilityService() {
     }
 
     private fun registrarDebug(texto: String) {
-        val prefsDebug = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
-        val hora = java.text.SimpleDateFormat("HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date())
-        val entradaNova = "=== $hora (OCR) ===\n$texto\n\n"
-        val logAntigo = prefsDebug.getString(PREF_ULTIMO_TEXTO, "") ?: ""
-        val novoLog = (entradaNova + logAntigo).take(8000)
-        prefsDebug.edit().putString(PREF_ULTIMO_TEXTO, novoLog).apply()
+        try {
+            val prefsDebug = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+            val hora = java.text.SimpleDateFormat("HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date())
+            val entradaNova = "=== $hora (OCR) ===\n$texto\n\n"
+            val logAntigo = prefsDebug.getString(PREF_ULTIMO_TEXTO, "") ?: ""
+            val novoLog = (entradaNova + logAntigo).take(8000)
+            prefsDebug.edit().putString(PREF_ULTIMO_TEXTO, novoLog).apply()
+        } catch (e: Exception) {
+            Log.e(TAG, "Erro salvando debug: ${e.message}")
+        }
     }
 
     private fun processarTelaDeCorrida(texto: String) {
