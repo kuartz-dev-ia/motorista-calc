@@ -1,12 +1,9 @@
+
 package com.motorista.calc
 
 import android.accessibilityservice.AccessibilityService
-import android.accessibilityservice.AccessibilityServiceInfo
-import android.view.accessibility.AccessibilityWindowInfo
 import android.content.Intent
 import android.os.Build
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
@@ -17,97 +14,44 @@ class RideAccessibilityService : AccessibilityService() {
 
     private val executor = Executors.newSingleThreadExecutor()
     private var ultimoTextoProcessado: String = ""
-    private var ultimoResumo: String = ""
 
-    private val pacotesDoApp = setOf("com.ubercab.driver", "com.app99.driver")
-
-    private val handler = Handler(Looper.getMainLooper())
-    private val pollingIntervalMs = 500L
-    private val pollRunnable = object : Runnable {
-        override fun run() {
-            varrerJanelas()
-            handler.postDelayed(this, pollingIntervalMs)
-        }
-    }
+    private val pacotesPermitidos = setOf("com.ubercab.driver", "com.app99.driver")
 
     override fun onServiceConnected() {
         super.onServiceConnected()
-        serviceInfo = serviceInfo?.apply {
-            flags = flags or AccessibilityServiceInfo.FLAG_RETRIEVE_INTERACTIVE_WINDOWS
-        }
-        Log.d(TAG, "Serviço de acessibilidade conectado (modo diagnóstico + polling)")
-        handler.post(pollRunnable)
+        Log.d(TAG, "Serviço de acessibilidade conectado")
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
-        varrerJanelas()
-    }
+        event ?: return
 
-    private fun tipoDeJanela(tipo: Int): String = when (tipo) {
-        AccessibilityWindowInfo.TYPE_APPLICATION -> "APP"
-        AccessibilityWindowInfo.TYPE_INPUT_METHOD -> "TECLADO"
-        AccessibilityWindowInfo.TYPE_SYSTEM -> "SISTEMA"
-        AccessibilityWindowInfo.TYPE_ACCESSIBILITY_OVERLAY -> "OVERLAY_ACESSIBILIDADE"
-        AccessibilityWindowInfo.TYPE_SPLIT_SCREEN_DIVIDER -> "DIVISOR"
-        AccessibilityWindowInfo.TYPE_MAGNIFICATION_OVERLAY -> "MAGNIFICADOR"
-        else -> "TIPO_$tipo"
-    }
+        val pacoteDoEvento = event.packageName?.toString()
+        if (pacoteDoEvento !in pacotesPermitidos) return
 
-    private fun varrerJanelas() {
-        val janelasVisiveis = windows ?: return
+        val rootNode = rootInActiveWindow ?: return
 
-        // RESUMO: lista TODAS as janelas visíveis com tipo, pacote e quantidade de
-        // caracteres de texto (mesmo zero), pra diagnosticar se o popup aparece
-        // como janela vazia ou nem aparece na lista.
-        val resumoPartes = mutableListOf<String>()
+        val textoTela = StringBuilder()
+        coletarTexto(rootNode, textoTela)
+        val texto = textoTela.toString()
 
-        for (janela in janelasVisiveis) {
-            val root = janela.root
-            val pacoteDaJanela = root?.packageName?.toString() ?: "sem-root"
-            val tipo = tipoDeJanela(janela.type)
+        if (texto == ultimoTextoProcessado || texto.isBlank()) return
+        ultimoTextoProcessado = texto
 
-            val textoTela = StringBuilder()
-            if (root != null) coletarTexto(root, textoTela)
-            val texto = textoTela.toString()
-
-            resumoPartes.add("$tipo/$pacoteDaJanela(${texto.length}c)")
-
-            if (texto.isBlank()) continue
-
-            val chave = "$pacoteDaJanela::$texto"
-            if (chave != ultimoTextoProcessado) {
-                ultimoTextoProcessado = chave
-                if (texto.contains("R$")) {
-                    registrarDebug(pacoteDaJanela, texto)
-                }
-                if (pacoteDaJanela in pacotesDoApp && TriggerPatterns.pareceTelaDeCorrida(texto)) {
-                    Log.d(TAG, "Tela de corrida detectada. Processando...")
-                    processarTelaDeCorrida(texto)
-                }
-            }
+        // DEBUG: registra todo texto com R$ pra diagnosticar, mesmo que não pareça corrida.
+        if (texto.contains("R$")) {
+            registrarDebug(texto)
         }
 
-        val resumo = resumoPartes.joinToString(" | ")
-        if (resumo != ultimoResumo) {
-            ultimoResumo = resumo
-            registrarResumo(resumo)
-        }
+        if (!TriggerPatterns.pareceTelaDeCorrida(texto)) return
+
+        Log.d(TAG, "Tela de corrida detectada. Processando...")
+        processarTelaDeCorrida(texto)
     }
 
-    private fun registrarResumo(resumo: String) {
+    private fun registrarDebug(texto: String) {
         val prefsDebug = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
         val hora = java.text.SimpleDateFormat("HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date())
-        val entradaNova = "--- $hora [RESUMO JANELAS] ---\n$resumo\n\n"
-        val logAntigo = prefsDebug.getString(PREF_RESUMO_JANELAS, "") ?: ""
-        val novoLog = (entradaNova + logAntigo).take(6000)
-        prefsDebug.edit().putString(PREF_RESUMO_JANELAS, novoLog).apply()
-    }
-
-    /** Mantém um histórico das últimas capturas com texto (mais recente primeiro), com o pacote de origem, pra debug. */
-    private fun registrarDebug(pacote: String, texto: String) {
-        val prefsDebug = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
-        val hora = java.text.SimpleDateFormat("HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date())
-        val entradaNova = "=== $hora [$pacote] ===\n$texto\n\n"
+        val entradaNova = "=== $hora ===\n$texto\n\n"
         val logAntigo = prefsDebug.getString(PREF_ULTIMO_TEXTO, "") ?: ""
         val novoLog = (entradaNova + logAntigo).take(8000)
         prefsDebug.edit().putString(PREF_ULTIMO_TEXTO, novoLog).apply()
@@ -209,11 +153,6 @@ class RideAccessibilityService : AccessibilityService() {
         Log.w(TAG, "Serviço de acessibilidade interrompido")
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        handler.removeCallbacks(pollRunnable)
-    }
-
     companion object {
         private const val TAG = "RideAccessibility"
         const val PREFS_NAME = "motorista_calc_prefs"
@@ -223,7 +162,6 @@ class RideAccessibilityService : AccessibilityService() {
         const val PREF_MIN_HORA = "minimo_valor_hora"
         const val PREF_SALVAR_PRINT = "salvar_print"
         const val PREF_ULTIMO_TEXTO = "ultimo_texto_capturado"
-        const val PREF_RESUMO_JANELAS = "resumo_janelas"
         const val PREF_FINANCIAMENTO = "financiamento_mensal"
         const val PREF_SEGURO = "seguro_mensal"
         const val PREF_IPVA = "ipva_anual"
