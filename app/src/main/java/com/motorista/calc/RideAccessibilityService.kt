@@ -1,4 +1,3 @@
-
 package com.motorista.calc
 
 import android.accessibilityservice.AccessibilityService
