@@ -219,12 +219,12 @@ class RideAccessibilityService : AccessibilityService() {
         Log.d(TAG, "Resultado: $resultado")
 
         val intent = Intent(this, OverlayService::class.java).apply {
-            putExtra(OverlayService.EXTRA_VALOR_KM_CALC, resultado.valorPorKmCalculado)
-            putExtra(OverlayService.EXTRA_VALOR_KM_EXIBIDO, resultado.valorPorKmExibido)
-            putExtra(OverlayService.EXTRA_VALOR_HORA_EFETIVO, resultado.valorPorHoraEfetivo)
-            putExtra(OverlayService.EXTRA_LUCRO, resultado.lucroLiquidoEstimado)
-            putExtra(OverlayService.EXTRA_SURGE, ride.surgeMultiplicador)
-            putExtra(OverlayService.EXTRA_AVALIACAO, ride.avaliacaoPassageiro)
+            resultado.valorPorKmCalculado?.let { putExtra(OverlayService.EXTRA_VALOR_KM_CALC, it) }
+            resultado.valorPorKmExibido?.let { putExtra(OverlayService.EXTRA_VALOR_KM_EXIBIDO, it) }
+            resultado.valorPorHoraEfetivo?.let { putExtra(OverlayService.EXTRA_VALOR_HORA_EFETIVO, it) }
+            resultado.lucroLiquidoEstimado?.let { putExtra(OverlayService.EXTRA_LUCRO, it) }
+            ride.surgeMultiplicador?.let { putExtra(OverlayService.EXTRA_SURGE, it) }
+            ride.avaliacaoPassageiro?.let { putExtra(OverlayService.EXTRA_AVALIACAO, it) }
             putExtra(OverlayService.EXTRA_VALE_A_PENA, resultado.valeAPena)
             putExtra(OverlayService.EXTRA_MOTIVO, resultado.motivo)
         }
