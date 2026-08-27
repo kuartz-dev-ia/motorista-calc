@@ -6,7 +6,9 @@ import android.graphics.Color
 import android.graphics.PixelFormat
 import android.graphics.drawable.GradientDrawable
 import android.os.Build
+import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
 import android.view.Gravity
 import android.view.WindowManager
 import android.widget.LinearLayout
@@ -16,6 +18,10 @@ class OverlayService : Service() {
 
     private var windowManager: WindowManager? = null
     private var overlayView: android.view.View? = null
+    private var botaoFechar: android.view.View? = null
+
+    private val handler = Handler(Looper.getMainLooper())
+    private var dismissRunnable: Runnable? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -40,8 +46,10 @@ class OverlayService : Service() {
         return START_NOT_STICKY
     }
 
+    // Só lê o extra se ele de fato existir com um valor real — evita o bug de
+    // "0.0 fantasma" quando o valor original era nulo.
     private fun Intent.getDoubleOrNull(key: String): Double? =
-        if (hasExtra(key)) getDoubleExtra(key, 0.0) else null
+        if (hasExtra(key)) getDoubleExtra(key, Double.NaN).takeIf { !it.isNaN() } else null
 
     private fun mostrarOverlay(
         valorKmCalc: Double?,
@@ -67,7 +75,8 @@ class OverlayService : Service() {
         val linhaTopo = TextView(this).apply {
             text = buildString {
                 append(if (valeAPena) "✅ VALE A PENA" else "⚠️ NÃO COMPENSA")
-                surge?.let { append("  ⚡%.1fx".format(it)) }
+                // Só mostra o raio quando realmente existe tarifa dinâmica (surge > 1.0).
+                if (surge != null && surge > 1.0) append("  ⚡%.1fx".format(surge))
             }
             setTextColor(Color.WHITE)
             textSize = 15f
@@ -101,7 +110,8 @@ class OverlayService : Service() {
             WindowManager.LayoutParams.TYPE_SYSTEM_ALERT
         }
 
-        val params = WindowManager.LayoutParams(
+        // Card principal: continua "furado" pra toque (não bloqueia o Aceitar por baixo).
+        val paramsCard = WindowManager.LayoutParams(
             WindowManager.LayoutParams.WRAP_CONTENT,
             WindowManager.LayoutParams.WRAP_CONTENT,
             layoutType,
@@ -115,8 +125,37 @@ class OverlayService : Service() {
         }
 
         overlayView = container
-        windowManager?.addView(overlayView, params)
-        container.postDelayed({ removerOverlayExistente() }, 9000)
+        windowManager?.addView(overlayView, paramsCard)
+
+        // Botão de fechar: janela SEPARADA, pequena, e essa SIM recebe toque
+        // (sem FLAG_NOT_TOUCHABLE), no canto superior direito da tela.
+        val fechar = TextView(this).apply {
+            text = "✕"
+            setTextColor(Color.WHITE)
+            textSize = 16f
+            gravity = Gravity.CENTER
+            setBackgroundColor(Color.parseColor("#CC000000"))
+            setPadding(20, 10, 20, 10)
+            setOnClickListener { removerOverlayExistente() }
+        }
+
+        val paramsFechar = WindowManager.LayoutParams(
+            WindowManager.LayoutParams.WRAP_CONTENT,
+            WindowManager.LayoutParams.WRAP_CONTENT,
+            layoutType,
+            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+            PixelFormat.TRANSLUCENT
+        ).apply {
+            gravity = Gravity.TOP or Gravity.END
+            x = 16
+            y = 90
+        }
+
+        botaoFechar = fechar
+        windowManager?.addView(botaoFechar, paramsFechar)
+
+        dismissRunnable = Runnable { removerOverlayExistente() }
+        handler.postDelayed(dismissRunnable!!, 9000)
     }
 
     private fun criarColuna(rotulo: String, valorTexto: String, minimoKm: Double, valorReal: Double?): LinearLayout {
@@ -150,6 +189,7 @@ class OverlayService : Service() {
             setTextColor(Color.parseColor("#CCFFFFFF"))
             textSize = 10f
             gravity = Gravity.CENTER_HORIZONTAL
+            setSingleLine(true)
         }
 
         coluna.addView(txtRotulo)
@@ -159,6 +199,9 @@ class OverlayService : Service() {
     }
 
     private fun removerOverlayExistente() {
+        dismissRunnable?.let { handler.removeCallbacks(it) }
+        dismissRunnable = null
+
         overlayView?.let {
             try {
                 windowManager?.removeView(it)
@@ -167,6 +210,15 @@ class OverlayService : Service() {
             }
         }
         overlayView = null
+
+        botaoFechar?.let {
+            try {
+                windowManager?.removeView(it)
+            } catch (e: Exception) {
+                // já removido, ignora
+            }
+        }
+        botaoFechar = null
     }
 
     override fun onDestroy() {
@@ -188,15 +240,13 @@ class OverlayService : Service() {
         private const val MIN_KM_REF = 1.50
         private const val MIN_HORA_REF = 25.0
 
-        // Referência à instância ativa, pra poder esconder/mostrar o card durante
-        // o print + OCR (evita que o app leia o próprio card como se fosse a tela
-        // da corrida).
         @Volatile
         private var instanciaAtual: OverlayService? = null
 
         fun ocultarTemporariamente() {
             try {
                 instanciaAtual?.overlayView?.visibility = android.view.View.INVISIBLE
+                instanciaAtual?.botaoFechar?.visibility = android.view.View.INVISIBLE
             } catch (e: Exception) {
                 // ignora
             }
@@ -205,6 +255,7 @@ class OverlayService : Service() {
         fun restaurarVisibilidade() {
             try {
                 instanciaAtual?.overlayView?.visibility = android.view.View.VISIBLE
+                instanciaAtual?.botaoFechar?.visibility = android.view.View.VISIBLE
             } catch (e: Exception) {
                 // ignora
             }
