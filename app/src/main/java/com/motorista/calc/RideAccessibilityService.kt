@@ -18,8 +18,6 @@ class RideAccessibilityService : AccessibilityService() {
 
     private val executor = Executors.newSingleThreadExecutor()
 
-    // Inicialização "preguiçosa" e protegida: só cria o cliente de OCR quando for
-    // usado de fato, e nunca deixa uma falha aqui derrubar o serviço inteiro.
     private val recognizer by lazy {
         try {
             TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
@@ -67,7 +65,11 @@ class RideAccessibilityService : AccessibilityService() {
     @RequiresApi(Build.VERSION_CODES.R)
     private fun tentarCapturarEOcr() {
         if (capturandoNoMomento) return
-        val ocr = recognizer ?: return
+        val ocr = recognizer
+        if (ocr == null) {
+            registrarStatus("Cliente de OCR não inicializou (recognizer null)")
+            return
+        }
         capturandoNoMomento = true
 
         try {
@@ -82,6 +84,7 @@ class RideAccessibilityService : AccessibilityService() {
                             result.hardwareBuffer.close()
 
                             if (bitmap == null) {
+                                registrarStatus("Print capturado, mas bitmap veio nulo")
                                 capturandoNoMomento = false
                                 return
                             }
@@ -90,33 +93,44 @@ class RideAccessibilityService : AccessibilityService() {
                             ocr.process(inputImage)
                                 .addOnSuccessListener { visionText ->
                                     try {
-                                        processarTextoOcr(visionText.text)
+                                        val textoOcr = visionText.text
+                                        registrarStatus("OCR OK (${textoOcr.length} caracteres lidos)")
+                                        processarTextoOcr(textoOcr)
                                     } catch (e: Exception) {
-                                        Log.e(TAG, "Erro processando texto do OCR: ${e.message}")
+                                        registrarStatus("Erro processando texto do OCR: ${e.message}")
                                     } finally {
                                         capturandoNoMomento = false
                                     }
                                 }
                                 .addOnFailureListener { erro ->
-                                    Log.e(TAG, "Falha no OCR: ${erro.message}")
+                                    registrarStatus("Falha no OCR: ${erro.message}")
                                     capturandoNoMomento = false
                                 }
                         } catch (e: Exception) {
-                            Log.e(TAG, "Erro processando print: ${e.message}")
+                            registrarStatus("Erro processando print: ${e.message}")
                             capturandoNoMomento = false
                         }
                     }
 
                     override fun onFailure(errorCode: Int) {
-                        // Código comum: pedimos print rápido demais (limite do sistema).
-                        // Não é grave, só espera o próximo ciclo.
+                        registrarStatus("Falha ao tirar print (código $errorCode)")
                         capturandoNoMomento = false
                     }
                 }
             )
         } catch (e: Exception) {
-            Log.e(TAG, "Erro ao pedir print: ${e.message}")
+            registrarStatus("Erro ao pedir print: ${e.message}")
             capturandoNoMomento = false
+        }
+    }
+
+    private fun registrarStatus(mensagem: String) {
+        try {
+            val prefsDebug = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+            val hora = java.text.SimpleDateFormat("HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date())
+            prefsDebug.edit().putString(PREF_STATUS_OCR, "[$hora] $mensagem").apply()
+        } catch (e: Exception) {
+            // ignora
         }
     }
 
@@ -124,9 +138,7 @@ class RideAccessibilityService : AccessibilityService() {
         if (texto.isBlank() || texto == ultimoTextoProcessado) return
         ultimoTextoProcessado = texto
 
-        if (texto.contains("R$")) {
-            registrarDebug(texto)
-        }
+        registrarDebug(texto)
 
         if (!TriggerPatterns.pareceTelaDeCorrida(texto)) return
 
@@ -227,6 +239,7 @@ class RideAccessibilityService : AccessibilityService() {
         const val PREF_MIN_HORA = "minimo_valor_hora"
         const val PREF_SALVAR_PRINT = "salvar_print"
         const val PREF_ULTIMO_TEXTO = "ultimo_texto_capturado"
+        const val PREF_STATUS_OCR = "status_ocr"
         const val PREF_FINANCIAMENTO = "financiamento_mensal"
         const val PREF_SEGURO = "seguro_mensal"
         const val PREF_IPVA = "ipva_anual"
@@ -236,3 +249,4 @@ class RideAccessibilityService : AccessibilityService() {
         const val PREF_KM_MES = "km_rodados_mes"
     }
 }
+
