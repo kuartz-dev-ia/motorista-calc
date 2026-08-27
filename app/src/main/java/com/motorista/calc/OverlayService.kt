@@ -12,16 +12,15 @@ import android.view.WindowManager
 import android.widget.LinearLayout
 import android.widget.TextView
 
-/**
- * Desenha um overlay flutuante no estilo "semáforo": colunas com R$/km, R$/hora
- * e nota do passageiro. O overlay é PURAMENTE VISUAL (FLAG_NOT_TOUCHABLE) —
- * nenhum toque nele é interceptado, então nunca bloqueia o botão "Aceitar"
- * do Uber/99 por baixo, nem qualquer outro botão da tela.
- */
 class OverlayService : Service() {
 
     private var windowManager: WindowManager? = null
     private var overlayView: android.view.View? = null
+
+    override fun onCreate() {
+        super.onCreate()
+        instanciaAtual = this
+    }
 
     override fun onBind(intent: Intent?): IBinder? = null
 
@@ -120,7 +119,6 @@ class OverlayService : Service() {
         container.postDelayed({ removerOverlayExistente() }, 9000)
     }
 
-    /** Coluna com rótulo, valor e uma bolinha colorida (verde se >= mínimo, vermelho se abaixo). */
     private fun criarColuna(rotulo: String, valorTexto: String, minimoKm: Double, valorReal: Double?): LinearLayout {
         val coluna = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
@@ -174,6 +172,7 @@ class OverlayService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         removerOverlayExistente()
+        if (instanciaAtual === this) instanciaAtual = null
     }
 
     companion object {
@@ -188,5 +187,27 @@ class OverlayService : Service() {
 
         private const val MIN_KM_REF = 1.50
         private const val MIN_HORA_REF = 25.0
+
+        // Referência à instância ativa, pra poder esconder/mostrar o card durante
+        // o print + OCR (evita que o app leia o próprio card como se fosse a tela
+        // da corrida).
+        @Volatile
+        private var instanciaAtual: OverlayService? = null
+
+        fun ocultarTemporariamente() {
+            try {
+                instanciaAtual?.overlayView?.visibility = android.view.View.INVISIBLE
+            } catch (e: Exception) {
+                // ignora
+            }
+        }
+
+        fun restaurarVisibilidade() {
+            try {
+                instanciaAtual?.overlayView?.visibility = android.view.View.VISIBLE
+            } catch (e: Exception) {
+                // ignora
+            }
+        }
     }
 }
