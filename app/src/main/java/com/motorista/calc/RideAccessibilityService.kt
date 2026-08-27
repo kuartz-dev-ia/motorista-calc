@@ -72,56 +72,66 @@ class RideAccessibilityService : AccessibilityService() {
         }
         capturandoNoMomento = true
 
-        try {
-            takeScreenshot(
-                android.view.Display.DEFAULT_DISPLAY,
-                executor,
-                object : TakeScreenshotCallback {
-                    override fun onSuccess(result: ScreenshotResult) {
-                        try {
-                            val bitmapHardware = Bitmap.wrapHardwareBuffer(result.hardwareBuffer, result.colorSpace)
-                            val bitmap = bitmapHardware?.copy(Bitmap.Config.ARGB_8888, false)
-                            result.hardwareBuffer.close()
+        // Esconde nosso próprio card antes do print (e espera um instante pra
+        // garantir que o sistema já redesenhou a tela sem ele), pra não ler o
+        // próprio resultado calculado como se fosse dado novo da corrida.
+        OverlayService.ocultarTemporariamente()
 
-                            if (bitmap == null) {
-                                registrarStatus("Print capturado, mas bitmap veio nulo")
-                                capturandoNoMomento = false
-                                return
-                            }
+        handler.postDelayed({
+            try {
+                takeScreenshot(
+                    android.view.Display.DEFAULT_DISPLAY,
+                    executor,
+                    object : TakeScreenshotCallback {
+                        override fun onSuccess(result: ScreenshotResult) {
+                            OverlayService.restaurarVisibilidade()
+                            try {
+                                val bitmapHardware = Bitmap.wrapHardwareBuffer(result.hardwareBuffer, result.colorSpace)
+                                val bitmap = bitmapHardware?.copy(Bitmap.Config.ARGB_8888, false)
+                                result.hardwareBuffer.close()
 
-                            val inputImage = InputImage.fromBitmap(bitmap, 0)
-                            ocr.process(inputImage)
-                                .addOnSuccessListener { visionText ->
-                                    try {
-                                        val textoOcr = visionText.text
-                                        registrarStatus("OCR OK (${textoOcr.length} caracteres lidos)")
-                                        processarTextoOcr(textoOcr)
-                                    } catch (e: Exception) {
-                                        registrarStatus("Erro processando texto do OCR: ${e.message}")
-                                    } finally {
+                                if (bitmap == null) {
+                                    registrarStatus("Print capturado, mas bitmap veio nulo")
+                                    capturandoNoMomento = false
+                                    return
+                                }
+
+                                val inputImage = InputImage.fromBitmap(bitmap, 0)
+                                ocr.process(inputImage)
+                                    .addOnSuccessListener { visionText ->
+                                        try {
+                                            val textoOcr = visionText.text
+                                            registrarStatus("OCR OK (${textoOcr.length} caracteres lidos)")
+                                            processarTextoOcr(textoOcr)
+                                        } catch (e: Exception) {
+                                            registrarStatus("Erro processando texto do OCR: ${e.message}")
+                                        } finally {
+                                            capturandoNoMomento = false
+                                        }
+                                    }
+                                    .addOnFailureListener { erro ->
+                                        registrarStatus("Falha no OCR: ${erro.message}")
                                         capturandoNoMomento = false
                                     }
-                                }
-                                .addOnFailureListener { erro ->
-                                    registrarStatus("Falha no OCR: ${erro.message}")
-                                    capturandoNoMomento = false
-                                }
-                        } catch (e: Exception) {
-                            registrarStatus("Erro processando print: ${e.message}")
+                            } catch (e: Exception) {
+                                registrarStatus("Erro processando print: ${e.message}")
+                                capturandoNoMomento = false
+                            }
+                        }
+
+                        override fun onFailure(errorCode: Int) {
+                            OverlayService.restaurarVisibilidade()
+                            registrarStatus("Falha ao tirar print (código $errorCode)")
                             capturandoNoMomento = false
                         }
                     }
-
-                    override fun onFailure(errorCode: Int) {
-                        registrarStatus("Falha ao tirar print (código $errorCode)")
-                        capturandoNoMomento = false
-                    }
-                }
-            )
-        } catch (e: Exception) {
-            registrarStatus("Erro ao pedir print: ${e.message}")
-            capturandoNoMomento = false
-        }
+                )
+            } catch (e: Exception) {
+                OverlayService.restaurarVisibilidade()
+                registrarStatus("Erro ao pedir print: ${e.message}")
+                capturandoNoMomento = false
+            }
+        }, 200L)
     }
 
     private fun registrarStatus(mensagem: String) {
@@ -249,4 +259,3 @@ class RideAccessibilityService : AccessibilityService() {
         const val PREF_KM_MES = "km_rodados_mes"
     }
 }
-
