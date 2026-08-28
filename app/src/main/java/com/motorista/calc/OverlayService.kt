@@ -34,34 +34,34 @@ class OverlayService : Service() {
         intent ?: return START_NOT_STICKY
 
         val valorKmCalc = intent.getDoubleOrNull(EXTRA_VALOR_KM_CALC)
-        val valorKmExibido = intent.getDoubleOrNull(EXTRA_VALOR_KM_EXIBIDO)
         val valorHoraEfetivo = intent.getDoubleOrNull(EXTRA_VALOR_HORA_EFETIVO)
+        val valorMinutoEfetivo = intent.getDoubleOrNull(EXTRA_VALOR_MINUTO_EFETIVO)
         val lucro = intent.getDoubleOrNull(EXTRA_LUCRO)
         val surge = intent.getDoubleOrNull(EXTRA_SURGE)
         val avaliacao = intent.getDoubleOrNull(EXTRA_AVALIACAO)
         val valeAPena = intent.getBooleanExtra(EXTRA_VALE_A_PENA, true)
         val motivo = intent.getStringExtra(EXTRA_MOTIVO) ?: ""
 
-        mostrarOverlay(valorKmCalc, valorKmExibido, valorHoraEfetivo, lucro, surge, avaliacao, valeAPena, motivo)
+        mostrarOverlay(valorKmCalc, valorHoraEfetivo, valorMinutoEfetivo, lucro, surge, avaliacao, valeAPena, motivo)
         return START_NOT_STICKY
     }
 
-    // Só lê o extra se ele de fato existir com um valor real — evita o bug de
-    // "0.0 fantasma" quando o valor original era nulo.
     private fun Intent.getDoubleOrNull(key: String): Double? =
         if (hasExtra(key)) getDoubleExtra(key, Double.NaN).takeIf { !it.isNaN() } else null
 
+    private fun dp(valor: Int): Int = (valor * resources.displayMetrics.density).toInt()
+
     private fun mostrarOverlay(
         valorKmCalc: Double?,
-        valorKmExibido: Double?,
         valorHoraEfetivo: Double?,
+        valorMinutoEfetivo: Double?,
         lucro: Double?,
         surge: Double?,
         avaliacao: Double?,
         valeAPena: Boolean,
         motivo: String
     ) {
-        removerOverlayExistente()
+        limparViewsSemCallback()
         windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
 
         val corFundo = if (valeAPena) Color.parseColor("#E62E7D32") else Color.parseColor("#E6C62828")
@@ -69,37 +69,38 @@ class OverlayService : Service() {
         val container = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setBackgroundColor(corFundo)
-            setPadding(28, 20, 28, 20)
+            setPadding(dp(16), dp(12), dp(16), dp(12))
         }
 
         val linhaTopo = TextView(this).apply {
             text = buildString {
                 append(if (valeAPena) "✅ VALE A PENA" else "⚠️ NÃO COMPENSA")
-                // Só mostra o raio quando realmente existe tarifa dinâmica (surge > 1.0).
                 if (surge != null && surge > 1.0) append("  ⚡%.1fx".format(surge))
             }
             setTextColor(Color.WHITE)
             textSize = 15f
-            setPadding(0, 0, 0, 12)
+            setPadding(0, 0, 0, dp(8))
         }
         container.addView(linhaTopo)
 
         val linhaMetricas = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
-        linhaMetricas.addView(criarColuna("R$/KM", valorKmCalc?.let { "%.2f".format(it) } ?: "--", minimoKm = MIN_KM_REF, valorReal = valorKmCalc))
-        linhaMetricas.addView(criarColuna("R$/H", valorHoraEfetivo?.let { "%.0f".format(it) } ?: "--", minimoKm = MIN_HORA_REF, valorReal = valorHoraEfetivo))
-        avaliacao?.let {
-            linhaMetricas.addView(criarColuna("NOTA", "%.2f".format(it), minimoKm = 4.5, valorReal = it))
-        }
+        linhaMetricas.addView(criarColuna("R$/KM", valorKmCalc?.let { "%.2f".format(it) } ?: "--", minimoRef = MIN_KM_REF, valorReal = valorKmCalc))
+        linhaMetricas.addView(criarColuna("R$/HORA", valorHoraEfetivo?.let { "%.0f".format(it) } ?: "--", minimoRef = MIN_HORA_REF, valorReal = valorHoraEfetivo))
+        linhaMetricas.addView(criarColuna("R$/MIN", valorMinutoEfetivo?.let { "%.2f".format(it) } ?: "--", minimoRef = MIN_MINUTO_REF, valorReal = valorMinutoEfetivo))
         container.addView(linhaMetricas)
 
         val linhaDetalhe = TextView(this).apply {
             text = buildString {
-                lucro?.let { append("Lucro líq. est.: R$ %.2f  ".format(it)) }
-                append(motivo)
+                lucro?.let { append("Lucro líq. est.: R$ %.2f".format(it)) }
+                avaliacao?.let { append("  •  Nota passageiro: %.2f".format(it)) }
+                if (motivo.isNotBlank()) {
+                    if (isNotEmpty()) append("\n")
+                    append(motivo)
+                }
             }
             setTextColor(Color.parseColor("#DDFFFFFF"))
             textSize = 12f
-            setPadding(0, 12, 0, 0)
+            setPadding(0, dp(8), 0, 0)
         }
         container.addView(linhaDetalhe)
 
@@ -110,7 +111,6 @@ class OverlayService : Service() {
             WindowManager.LayoutParams.TYPE_SYSTEM_ALERT
         }
 
-        // Card principal: continua "furado" pra toque (não bloqueia o Aceitar por baixo).
         val paramsCard = WindowManager.LayoutParams(
             WindowManager.LayoutParams.WRAP_CONTENT,
             WindowManager.LayoutParams.WRAP_CONTENT,
@@ -121,22 +121,20 @@ class OverlayService : Service() {
             PixelFormat.TRANSLUCENT
         ).apply {
             gravity = Gravity.TOP or Gravity.CENTER_HORIZONTAL
-            y = 100
+            y = dp(60)
         }
 
         overlayView = container
         windowManager?.addView(overlayView, paramsCard)
 
-        // Botão de fechar: janela SEPARADA, pequena, e essa SIM recebe toque
-        // (sem FLAG_NOT_TOUCHABLE), no canto superior direito da tela.
         val fechar = TextView(this).apply {
             text = "✕"
             setTextColor(Color.WHITE)
             textSize = 16f
             gravity = Gravity.CENTER
             setBackgroundColor(Color.parseColor("#CC000000"))
-            setPadding(20, 10, 20, 10)
-            setOnClickListener { removerOverlayExistente() }
+            setPadding(dp(12), dp(6), dp(12), dp(6))
+            setOnClickListener { fecharCard() }
         }
 
         val paramsFechar = WindowManager.LayoutParams(
@@ -147,34 +145,39 @@ class OverlayService : Service() {
             PixelFormat.TRANSLUCENT
         ).apply {
             gravity = Gravity.TOP or Gravity.END
-            x = 16
-            y = 90
+            x = dp(8)
+            y = dp(54)
         }
 
         botaoFechar = fechar
         windowManager?.addView(botaoFechar, paramsFechar)
 
-        dismissRunnable = Runnable { removerOverlayExistente() }
-        handler.postDelayed(dismissRunnable!!, 9000)
+        dismissRunnable = Runnable { fecharCard() }
+        handler.postDelayed(dismissRunnable!!, DURACAO_EXIBICAO_MS)
     }
 
-    private fun criarColuna(rotulo: String, valorTexto: String, minimoKm: Double, valorReal: Double?): LinearLayout {
+    private fun criarColuna(rotulo: String, valorTexto: String, minimoRef: Double, valorReal: Double?): LinearLayout {
         val coluna = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            setPadding(24, 0, 24, 0)
+            setPadding(dp(10), 0, dp(10), 0)
+            minimumWidth = dp(78)
         }
 
         val bolinha = android.view.View(this).apply {
             val cor = when {
                 valorReal == null -> Color.GRAY
-                valorReal >= minimoKm -> Color.parseColor("#4CAF50")
+                valorReal >= minimoRef -> Color.parseColor("#4CAF50")
                 else -> Color.parseColor("#F44336")
             }
             background = GradientDrawable().apply {
                 shape = GradientDrawable.OVAL
                 setColor(cor)
             }
-            layoutParams = LinearLayout.LayoutParams(36, 36).apply { gravity = Gravity.CENTER_HORIZONTAL }
+            layoutParams = LinearLayout.LayoutParams(dp(12), dp(12)).apply {
+                gravity = Gravity.CENTER_HORIZONTAL
+                topMargin = dp(2)
+                bottomMargin = dp(2)
+            }
         }
 
         val txtValor = TextView(this).apply {
@@ -187,9 +190,9 @@ class OverlayService : Service() {
         val txtRotulo = TextView(this).apply {
             text = rotulo
             setTextColor(Color.parseColor("#CCFFFFFF"))
-            textSize = 10f
+            textSize = 11f
             gravity = Gravity.CENTER_HORIZONTAL
-            setSingleLine(true)
+            maxLines = 1
         }
 
         coluna.addView(txtRotulo)
@@ -198,32 +201,34 @@ class OverlayService : Service() {
         return coluna
     }
 
-    private fun removerOverlayExistente() {
+    /** Remove as views da tela SEM avisar quem estava esperando o fechamento —
+     * usado internamente quando um novo card substitui um anterior. */
+    private fun limparViewsSemCallback() {
         dismissRunnable?.let { handler.removeCallbacks(it) }
         dismissRunnable = null
 
         overlayView?.let {
-            try {
-                windowManager?.removeView(it)
-            } catch (e: Exception) {
-                // já removido, ignora
-            }
+            try { windowManager?.removeView(it) } catch (e: Exception) { }
         }
         overlayView = null
 
         botaoFechar?.let {
-            try {
-                windowManager?.removeView(it)
-            } catch (e: Exception) {
-                // já removido, ignora
-            }
+            try { windowManager?.removeView(it) } catch (e: Exception) { }
         }
         botaoFechar = null
     }
 
+    /** Fecha o card de vez (usuário tocou o X, ou o tempo de exibição acabou) e
+     * avisa quem estava esperando (o serviço de acessibilidade retoma a varredura). */
+    private fun fecharCard() {
+        limparViewsSemCallback()
+        aoFechar?.invoke()
+        aoFechar = null
+    }
+
     override fun onDestroy() {
         super.onDestroy()
-        removerOverlayExistente()
+        limparViewsSemCallback()
         if (instanciaAtual === this) instanciaAtual = null
     }
 
@@ -231,6 +236,7 @@ class OverlayService : Service() {
         const val EXTRA_VALOR_KM_CALC = "extra_valor_km_calc"
         const val EXTRA_VALOR_KM_EXIBIDO = "extra_valor_km_exibido"
         const val EXTRA_VALOR_HORA_EFETIVO = "extra_valor_hora_efetivo"
+        const val EXTRA_VALOR_MINUTO_EFETIVO = "extra_valor_minuto_efetivo"
         const val EXTRA_LUCRO = "extra_lucro"
         const val EXTRA_SURGE = "extra_surge"
         const val EXTRA_AVALIACAO = "extra_avaliacao"
@@ -239,26 +245,31 @@ class OverlayService : Service() {
 
         private const val MIN_KM_REF = 1.50
         private const val MIN_HORA_REF = 25.0
+        private const val MIN_MINUTO_REF = 0.42 // ~ R$25/hora dividido por 60
+
+        private const val DURACAO_EXIBICAO_MS = 5000L
 
         @Volatile
         private var instanciaAtual: OverlayService? = null
+
+        /** Callback chamado quando o card fecha (por X ou por tempo). Quem exibiu o
+         * card (o RideAccessibilityService) usa isso pra saber quando pode voltar
+         * a tirar prints em busca da próxima corrida. */
+        @Volatile
+        var aoFechar: (() -> Unit)? = null
 
         fun ocultarTemporariamente() {
             try {
                 instanciaAtual?.overlayView?.visibility = android.view.View.INVISIBLE
                 instanciaAtual?.botaoFechar?.visibility = android.view.View.INVISIBLE
-            } catch (e: Exception) {
-                // ignora
-            }
+            } catch (e: Exception) { }
         }
 
         fun restaurarVisibilidade() {
             try {
                 instanciaAtual?.overlayView?.visibility = android.view.View.VISIBLE
                 instanciaAtual?.botaoFechar?.visibility = android.view.View.VISIBLE
-            } catch (e: Exception) {
-                // ignora
-            }
+            } catch (e: Exception) { }
         }
     }
 }
