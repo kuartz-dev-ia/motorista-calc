@@ -24,6 +24,11 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".HistoricoActivity"
+            android:exported="false"
+            android:label="Histórico de hoje" />
+
         <service
             android:name=".RideAccessibilityService"
             android:exported="true"
