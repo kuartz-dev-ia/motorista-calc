@@ -35,7 +35,9 @@ class RideAccessibilityService : AccessibilityService() {
     private val pollRunnable = object : Runnable {
         override fun run() {
             try {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                val monitoramentoAtivo = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+                    .getBoolean(PREF_MONITORAMENTO_ATIVO, true)
+                if (monitoramentoAtivo && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                     tentarCapturarEOcr()
                 }
             } catch (e: Exception) {
@@ -253,6 +255,7 @@ class RideAccessibilityService : AccessibilityService() {
         const val PREF_SALVAR_PRINT = "salvar_print"
         const val PREF_ULTIMO_TEXTO = "ultimo_texto_capturado"
         const val PREF_STATUS_OCR = "status_ocr"
+        const val PREF_MONITORAMENTO_ATIVO = "monitoramento_ativo"
         const val PREF_FINANCIAMENTO = "financiamento_mensal"
         const val PREF_SEGURO = "seguro_mensal"
         const val PREF_IPVA = "ipva_anual"
