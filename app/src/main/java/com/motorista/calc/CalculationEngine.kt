@@ -2,17 +2,16 @@ package com.motorista.calc
 
 data class RideInfo(
     val valorTotal: Double?,
-    val valorPorKmExibido: Double?,      // já vem calculado pelo app (Uber/99), usamos pra conferência
-    val surgeMultiplicador: Double?,     // ex: 2,1x — tarifa dinâmica
+    val valorPorKmExibido: Double?,
+    val surgeMultiplicador: Double?,
     val avaliacaoPassageiro: Double?,
     val viagemLonga: Boolean,
     val verificado: Boolean,
-    val tempoPickupMin: Int?,            // tempo até chegar no passageiro (não pago)
+    val tempoPickupMin: Int?,
     val distanciaPickupKm: Double?,
-    val tempoCorridaMin: Int?,           // tempo da corrida em si (embarque -> destino)
+    val tempoCorridaMin: Int?,
     val distanciaCorridaKm: Double?
 ) {
-    /** Tempo total "no relógio" do motorista: deslocamento até o passageiro + corrida. */
     val tempoEfetivoMin: Int?
         get() = if (tempoPickupMin != null || tempoCorridaMin != null)
             (tempoPickupMin ?: 0) + (tempoCorridaMin ?: 0)
@@ -22,23 +21,16 @@ data class RideInfo(
 data class RideResult(
     val valorPorKmCalculado: Double?,
     val valorPorKmExibido: Double?,
-    val valorPorHoraCorrida: Double?,     // considerando só o tempo da corrida
-    val valorPorHoraEfetivo: Double?,     // considerando também o deslocamento até o passageiro
+    val valorPorHoraCorrida: Double?,
+    val valorPorHoraEfetivo: Double?,
+    val valorPorMinutoEfetivo: Double?,
     val custoCombustivelEstimado: Double?,
-    val custoFixoEstimado: Double?,       // parcela de financiamento/seguro/IPVA/etc rateada nessa corrida
-    val lucroLiquidoEstimado: Double?,    // valor da corrida - combustível - custos fixos rateados
+    val custoFixoEstimado: Double?,
+    val lucroLiquidoEstimado: Double?,
     val valeAPena: Boolean,
     val motivo: String
 )
 
-/**
- * Motor de cálculo. Os parâmetros vêm das preferências do usuário (SharedPreferences).
- *
- * custoFixoPorKm: soma de todos os custos fixos mensais (financiamento, seguro, IPVA/12,
- * licenciamento/12, manutenção programada, contas pessoais) dividida pelos km rodados por
- * mês. Isso dá quanto de custo fixo "pesa" em cada km rodado, e é descontado do valor da
- * corrida junto com o combustível pra chegar no ganho líquido real.
- */
 class CalculationEngine(
     private val precoCombustivelPorLitro: Double = 6.10,
     private val consumoKmPorLitro: Double = 12.0,
@@ -63,6 +55,10 @@ class CalculationEngine(
         val tempoEfetivo = ride.tempoEfetivoMin
         val valorPorHoraEfetivo = if (valor != null && tempoEfetivo != null && tempoEfetivo > 0) {
             valor / (tempoEfetivo / 60.0)
+        } else null
+
+        val valorPorMinutoEfetivo = if (valor != null && tempoEfetivo != null && tempoEfetivo > 0) {
+            valor / tempoEfetivo
         } else null
 
         val custoCombustivel = if (distanciaTotalRodada > 0) {
@@ -105,6 +101,7 @@ class CalculationEngine(
             valorPorKmExibido = ride.valorPorKmExibido,
             valorPorHoraCorrida = valorPorHoraCorrida,
             valorPorHoraEfetivo = valorPorHoraEfetivo,
+            valorPorMinutoEfetivo = valorPorMinutoEfetivo,
             custoCombustivelEstimado = custoCombustivel,
             custoFixoEstimado = custoFixoEstimado,
             lucroLiquidoEstimado = lucroLiquido,
