@@ -20,6 +20,7 @@ class MainActivity : AppCompatActivity() {
 
         val btnAtivarAcessibilidade = findViewById<android.widget.Button>(R.id.btnAtivarAcessibilidade)
         val btnPermitirOverlay = findViewById<android.widget.Button>(R.id.btnPermitirOverlay)
+        val btnHistorico = findViewById<android.widget.Button>(R.id.btnHistorico)
         val edtMinKm = findViewById<android.widget.EditText>(R.id.edtMinKm)
         val edtMinHora = findViewById<android.widget.EditText>(R.id.edtMinHora)
         val edtConsumo = findViewById<android.widget.EditText>(R.id.edtConsumo)
@@ -52,6 +53,10 @@ class MainActivity : AppCompatActivity() {
         switchAtivo.setOnCheckedChangeListener { _, ativado ->
             prefs.edit().putBoolean(RideAccessibilityService.PREF_MONITORAMENTO_ATIVO, ativado).apply()
             switchAtivo.text = if (ativado) "Monitorar corridas (ligado)" else "Monitorar corridas (desligado)"
+        }
+
+        btnHistorico.setOnClickListener {
+            startActivity(Intent(this, HistoricoActivity::class.java))
         }
 
         btnAtivarAcessibilidade.setOnClickListener {
