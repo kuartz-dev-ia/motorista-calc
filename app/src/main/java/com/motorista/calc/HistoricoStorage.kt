@@ -6,6 +6,7 @@ import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlin.math.abs
 
 data class RegistroCorrida(
     val id: Long,
@@ -29,6 +30,11 @@ object HistoricoStorage {
     private const val CHAVE_REGISTROS = "registros"
     private const val MAX_REGISTROS = 500
 
+    // Se a MESMA oferta (valor + distância parecidos) for detectada de novo dentro
+    // desse tempo, é considerada a mesma corrida (ainda na tela, não uma nova) —
+    // evita duplicar no histórico enquanto o motorista não decide.
+    private const val JANELA_DEDUP_MS = 45_000L
+
     private val formatoDia = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
 
     fun diaChaveDeHoje(): String = formatoDia.format(Date())
@@ -43,7 +49,17 @@ object HistoricoStorage {
         lucroLiquido: Double?,
         valeAPena: Boolean
     ): Long {
-        val id = System.currentTimeMillis()
+        val agora = System.currentTimeMillis()
+        val lista = lerTodos(context).toMutableList()
+
+        val existente = lista.lastOrNull { r ->
+            (agora - r.dataHora) < JANELA_DEDUP_MS &&
+                abs(r.valorTotal - valorTotal) < 0.05 &&
+                abs(r.distanciaTotalKm - distanciaTotalKm) < 0.15
+        }
+        if (existente != null) return existente.id
+
+        val id = agora
         val registro = RegistroCorrida(
             id = id,
             dataHora = id,
@@ -58,7 +74,6 @@ object HistoricoStorage {
             aceita = false,
             cancelada = false
         )
-        val lista = lerTodos(context).toMutableList()
         lista.add(registro)
         val podado = if (lista.size > MAX_REGISTROS) lista.takeLast(MAX_REGISTROS) else lista
         salvarTodos(context, podado)
