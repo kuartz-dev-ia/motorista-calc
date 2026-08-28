@@ -38,10 +38,28 @@ class HistoricoActivity : AppCompatActivity() {
         val aceitas = registros.filter { it.aceita && !it.cancelada }
 
         txtResumoBoas.text = montarResumo(boas)
-        renderizarLista(containerBoas, boas, mostrarBotaoCancelar = false)
+        renderizarLista(
+            container = containerBoas,
+            lista = boas,
+            rotuloBotao = "Aceitei",
+            mostrarBotao = { registro -> !registro.aceita },
+            acaoBotao = { registro ->
+                HistoricoStorage.marcarAceita(this, registro.id)
+                atualizarTela()
+            }
+        )
 
         txtResumoAceitas.text = montarResumo(aceitas)
-        renderizarLista(containerAceitas, aceitas, mostrarBotaoCancelar = true)
+        renderizarLista(
+            container = containerAceitas,
+            lista = aceitas,
+            rotuloBotao = "Cancelei",
+            mostrarBotao = { true },
+            acaoBotao = { registro ->
+                HistoricoStorage.marcarCancelada(this, registro.id)
+                atualizarTela()
+            }
+        )
     }
 
     private fun montarResumo(lista: List<RegistroCorrida>): String {
@@ -64,7 +82,13 @@ class HistoricoActivity : AppCompatActivity() {
         }
     }
 
-    private fun renderizarLista(container: LinearLayout, lista: List<RegistroCorrida>, mostrarBotaoCancelar: Boolean) {
+    private fun renderizarLista(
+        container: LinearLayout,
+        lista: List<RegistroCorrida>,
+        rotuloBotao: String,
+        mostrarBotao: (RegistroCorrida) -> Boolean,
+        acaoBotao: (RegistroCorrida) -> Unit
+    ) {
         container.removeAllViews()
         val formatoHora = SimpleDateFormat("HH:mm", Locale.getDefault())
 
@@ -89,16 +113,13 @@ class HistoricoActivity : AppCompatActivity() {
             }
             linha.addView(texto)
 
-            if (mostrarBotaoCancelar) {
-                val btnCancelar = Button(this).apply {
-                    text = "Cancelei"
+            if (mostrarBotao(registro)) {
+                val btnAcao = Button(this).apply {
+                    text = rotuloBotao
                     textSize = 11f
-                    setOnClickListener {
-                        HistoricoStorage.marcarCancelada(this@HistoricoActivity, registro.id)
-                        atualizarTela()
-                    }
+                    setOnClickListener { acaoBotao(registro) }
                 }
-                linha.addView(btnCancelar)
+                linha.addView(btnAcao)
             }
 
             container.addView(linha)
