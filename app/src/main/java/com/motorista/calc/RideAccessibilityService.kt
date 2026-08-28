@@ -217,13 +217,29 @@ class RideAccessibilityService : AccessibilityService() {
         Log.d(TAG, "Ride: $ride")
         Log.d(TAG, "Resultado: $resultado")
 
+        // Registra essa corrida no histórico do dia (todas, boas ou não), pra
+        // alimentar os resumos e permitir marcar "Aceitei" depois.
+        val distanciaTotalKm = (ride.distanciaPickupKm ?: 0.0) + (ride.distanciaCorridaKm ?: 0.0)
+        val tempoTotalMin = ride.tempoEfetivoMin ?: 0
+        val registroId = HistoricoStorage.adicionarRegistro(
+            context = this,
+            valorTotal = ride.valorTotal,
+            distanciaTotalKm = distanciaTotalKm,
+            tempoTotalMin = tempoTotalMin,
+            valorPorKm = resultado.valorPorKmCalculado,
+            valorPorHora = resultado.valorPorHoraEfetivo,
+            lucroLiquido = resultado.lucroLiquidoEstimado,
+            valeAPena = resultado.valeAPena
+        )
+
         // Pausa a varredura (print + OCR) enquanto o card estiver na tela — evita
         // o "piscar" de ficar escondendo/mostrando o card a cada ciclo. A varredura
-        // volta sozinha quando o card fechar (por X ou pelo tempo de exibição).
+        // volta sozinha quando o card fechar (por X, por "Aceitei", ou pelo tempo).
         handler.removeCallbacks(pollRunnable)
         OverlayService.aoFechar = { handler.post(pollRunnable) }
 
         val intent = Intent(this, OverlayService::class.java).apply {
+            putExtra(OverlayService.EXTRA_REGISTRO_ID, registroId)
             resultado.valorPorKmCalculado?.let { putExtra(OverlayService.EXTRA_VALOR_KM_CALC, it) }
             resultado.valorPorHoraEfetivo?.let { putExtra(OverlayService.EXTRA_VALOR_HORA_EFETIVO, it) }
             resultado.valorPorMinutoEfetivo?.let { putExtra(OverlayService.EXTRA_VALOR_MINUTO_EFETIVO, it) }
