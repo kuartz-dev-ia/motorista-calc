@@ -33,6 +33,7 @@ class MainActivity : AppCompatActivity() {
         val edtKmMes = findViewById<android.widget.EditText>(R.id.edtKmMes)
         val btnSalvar = findViewById<android.widget.Button>(R.id.btnSalvar)
         val txtStatus = findViewById<android.widget.TextView>(R.id.txtStatus)
+        val switchAtivo = findViewById<android.widget.Switch>(R.id.switchAtivo)
 
         edtMinKm.setText(prefs.getFloat(RideAccessibilityService.PREF_MIN_KM, 1.50f).toString())
         edtMinHora.setText(prefs.getFloat(RideAccessibilityService.PREF_MIN_HORA, 25.0f).toString())
@@ -45,6 +46,13 @@ class MainActivity : AppCompatActivity() {
         edtManutencao.setText(prefs.getFloat(RideAccessibilityService.PREF_MANUTENCAO, 0f).toString())
         edtContasPessoais.setText(prefs.getFloat(RideAccessibilityService.PREF_CONTAS_PESSOAIS, 0f).toString())
         edtKmMes.setText(prefs.getFloat(RideAccessibilityService.PREF_KM_MES, 3000f).toString())
+
+        switchAtivo.isChecked = prefs.getBoolean(RideAccessibilityService.PREF_MONITORAMENTO_ATIVO, true)
+        switchAtivo.text = if (switchAtivo.isChecked) "Monitorar corridas (ligado)" else "Monitorar corridas (desligado)"
+        switchAtivo.setOnCheckedChangeListener { _, ativado ->
+            prefs.edit().putBoolean(RideAccessibilityService.PREF_MONITORAMENTO_ATIVO, ativado).apply()
+            switchAtivo.text = if (ativado) "Monitorar corridas (ligado)" else "Monitorar corridas (desligado)"
+        }
 
         btnAtivarAcessibilidade.setOnClickListener {
             startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
@@ -86,7 +94,6 @@ class MainActivity : AppCompatActivity() {
         atualizarDebug()
     }
 
-    /** Mostra o último texto capturado automaticamente, sem precisar de botão. */
     private fun atualizarDebug() {
         val txtDebug = findViewById<android.widget.TextView>(R.id.txtDebug) ?: return
         val status = prefs.getString(RideAccessibilityService.PREF_STATUS_OCR, null)
