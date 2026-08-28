@@ -64,8 +64,8 @@ class OverlayService : Service() {
         limparViewsSemCallback()
         windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
 
-        val corFundo = if (valeAPena) Color.parseColor("#E62E7D32") else Color.parseColor("#E6C62828")
-
+        val corFundo = if (valeAPena) Color.parseColor("#FF1B5E20") else Color.parseColor("#FF8B1A1A")
+        
         val container = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setBackgroundColor(corFundo)
