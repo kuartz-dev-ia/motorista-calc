@@ -1,9 +1,5 @@
 package com.motorista.calc
 
-/**
- * Central de padrões (regex) usados para reconhecer informações relevantes
- * no texto que o AccessibilityService extrai da tela do app de corrida.
- */
 object TriggerPatterns {
 
     val PALAVRAS_GATILHO = listOf(
@@ -15,19 +11,23 @@ object TriggerPatterns {
         "exclusivo"
     )
 
-    // Nomes de categoria de corrida — mais um sinal de que é uma tela de solicitação real.
     val CATEGORIAS = listOf(
         "uberx", "uber x", "black", "comfort", "confort", "conforto",
         "pop", "business", "99pop", "99top", "99comfort", "99moto"
     )
 
-    /**
-     * Considera tela de corrida real quando:
-     * - tem um valor em R$
-     * - tem PELO MENOS DUAS "pernas" (formato "X min (Y km)") — uma pra embarque,
-     *   outra pra desembarque. Telas de bônus/radar não têm duas pernas assim.
-     * - E tem uma palavra-gatilho OU um nome de categoria (Uber X, Black, Comfort...)
-     */
+    /** Remove qualquer trecho que pareça ser o NOSSO PRÓPRIO card (frases que só
+     * existem nele), caso ele ainda esteja visível numa captura por engano —
+     * evita que o app leia o próprio resultado calculado como se fosse dado
+     * novo da corrida. */
+    fun limparTextoContaminado(texto: String): String {
+        val regexCardProprio = Regex(
+            "(VALE A PENA|N[ÃA]O COMPENSA)[\\s\\S]{0,400}?Lucro l[ií]q\\.? ?est\\.?:? ?R\\$ ?[0-9.,]+",
+            RegexOption.IGNORE_CASE
+        )
+        return texto.replace(regexCardProprio, " ")
+    }
+
     fun pareceTelaDeCorrida(textoTela: String): Boolean {
         val textoLower = textoTela.lowercase()
         val temValor = VALOR_REGEX.containsMatchIn(textoTela)
