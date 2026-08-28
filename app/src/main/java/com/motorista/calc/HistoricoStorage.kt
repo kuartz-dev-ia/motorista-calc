@@ -23,22 +23,19 @@ data class RegistroCorrida(
     val cancelada: Boolean
 )
 
-/** Guarda o histórico de corridas detectadas (boas e não boas) e quais delas o
- * motorista marcou como aceitas ou canceladas, usando SharedPreferences + JSON. */
 object HistoricoStorage {
     private const val PREFS_NAME = "motorista_calc_historico"
     private const val CHAVE_REGISTROS = "registros"
     private const val MAX_REGISTROS = 500
-
-    // Se a MESMA oferta (valor + distância parecidos) for detectada de novo dentro
-    // desse tempo, é considerada a mesma corrida (ainda na tela, não uma nova) —
-    // evita duplicar no histórico enquanto o motorista não decide.
     private const val JANELA_DEDUP_MS = 45_000L
 
     private val formatoDia = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
 
     fun diaChaveDeHoje(): String = formatoDia.format(Date())
 
+    /** Retorna (id, foiRegistroNovo). Se a mesma oferta (valor + distância
+     * parecidos) já tiver sido registrada há pouco, reaproveita o id existente
+     * e sinaliza que NÃO é nova — quem chamou não deve mostrar o card de novo. */
     fun adicionarRegistro(
         context: Context,
         valorTotal: Double,
@@ -48,7 +45,7 @@ object HistoricoStorage {
         valorPorHora: Double?,
         lucroLiquido: Double?,
         valeAPena: Boolean
-    ): Long {
+    ): Pair<Long, Boolean> {
         val agora = System.currentTimeMillis()
         val lista = lerTodos(context).toMutableList()
 
@@ -57,7 +54,7 @@ object HistoricoStorage {
                 abs(r.valorTotal - valorTotal) < 0.05 &&
                 abs(r.distanciaTotalKm - distanciaTotalKm) < 0.15
         }
-        if (existente != null) return existente.id
+        if (existente != null) return existente.id to false
 
         val id = agora
         val registro = RegistroCorrida(
@@ -77,7 +74,7 @@ object HistoricoStorage {
         lista.add(registro)
         val podado = if (lista.size > MAX_REGISTROS) lista.takeLast(MAX_REGISTROS) else lista
         salvarTodos(context, podado)
-        return id
+        return id to true
     }
 
     fun marcarAceita(context: Context, id: Long) {
