@@ -72,9 +72,6 @@ class RideAccessibilityService : AccessibilityService() {
         }
         capturandoNoMomento = true
 
-        // Esconde nosso próprio card antes do print (e espera um instante pra
-        // garantir que o sistema já redesenhou a tela sem ele), pra não ler o
-        // próprio resultado calculado como se fosse dado novo da corrida.
         OverlayService.ocultarTemporariamente()
 
         handler.postDelayed({
@@ -218,10 +215,16 @@ class RideAccessibilityService : AccessibilityService() {
         Log.d(TAG, "Ride: $ride")
         Log.d(TAG, "Resultado: $resultado")
 
+        // Pausa a varredura (print + OCR) enquanto o card estiver na tela — evita
+        // o "piscar" de ficar escondendo/mostrando o card a cada ciclo. A varredura
+        // volta sozinha quando o card fechar (por X ou pelo tempo de exibição).
+        handler.removeCallbacks(pollRunnable)
+        OverlayService.aoFechar = { handler.post(pollRunnable) }
+
         val intent = Intent(this, OverlayService::class.java).apply {
             resultado.valorPorKmCalculado?.let { putExtra(OverlayService.EXTRA_VALOR_KM_CALC, it) }
-            resultado.valorPorKmExibido?.let { putExtra(OverlayService.EXTRA_VALOR_KM_EXIBIDO, it) }
             resultado.valorPorHoraEfetivo?.let { putExtra(OverlayService.EXTRA_VALOR_HORA_EFETIVO, it) }
+            resultado.valorPorMinutoEfetivo?.let { putExtra(OverlayService.EXTRA_VALOR_MINUTO_EFETIVO, it) }
             resultado.lucroLiquidoEstimado?.let { putExtra(OverlayService.EXTRA_LUCRO, it) }
             ride.surgeMultiplicador?.let { putExtra(OverlayService.EXTRA_SURGE, it) }
             ride.avaliacaoPassageiro?.let { putExtra(OverlayService.EXTRA_AVALIACAO, it) }
