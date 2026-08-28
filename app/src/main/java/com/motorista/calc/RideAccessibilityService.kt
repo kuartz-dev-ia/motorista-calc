@@ -143,9 +143,11 @@ class RideAccessibilityService : AccessibilityService() {
         }
     }
 
-    private fun processarTextoOcr(texto: String) {
-        if (texto.isBlank() || texto == ultimoTextoProcessado) return
-        ultimoTextoProcessado = texto
+    private fun processarTextoOcr(textoBruto: String) {
+        if (textoBruto.isBlank() || textoBruto == ultimoTextoProcessado) return
+        ultimoTextoProcessado = textoBruto
+
+        val texto = TriggerPatterns.limparTextoContaminado(textoBruto)
 
         registrarDebug(texto)
 
@@ -217,11 +219,9 @@ class RideAccessibilityService : AccessibilityService() {
         Log.d(TAG, "Ride: $ride")
         Log.d(TAG, "Resultado: $resultado")
 
-        // Registra essa corrida no histórico do dia (todas, boas ou não), pra
-        // alimentar os resumos e permitir marcar "Aceitei" depois.
         val distanciaTotalKm = (ride.distanciaPickupKm ?: 0.0) + (ride.distanciaCorridaKm ?: 0.0)
         val tempoTotalMin = ride.tempoEfetivoMin ?: 0
-        val registroId = HistoricoStorage.adicionarRegistro(
+        val (registroId, registroNovo) = HistoricoStorage.adicionarRegistro(
             context = this,
             valorTotal = ride.valorTotal,
             distanciaTotalKm = distanciaTotalKm,
@@ -232,9 +232,13 @@ class RideAccessibilityService : AccessibilityService() {
             valeAPena = resultado.valeAPena
         )
 
-        // Pausa a varredura (print + OCR) enquanto o card estiver na tela — evita
-        // o "piscar" de ficar escondendo/mostrando o card a cada ciclo. A varredura
-        // volta sozinha quando o card fechar (por X, por "Aceitei", ou pelo tempo).
+        if (!registroNovo) {
+            // Mesma oferta que já apareceu há pouco (ainda pendente na tela do
+            // Uber/99) — não mostra o card de novo pra não ficar "piscando".
+            Log.d(TAG, "Oferta repetida detectada, ignorando reexibição do card.")
+            return
+        }
+
         handler.removeCallbacks(pollRunnable)
         OverlayService.aoFechar = { handler.post(pollRunnable) }
 
@@ -250,6 +254,42 @@ class RideAccessibilityService : AccessibilityService() {
             putExtra(OverlayService.EXTRA_MOTIVO, resultado.motivo)
         }
         startService(intent)
+
+        // Agenda um print (com o card já visível) pra guardar no histórico de
+        // imagens — roda DEPOIS da captura de OCR, então não atrapalha o cálculo.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            handler.postDelayed({ salvarPrintDoMomento() }, 500L)
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.R)
+    private fun salvarPrintDoMomento() {
+        try {
+            takeScreenshot(
+                android.view.Display.DEFAULT_DISPLAY,
+                executor,
+                object : TakeScreenshotCallback {
+                    override fun onSuccess(result: ScreenshotResult) {
+                        try {
+                            val bitmapHardware = Bitmap.wrapHardwareBuffer(result.hardwareBuffer, result.colorSpace)
+                            val bitmap = bitmapHardware?.copy(Bitmap.Config.ARGB_8888, false)
+                            result.hardwareBuffer.close()
+                            if (bitmap != null) {
+                                PrintsStorage.salvar(this@RideAccessibilityService, bitmap)
+                            }
+                        } catch (e: Exception) {
+                            Log.e(TAG, "Erro salvando print do momento: ${e.message}")
+                        }
+                    }
+
+                    override fun onFailure(errorCode: Int) {
+                        Log.e(TAG, "Falha ao tirar print pra salvar (código $errorCode)")
+                    }
+                }
+            )
+        } catch (e: Exception) {
+            Log.e(TAG, "Erro ao pedir print pra salvar: ${e.message}")
+        }
     }
 
     override fun onInterrupt() {
