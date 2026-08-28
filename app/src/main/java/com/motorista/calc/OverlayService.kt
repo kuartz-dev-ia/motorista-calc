@@ -18,7 +18,8 @@ class OverlayService : Service() {
 
     private var windowManager: WindowManager? = null
     private var overlayView: android.view.View? = null
-    private var botaoFechar: android.view.View? = null
+    private var barraAcoes: android.view.View? = null
+    private var registroIdAtual: Long? = null
 
     private val handler = Handler(Looper.getMainLooper())
     private var dismissRunnable: Runnable? = null
@@ -33,6 +34,7 @@ class OverlayService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         intent ?: return START_NOT_STICKY
 
+        val registroId = if (intent.hasExtra(EXTRA_REGISTRO_ID)) intent.getLongExtra(EXTRA_REGISTRO_ID, -1L) else null
         val valorKmCalc = intent.getDoubleOrNull(EXTRA_VALOR_KM_CALC)
         val valorHoraEfetivo = intent.getDoubleOrNull(EXTRA_VALOR_HORA_EFETIVO)
         val valorMinutoEfetivo = intent.getDoubleOrNull(EXTRA_VALOR_MINUTO_EFETIVO)
@@ -42,7 +44,7 @@ class OverlayService : Service() {
         val valeAPena = intent.getBooleanExtra(EXTRA_VALE_A_PENA, true)
         val motivo = intent.getStringExtra(EXTRA_MOTIVO) ?: ""
 
-        mostrarOverlay(valorKmCalc, valorHoraEfetivo, valorMinutoEfetivo, lucro, surge, avaliacao, valeAPena, motivo)
+        mostrarOverlay(registroId, valorKmCalc, valorHoraEfetivo, valorMinutoEfetivo, lucro, surge, avaliacao, valeAPena, motivo)
         return START_NOT_STICKY
     }
 
@@ -52,6 +54,7 @@ class OverlayService : Service() {
     private fun dp(valor: Int): Int = (valor * resources.displayMetrics.density).toInt()
 
     private fun mostrarOverlay(
+        registroId: Long?,
         valorKmCalc: Double?,
         valorHoraEfetivo: Double?,
         valorMinutoEfetivo: Double?,
@@ -62,10 +65,11 @@ class OverlayService : Service() {
         motivo: String
     ) {
         limparViewsSemCallback()
+        registroIdAtual = registroId
         windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
 
         val corFundo = if (valeAPena) Color.parseColor("#FF1B5E20") else Color.parseColor("#FF8B1A1A")
-        
+
         val container = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setBackgroundColor(corFundo)
@@ -127,17 +131,43 @@ class OverlayService : Service() {
         overlayView = container
         windowManager?.addView(overlayView, paramsCard)
 
-        val fechar = TextView(this).apply {
+        // Barra com dois botões: "✔ Aceitei" (marca a corrida no histórico) e
+        // "✕" (só fecha o card). Janela separada, recebe toque normalmente.
+        val barra = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+        }
+
+        val btnAceitei = TextView(this).apply {
+            text = "✔ Aceitei"
+            setTextColor(Color.WHITE)
+            textSize = 12f
+            setBackgroundColor(Color.parseColor("#CC1B5E20"))
+            setPadding(dp(12), dp(6), dp(12), dp(6))
+            setOnClickListener {
+                registroIdAtual?.let { id -> HistoricoStorage.marcarAceita(this@OverlayService, id) }
+                fecharCard()
+            }
+        }
+
+        val espaco = android.view.View(this).apply {
+            layoutParams = LinearLayout.LayoutParams(dp(6), 1)
+        }
+
+        val btnFechar = TextView(this).apply {
             text = "✕"
             setTextColor(Color.WHITE)
-            textSize = 16f
+            textSize = 14f
             gravity = Gravity.CENTER
             setBackgroundColor(Color.parseColor("#CC000000"))
             setPadding(dp(12), dp(6), dp(12), dp(6))
             setOnClickListener { fecharCard() }
         }
 
-        val paramsFechar = WindowManager.LayoutParams(
+        barra.addView(btnAceitei)
+        barra.addView(espaco)
+        barra.addView(btnFechar)
+
+        val paramsBarra = WindowManager.LayoutParams(
             WindowManager.LayoutParams.WRAP_CONTENT,
             WindowManager.LayoutParams.WRAP_CONTENT,
             layoutType,
@@ -149,8 +179,8 @@ class OverlayService : Service() {
             y = dp(54)
         }
 
-        botaoFechar = fechar
-        windowManager?.addView(botaoFechar, paramsFechar)
+        barraAcoes = barra
+        windowManager?.addView(barraAcoes, paramsBarra)
 
         dismissRunnable = Runnable { fecharCard() }
         handler.postDelayed(dismissRunnable!!, DURACAO_EXIBICAO_MS)
@@ -201,8 +231,6 @@ class OverlayService : Service() {
         return coluna
     }
 
-    /** Remove as views da tela SEM avisar quem estava esperando o fechamento —
-     * usado internamente quando um novo card substitui um anterior. */
     private fun limparViewsSemCallback() {
         dismissRunnable?.let { handler.removeCallbacks(it) }
         dismissRunnable = null
@@ -212,16 +240,15 @@ class OverlayService : Service() {
         }
         overlayView = null
 
-        botaoFechar?.let {
+        barraAcoes?.let {
             try { windowManager?.removeView(it) } catch (e: Exception) { }
         }
-        botaoFechar = null
+        barraAcoes = null
     }
 
-    /** Fecha o card de vez (usuário tocou o X, ou o tempo de exibição acabou) e
-     * avisa quem estava esperando (o serviço de acessibilidade retoma a varredura). */
     private fun fecharCard() {
         limparViewsSemCallback()
+        registroIdAtual = null
         aoFechar?.invoke()
         aoFechar = null
     }
@@ -233,6 +260,7 @@ class OverlayService : Service() {
     }
 
     companion object {
+        const val EXTRA_REGISTRO_ID = "extra_registro_id"
         const val EXTRA_VALOR_KM_CALC = "extra_valor_km_calc"
         const val EXTRA_VALOR_KM_EXIBIDO = "extra_valor_km_exibido"
         const val EXTRA_VALOR_HORA_EFETIVO = "extra_valor_hora_efetivo"
@@ -245,30 +273,27 @@ class OverlayService : Service() {
 
         private const val MIN_KM_REF = 1.50
         private const val MIN_HORA_REF = 25.0
-        private const val MIN_MINUTO_REF = 0.42 // ~ R$25/hora dividido por 60
+        private const val MIN_MINUTO_REF = 0.42
 
         private const val DURACAO_EXIBICAO_MS = 5000L
 
         @Volatile
         private var instanciaAtual: OverlayService? = null
 
-        /** Callback chamado quando o card fecha (por X ou por tempo). Quem exibiu o
-         * card (o RideAccessibilityService) usa isso pra saber quando pode voltar
-         * a tirar prints em busca da próxima corrida. */
         @Volatile
         var aoFechar: (() -> Unit)? = null
 
         fun ocultarTemporariamente() {
             try {
                 instanciaAtual?.overlayView?.visibility = android.view.View.INVISIBLE
-                instanciaAtual?.botaoFechar?.visibility = android.view.View.INVISIBLE
+                instanciaAtual?.barraAcoes?.visibility = android.view.View.INVISIBLE
             } catch (e: Exception) { }
         }
 
         fun restaurarVisibilidade() {
             try {
                 instanciaAtual?.overlayView?.visibility = android.view.View.VISIBLE
-                instanciaAtual?.botaoFechar?.visibility = android.view.View.VISIBLE
+                instanciaAtual?.barraAcoes?.visibility = android.view.View.VISIBLE
             } catch (e: Exception) { }
         }
     }
