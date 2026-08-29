@@ -239,8 +239,6 @@ class RideAccessibilityService : AccessibilityService() {
         )
 
         if (!registroNovo) {
-            // Mesma oferta que já apareceu há pouco (ainda pendente na tela do
-            // Uber/99) — não mostra o card de novo pra não ficar "piscando".
             Log.d(TAG, "Oferta repetida detectada, ignorando reexibição do card.")
             return
         }
@@ -261,8 +259,6 @@ class RideAccessibilityService : AccessibilityService() {
         }
         startService(intent)
 
-        // Agenda um print (com o card já visível) pra guardar no histórico de
-        // imagens — roda DEPOIS da captura de OCR, então não atrapalha o cálculo.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             handler.postDelayed({ salvarPrintDoMomento() }, 500L)
         }
@@ -324,6 +320,7 @@ class RideAccessibilityService : AccessibilityService() {
         const val PREF_LICENCIAMENTO = "licenciamento_anual"
         const val PREF_MANUTENCAO = "manutencao_mensal"
         const val PREF_CONTAS_PESSOAIS = "contas_pessoais_mensal"
-        private const val VALOR_MAXIMO_PLAUSIVEL = 500.0
+        const val PREF_KM_MES = "km_rodados_mes"
+        private const val VALOR_MAXIMO_PLAUSIVEL = 300.0
     }
 }
