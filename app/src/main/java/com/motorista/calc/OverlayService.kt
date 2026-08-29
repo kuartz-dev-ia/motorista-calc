@@ -275,7 +275,7 @@ class OverlayService : Service() {
         private const val MIN_HORA_REF = 25.0
         private const val MIN_MINUTO_REF = 0.42
 
-        private const val DURACAO_EXIBICAO_MS = 5000L
+        private const val DURACAO_EXIBICAO_MS = 50000L
 
         @Volatile
         private var instanciaAtual: OverlayService? = null
