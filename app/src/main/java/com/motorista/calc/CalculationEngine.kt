@@ -47,8 +47,8 @@ class CalculationEngine(
         val distanciaCorrida = ride.distanciaCorridaKm
         val distanciaTotalRodada = (ride.distanciaPickupKm ?: 0.0) + (distanciaCorrida ?: 0.0)
 
-        val valorPorKmCalculado = if (valor != null && distanciaCorrida != null && distanciaCorrida > 0) {
-            valor / distanciaCorrida
+        val valorPorKmCalculado = if (valor != null && distanciaTotalRodada > 0) {
+            valor / distanciaTotalRodada
         } else null
 
         val valorPorHoraCorrida = if (valor != null && ride.tempoCorridaMin != null && ride.tempoCorridaMin > 0) {
