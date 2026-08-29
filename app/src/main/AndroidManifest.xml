@@ -29,6 +29,11 @@
             android:exported="false"
             android:label="Histórico de hoje" />
 
+        <activity
+            android:name=".PrintsActivity"
+            android:exported="false"
+            android:label="Prints salvos" />
+
         <service
             android:name=".RideAccessibilityService"
             android:exported="true"
