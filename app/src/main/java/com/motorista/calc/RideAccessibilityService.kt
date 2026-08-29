@@ -248,14 +248,11 @@ class RideAccessibilityService : AccessibilityService() {
 
         val intent = Intent(this, OverlayService::class.java).apply {
             putExtra(OverlayService.EXTRA_REGISTRO_ID, registroId)
+            putExtra(OverlayService.EXTRA_NIVEL, resultado.nivel.ordinal)
             resultado.valorPorKmCalculado?.let { putExtra(OverlayService.EXTRA_VALOR_KM_CALC, it) }
             resultado.valorPorHoraEfetivo?.let { putExtra(OverlayService.EXTRA_VALOR_HORA_EFETIVO, it) }
             resultado.valorPorMinutoEfetivo?.let { putExtra(OverlayService.EXTRA_VALOR_MINUTO_EFETIVO, it) }
             resultado.lucroLiquidoEstimado?.let { putExtra(OverlayService.EXTRA_LUCRO, it) }
-            ride.surgeMultiplicador?.let { putExtra(OverlayService.EXTRA_SURGE, it) }
-            ride.avaliacaoPassageiro?.let { putExtra(OverlayService.EXTRA_AVALIACAO, it) }
-            putExtra(OverlayService.EXTRA_VALE_A_PENA, resultado.valeAPena)
-            putExtra(OverlayService.EXTRA_MOTIVO, resultado.motivo)
         }
         startService(intent)
 
