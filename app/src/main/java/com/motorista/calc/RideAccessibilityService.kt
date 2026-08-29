@@ -321,6 +321,6 @@ class RideAccessibilityService : AccessibilityService() {
         const val PREF_MANUTENCAO = "manutencao_mensal"
         const val PREF_CONTAS_PESSOAIS = "contas_pessoais_mensal"
         const val PREF_KM_MES = "km_rodados_mes"
-        private const val VALOR_MAXIMO_PLAUSIVEL = 300.0
+        private const val VALOR_MAXIMO_PLAUSIVEL = 500.0
     }
 }
