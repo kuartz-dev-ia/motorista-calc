@@ -18,6 +18,8 @@ data class RideInfo(
         else null
 }
 
+enum class NivelCorrida { RUIM, MEDIO, BOM }
+
 data class RideResult(
     val valorPorKmCalculado: Double?,
     val valorPorKmExibido: Double?,
@@ -28,6 +30,7 @@ data class RideResult(
     val custoFixoEstimado: Double?,
     val lucroLiquidoEstimado: Double?,
     val valeAPena: Boolean,
+    val nivel: NivelCorrida,
     val motivo: String
 )
 
@@ -96,6 +99,17 @@ class CalculationEngine(
             motivos.add("Dentro dos parâmetros configurados")
         }
 
+        // Nível: RUIM se não vale a pena; entre BOM e MEDIO conforme a margem
+        // acima dos mínimos configurados (quanto mais folga, mais "BOM").
+        val nivel = if (!valeAPena) {
+            NivelCorrida.RUIM
+        } else {
+            val margemKm = if (valorPorKmCalculado != null && minimoValorPorKm > 0) valorPorKmCalculado / minimoValorPorKm else null
+            val margemHora = if (referenciaHora != null && minimoValorPorHora > 0) referenciaHora / minimoValorPorHora else null
+            val margem = listOfNotNull(margemKm, margemHora).minOrNull() ?: 1.0
+            if (margem >= 1.3) NivelCorrida.BOM else NivelCorrida.MEDIO
+        }
+
         return RideResult(
             valorPorKmCalculado = valorPorKmCalculado,
             valorPorKmExibido = ride.valorPorKmExibido,
@@ -106,6 +120,7 @@ class CalculationEngine(
             custoFixoEstimado = custoFixoEstimado,
             lucroLiquidoEstimado = lucroLiquido,
             valeAPena = valeAPena,
+            nivel = nivel,
             motivo = motivos.joinToString("; ")
         )
     }
