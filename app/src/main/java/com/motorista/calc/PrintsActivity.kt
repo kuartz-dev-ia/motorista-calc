@@ -1,7 +1,9 @@
 package com.motorista.calc
 
+import android.content.Intent
 import android.graphics.BitmapFactory
 import android.graphics.Typeface
+import android.net.Uri
 import android.os.Bundle
 import android.view.Gravity
 import android.widget.Button
@@ -9,6 +11,8 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.FileProvider
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -26,6 +30,36 @@ class PrintsActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         atualizarLista()
+    }
+
+    private fun uriDoArquivo(file: File): Uri =
+        FileProvider.getUriForFile(this, "$packageName.fileprovider", file)
+
+    private fun abrirImagem(file: File) {
+        try {
+            val uri = uriDoArquivo(file)
+            val intent = Intent(Intent.ACTION_VIEW).apply {
+                setDataAndType(uri, "image/png")
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
+            startActivity(Intent.createChooser(intent, "Abrir print"))
+        } catch (e: Exception) {
+            // ignora falha ao abrir
+        }
+    }
+
+    private fun compartilharImagem(file: File) {
+        try {
+            val uri = uriDoArquivo(file)
+            val intent = Intent(Intent.ACTION_SEND).apply {
+                type = "image/png"
+                putExtra(Intent.EXTRA_STREAM, uri)
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
+            startActivity(Intent.createChooser(intent, "Compartilhar print"))
+        } catch (e: Exception) {
+            // ignora falha ao compartilhar
+        }
     }
 
     private fun atualizarLista() {
@@ -82,6 +116,7 @@ class PrintsActivity : AppCompatActivity() {
                     } catch (e: Exception) {
                         // ignora falha ao gerar miniatura
                     }
+                    setOnClickListener { abrirImagem(arquivo) }
                 }
 
                 val txtHora = TextView(this).apply {
@@ -89,6 +124,12 @@ class PrintsActivity : AppCompatActivity() {
                     textSize = 12f
                     setPadding(16, 0, 16, 0)
                     layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+                }
+
+                val btnCompartilhar = Button(this).apply {
+                    text = "Compartilhar"
+                    textSize = 11f
+                    setOnClickListener { compartilharImagem(arquivo) }
                 }
 
                 val btnApagar = Button(this).apply {
@@ -102,6 +143,7 @@ class PrintsActivity : AppCompatActivity() {
 
                 linha.addView(thumb)
                 linha.addView(txtHora)
+                linha.addView(btnCompartilhar)
                 linha.addView(btnApagar)
                 container.addView(linha)
             }
