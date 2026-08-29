@@ -31,4 +31,31 @@ object PrintsStorage {
             // ignora falha ao salvar print, não é crítico
         }
     }
+
+    fun listarTodos(context: Context): List<File> {
+        val base = pastaBase(context)
+        val lista = mutableListOf<File>()
+        base.walkTopDown().forEach { f ->
+            if (f.isFile && f.extension.equals("png", ignoreCase = true)) lista.add(f)
+        }
+        return lista.sortedByDescending { it.lastModified() }
+    }
+
+    /** Reconstrói "yyyy-MM-dd" a partir da estrutura de pastas prints/yyyy/MM/dd/arquivo.png */
+    fun dataDoArquivo(file: File): String {
+        val dd = file.parentFile?.name ?: "??"
+        val mm = file.parentFile?.parentFile?.name ?: "??"
+        val yyyy = file.parentFile?.parentFile?.parentFile?.name ?: "????"
+        return "$yyyy-$mm-$dd"
+    }
+
+    fun apagar(file: File): Boolean = try {
+        file.delete()
+    } catch (e: Exception) {
+        false
+    }
+
+    fun apagarTodosDoDia(context: Context, dataChave: String) {
+        listarTodos(context).filter { dataDoArquivo(it) == dataChave }.forEach { apagar(it) }
+    }
 }
