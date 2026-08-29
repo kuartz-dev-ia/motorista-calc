@@ -193,6 +193,12 @@ class RideAccessibilityService : AccessibilityService() {
             return
         }
 
+        if (ride.valorTotal > VALOR_MAXIMO_PLAUSIVEL) {
+            Log.d(TAG, "Valor implausível (R$ ${ride.valorTotal}), provável erro de OCR. Ignorando.")
+            registrarStatus("Valor implausível ignorado: R$ ${ride.valorTotal}")
+            return
+        }
+
         val prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
 
         val financiamento = prefs.getFloat(PREF_FINANCIAMENTO, 0f).toDouble()
@@ -318,6 +324,6 @@ class RideAccessibilityService : AccessibilityService() {
         const val PREF_LICENCIAMENTO = "licenciamento_anual"
         const val PREF_MANUTENCAO = "manutencao_mensal"
         const val PREF_CONTAS_PESSOAIS = "contas_pessoais_mensal"
-        const val PREF_KM_MES = "km_rodados_mes"
+        private const val VALOR_MAXIMO_PLAUSIVEL = 500.0
     }
 }
