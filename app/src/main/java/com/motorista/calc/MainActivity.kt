@@ -59,6 +59,11 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, HistoricoActivity::class.java))
         }
 
+        val btnPrints = findViewById<android.widget.Button>(R.id.btnPrints)
+        btnPrints.setOnClickListener {
+            startActivity(Intent(this, PrintsActivity::class.java))
+        }
+
         btnAtivarAcessibilidade.setOnClickListener {
             startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
         }
