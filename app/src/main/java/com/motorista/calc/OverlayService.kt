@@ -4,6 +4,7 @@ import android.app.Service
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.PixelFormat
+import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.os.Build
 import android.os.Handler
@@ -39,12 +40,9 @@ class OverlayService : Service() {
         val valorHoraEfetivo = intent.getDoubleOrNull(EXTRA_VALOR_HORA_EFETIVO)
         val valorMinutoEfetivo = intent.getDoubleOrNull(EXTRA_VALOR_MINUTO_EFETIVO)
         val lucro = intent.getDoubleOrNull(EXTRA_LUCRO)
-        val surge = intent.getDoubleOrNull(EXTRA_SURGE)
-        val avaliacao = intent.getDoubleOrNull(EXTRA_AVALIACAO)
-        val valeAPena = intent.getBooleanExtra(EXTRA_VALE_A_PENA, true)
-        val motivo = intent.getStringExtra(EXTRA_MOTIVO) ?: ""
+        val nivel = NivelCorrida.values().getOrElse(intent.getIntExtra(EXTRA_NIVEL, 0)) { NivelCorrida.RUIM }
 
-        mostrarOverlay(registroId, valorKmCalc, valorHoraEfetivo, valorMinutoEfetivo, lucro, surge, avaliacao, valeAPena, motivo)
+        mostrarOverlay(registroId, valorKmCalc, valorHoraEfetivo, valorMinutoEfetivo, lucro, nivel)
         return START_NOT_STICKY
     }
 
@@ -59,54 +57,53 @@ class OverlayService : Service() {
         valorHoraEfetivo: Double?,
         valorMinutoEfetivo: Double?,
         lucro: Double?,
-        surge: Double?,
-        avaliacao: Double?,
-        valeAPena: Boolean,
-        motivo: String
+        nivel: NivelCorrida
     ) {
         limparViewsSemCallback()
         registroIdAtual = registroId
         windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
 
-        val corFundo = if (valeAPena) Color.parseColor("#FF1B5E20") else Color.parseColor("#FF8B1A1A")
+        val (corFundo, corTitulo, corValor, textoTitulo) = when (nivel) {
+            NivelCorrida.RUIM -> arrayOf(Color.parseColor("#FF791F1F"), Color.parseColor("#FFF7C1C1"), Color.parseColor("#FFFCEBEB"), "NÃO COMPENSA")
+            NivelCorrida.MEDIO -> arrayOf(Color.parseColor("#FF854F0B"), Color.parseColor("#FFFAC775"), Color.parseColor("#FFFAEEDA"), "VOCÊ DECIDE")
+            NivelCorrida.BOM -> arrayOf(Color.parseColor("#FF173404"), Color.parseColor("#FFC0DD97"), Color.parseColor("#FFEAF3DE"), "VALE A PENA")
+        }
 
         val container = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            setBackgroundColor(corFundo)
-            setPadding(dp(16), dp(12), dp(16), dp(12))
+            gravity = Gravity.CENTER_HORIZONTAL
+            setBackgroundColor(corFundo as Int)
+            setPadding(dp(20), dp(10), dp(20), dp(10))
         }
 
         val linhaTopo = TextView(this).apply {
-            text = buildString {
-                append(if (valeAPena) "✅ VALE A PENA" else "⚠️ NÃO COMPENSA")
-                if (surge != null && surge > 1.0) append("  ⚡%.1fx".format(surge))
-            }
-            setTextColor(Color.WHITE)
-            textSize = 15f
-            setPadding(0, 0, 0, dp(8))
+            text = textoTitulo as String
+            setTextColor(corTitulo as Int)
+            textSize = 16f
+            setTypeface(typeface, Typeface.BOLD)
+            gravity = Gravity.CENTER_HORIZONTAL
+            setPadding(0, 0, 0, dp(6))
         }
         container.addView(linhaTopo)
 
-        val linhaMetricas = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
-        linhaMetricas.addView(criarColuna("R$/KM", valorKmCalc?.let { "%.2f".format(it) } ?: "--", minimoRef = MIN_KM_REF, valorReal = valorKmCalc))
-        linhaMetricas.addView(criarColuna("R$/HORA", valorHoraEfetivo?.let { "%.0f".format(it) } ?: "--", minimoRef = MIN_HORA_REF, valorReal = valorHoraEfetivo))
-        linhaMetricas.addView(criarColuna("R$/MIN", valorMinutoEfetivo?.let { "%.2f".format(it) } ?: "--", minimoRef = MIN_MINUTO_REF, valorReal = valorMinutoEfetivo))
+        val linhaMetricas = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_HORIZONTAL
+        }
+        linhaMetricas.addView(criarColuna("R$/KM", valorKmCalc?.let { "%.2f".format(it) } ?: "--", corTitulo as Int, corValor as Int))
+        linhaMetricas.addView(criarColuna("R$/HORA", valorHoraEfetivo?.let { "%.0f".format(it) } ?: "--", corTitulo, corValor))
+        linhaMetricas.addView(criarColuna("R$/MIN", valorMinutoEfetivo?.let { "%.2f".format(it) } ?: "--", corTitulo, corValor))
         container.addView(linhaMetricas)
 
-        val linhaDetalhe = TextView(this).apply {
-            text = buildString {
-                lucro?.let { append("Lucro líq. est.: R$ %.2f".format(it)) }
-                avaliacao?.let { append("  •  Nota passageiro: %.2f".format(it)) }
-                if (motivo.isNotBlank()) {
-                    if (isNotEmpty()) append("\n")
-                    append(motivo)
-                }
-            }
-            setTextColor(Color.parseColor("#DDFFFFFF"))
-            textSize = 12f
-            setPadding(0, dp(8), 0, 0)
+        val linhaLucro = TextView(this).apply {
+            text = lucro?.let { "Lucro líquido: R$ %.2f".format(it) } ?: ""
+            setTextColor(corTitulo)
+            textSize = 15f
+            setTypeface(typeface, Typeface.BOLD)
+            gravity = Gravity.CENTER_HORIZONTAL
+            setPadding(0, dp(6), 0, 0)
         }
-        container.addView(linhaDetalhe)
+        container.addView(linhaLucro)
 
         val layoutType = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
@@ -131,11 +128,7 @@ class OverlayService : Service() {
         overlayView = container
         windowManager?.addView(overlayView, paramsCard)
 
-        // Barra com dois botões: "✔ Aceitei" (marca a corrida no histórico) e
-        // "✕" (só fecha o card). Janela separada, recebe toque normalmente.
-        val barra = LinearLayout(this).apply {
-            orientation = LinearLayout.HORIZONTAL
-        }
+        val barra = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
 
         val btnAceitei = TextView(this).apply {
             text = "✔ Aceitei"
@@ -176,7 +169,7 @@ class OverlayService : Service() {
         ).apply {
             gravity = Gravity.TOP or Gravity.END
             x = dp(8)
-            y = dp(54)
+            y = dp(50)
         }
 
         barraAcoes = barra
@@ -186,47 +179,30 @@ class OverlayService : Service() {
         handler.postDelayed(dismissRunnable!!, DURACAO_EXIBICAO_MS)
     }
 
-    private fun criarColuna(rotulo: String, valorTexto: String, minimoRef: Double, valorReal: Double?): LinearLayout {
+    private fun criarColuna(rotulo: String, valorTexto: String, corRotulo: Int, corValor: Int): LinearLayout {
         val coluna = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            setPadding(dp(10), 0, dp(10), 0)
-            minimumWidth = dp(78)
-        }
-
-        val bolinha = android.view.View(this).apply {
-            val cor = when {
-                valorReal == null -> Color.GRAY
-                valorReal >= minimoRef -> Color.parseColor("#4CAF50")
-                else -> Color.parseColor("#F44336")
-            }
-            background = GradientDrawable().apply {
-                shape = GradientDrawable.OVAL
-                setColor(cor)
-            }
-            layoutParams = LinearLayout.LayoutParams(dp(12), dp(12)).apply {
-                gravity = Gravity.CENTER_HORIZONTAL
-                topMargin = dp(2)
-                bottomMargin = dp(2)
-            }
+            gravity = Gravity.CENTER_HORIZONTAL
+            setPadding(dp(12), 0, dp(12), 0)
         }
 
         val txtValor = TextView(this).apply {
             text = valorTexto
-            setTextColor(Color.WHITE)
-            textSize = 16f
+            setTextColor(corValor)
+            textSize = 21f
+            setTypeface(typeface, Typeface.BOLD)
             gravity = Gravity.CENTER_HORIZONTAL
         }
 
         val txtRotulo = TextView(this).apply {
             text = rotulo
-            setTextColor(Color.parseColor("#CCFFFFFF"))
+            setTextColor(corRotulo)
             textSize = 11f
             gravity = Gravity.CENTER_HORIZONTAL
             maxLines = 1
         }
 
         coluna.addView(txtRotulo)
-        coluna.addView(bolinha)
         coluna.addView(txtValor)
         return coluna
     }
@@ -262,20 +238,12 @@ class OverlayService : Service() {
     companion object {
         const val EXTRA_REGISTRO_ID = "extra_registro_id"
         const val EXTRA_VALOR_KM_CALC = "extra_valor_km_calc"
-        const val EXTRA_VALOR_KM_EXIBIDO = "extra_valor_km_exibido"
         const val EXTRA_VALOR_HORA_EFETIVO = "extra_valor_hora_efetivo"
         const val EXTRA_VALOR_MINUTO_EFETIVO = "extra_valor_minuto_efetivo"
         const val EXTRA_LUCRO = "extra_lucro"
-        const val EXTRA_SURGE = "extra_surge"
-        const val EXTRA_AVALIACAO = "extra_avaliacao"
-        const val EXTRA_VALE_A_PENA = "extra_vale_a_pena"
-        const val EXTRA_MOTIVO = "extra_motivo"
+        const val EXTRA_NIVEL = "extra_nivel"
 
-        private const val MIN_KM_REF = 1.50
-        private const val MIN_HORA_REF = 25.0
-        private const val MIN_MINUTO_REF = 0.42
-
-        private const val DURACAO_EXIBICAO_MS = 50000L
+        private const val DURACAO_EXIBICAO_MS = 30000L
 
         @Volatile
         private var instanciaAtual: OverlayService? = null
