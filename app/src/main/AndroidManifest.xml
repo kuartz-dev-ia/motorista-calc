@@ -34,6 +34,11 @@
             android:exported="false"
             android:label="Prints salvos" />
 
+        <activity
+            android:name=".ParametrosActivity"
+            android:exported="false"
+            android:label="Parâmetros" />
+
         <service
             android:name=".RideAccessibilityService"
             android:exported="true"
