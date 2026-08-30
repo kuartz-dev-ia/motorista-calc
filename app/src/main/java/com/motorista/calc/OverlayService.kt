@@ -40,9 +40,10 @@ class OverlayService : Service() {
         val valorHoraEfetivo = intent.getDoubleOrNull(EXTRA_VALOR_HORA_EFETIVO)
         val valorMinutoEfetivo = intent.getDoubleOrNull(EXTRA_VALOR_MINUTO_EFETIVO)
         val lucro = intent.getDoubleOrNull(EXTRA_LUCRO)
+        val percentualLucro = intent.getDoubleOrNull(EXTRA_PERCENTUAL_LUCRO)
         val nivel = NivelCorrida.values().getOrElse(intent.getIntExtra(EXTRA_NIVEL, 0)) { NivelCorrida.RUIM }
 
-        mostrarOverlay(registroId, valorKmCalc, valorHoraEfetivo, valorMinutoEfetivo, lucro, nivel)
+        mostrarOverlay(registroId, valorKmCalc, valorHoraEfetivo, valorMinutoEfetivo, lucro, percentualLucro, nivel)
         return START_NOT_STICKY
     }
 
@@ -57,28 +58,39 @@ class OverlayService : Service() {
         valorHoraEfetivo: Double?,
         valorMinutoEfetivo: Double?,
         lucro: Double?,
+        percentualLucro: Double?,
         nivel: NivelCorrida
     ) {
         limparViewsSemCallback()
         registroIdAtual = registroId
         windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
 
-        val (corFundo, corTitulo, corValor, textoTitulo) = when (nivel) {
-            NivelCorrida.RUIM -> arrayOf(Color.parseColor("#FF791F1F"), Color.parseColor("#FFF7C1C1"), Color.parseColor("#FFFCEBEB"), "NÃO COMPENSA")
-            NivelCorrida.MEDIO -> arrayOf(Color.parseColor("#FF854F0B"), Color.parseColor("#FFFAC775"), Color.parseColor("#FFFAEEDA"), "VOCÊ DECIDE")
-            NivelCorrida.BOM -> arrayOf(Color.parseColor("#FF173404"), Color.parseColor("#FFC0DD97"), Color.parseColor("#FFEAF3DE"), "VALE A PENA")
+        data class Paleta(val fundoTopo: Int, val fundoBase: Int, val borda: Int, val titulo: Int, val rotulo: Int, val valor: Int, val pillFundo: Int, val texto: String)
+
+        val paleta = when (nivel) {
+            NivelCorrida.RUIM -> Paleta(Color.parseColor("#4A1414"), Color.parseColor("#2A0A0A"), Color.parseColor("#C24A4A"), Color.parseColor("#F7C1C1"), Color.parseColor("#D98787"), Color.parseColor("#FCEBEB"), Color.parseColor("#5A1E1E"), "NÃO COMPENSA")
+            NivelCorrida.MEDIO -> Paleta(Color.parseColor("#4A340A"), Color.parseColor("#2A1D03"), Color.parseColor("#D69A3F"), Color.parseColor("#FAC775"), Color.parseColor("#C99A55"), Color.parseColor("#FAEEDA"), Color.parseColor("#5A3E12"), "VOCÊ DECIDE")
+            NivelCorrida.BOM -> Paleta(Color.parseColor("#1E4A0A"), Color.parseColor("#0F2A03"), Color.parseColor("#6FAF3D"), Color.parseColor("#C0DD97"), Color.parseColor("#8FB868"), Color.parseColor("#EAF3DE"), Color.parseColor("#2E5A16"), "VALE A PENA")
+        }
+
+        val fundoCard = GradientDrawable(
+            GradientDrawable.Orientation.TL_BR,
+            intArrayOf(paleta.fundoTopo, paleta.fundoBase)
+        ).apply {
+            cornerRadius = dp(20).toFloat()
+            setStroke(dp(2), paleta.borda)
         }
 
         val container = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             gravity = Gravity.CENTER_HORIZONTAL
-            setBackgroundColor(corFundo as Int)
+            background = fundoCard
             setPadding(dp(20), dp(10), dp(20), dp(10))
         }
 
         val linhaTopo = TextView(this).apply {
-            text = textoTitulo as String
-            setTextColor(corTitulo as Int)
+            text = paleta.texto
+            setTextColor(paleta.titulo)
             textSize = 16f
             setTypeface(typeface, Typeface.BOLD)
             gravity = Gravity.CENTER_HORIZONTAL
@@ -90,18 +102,50 @@ class OverlayService : Service() {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_HORIZONTAL
         }
-        linhaMetricas.addView(criarColuna("R$/KM", valorKmCalc?.let { "%.2f".format(it) } ?: "--", corTitulo as Int, corValor as Int))
-        linhaMetricas.addView(criarColuna("R$/HORA", valorHoraEfetivo?.let { "%.0f".format(it) } ?: "--", corTitulo, corValor))
-        linhaMetricas.addView(criarColuna("R$/MIN", valorMinutoEfetivo?.let { "%.2f".format(it) } ?: "--", corTitulo, corValor))
+        linhaMetricas.addView(criarColuna("R$/KM", valorKmCalc?.let { "%.2f".format(it) } ?: "--", paleta.rotulo, paleta.valor))
+        linhaMetricas.addView(criarColuna("R$/HORA", valorHoraEfetivo?.let { "%.0f".format(it) } ?: "--", paleta.rotulo, paleta.valor))
+        linhaMetricas.addView(criarColuna("R$/MIN", valorMinutoEfetivo?.let { "%.2f".format(it) } ?: "--", paleta.rotulo, paleta.valor))
         container.addView(linhaMetricas)
 
-        val linhaLucro = TextView(this).apply {
-            text = lucro?.let { "Lucro líquido: R$ %.2f".format(it) } ?: ""
-            setTextColor(corTitulo)
-            textSize = 15f
+        val linhaSeparadora = android.view.View(this).apply {
+            setBackgroundColor(Color.parseColor("#26FFFFFF"))
+            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dp(1)).apply {
+                topMargin = dp(8); bottomMargin = dp(8)
+            }
+        }
+        container.addView(linhaSeparadora)
+
+        val linhaLucro = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER
+        }
+
+        val txtLucro = TextView(this).apply {
+            text = lucro?.let { "R$ %.2f".format(it) } ?: "--"
+            setTextColor(paleta.valor)
+            textSize = 16f
             setTypeface(typeface, Typeface.BOLD)
-            gravity = Gravity.CENTER_HORIZONTAL
-            setPadding(0, dp(6), 0, 0)
+        }
+        linhaLucro.addView(txtLucro)
+
+        if (percentualLucro != null) {
+            val espacoPill = android.view.View(this).apply {
+                layoutParams = LinearLayout.LayoutParams(dp(8), 1)
+            }
+            val pillFundo = GradientDrawable().apply {
+                cornerRadius = dp(10).toFloat()
+                setColor(paleta.pillFundo)
+            }
+            val txtPercentual = TextView(this).apply {
+                text = "%.0f%% lucro".format(percentualLucro)
+                setTextColor(paleta.titulo)
+                textSize = 12f
+                setTypeface(typeface, Typeface.BOLD)
+                background = pillFundo
+                setPadding(dp(8), dp(2), dp(8), dp(2))
+            }
+            linhaLucro.addView(espacoPill)
+            linhaLucro.addView(txtPercentual)
         }
         container.addView(linhaLucro)
 
@@ -134,7 +178,10 @@ class OverlayService : Service() {
             text = "✔ Aceitei"
             setTextColor(Color.WHITE)
             textSize = 12f
-            setBackgroundColor(Color.parseColor("#CC1B5E20"))
+            background = GradientDrawable().apply {
+                cornerRadius = dp(8).toFloat()
+                setColor(Color.parseColor("#CC1B5E20"))
+            }
             setPadding(dp(12), dp(6), dp(12), dp(6))
             setOnClickListener {
                 registroIdAtual?.let { id -> HistoricoStorage.marcarAceita(this@OverlayService, id) }
@@ -151,7 +198,10 @@ class OverlayService : Service() {
             setTextColor(Color.WHITE)
             textSize = 14f
             gravity = Gravity.CENTER
-            setBackgroundColor(Color.parseColor("#CC000000"))
+            background = GradientDrawable().apply {
+                cornerRadius = dp(8).toFloat()
+                setColor(Color.parseColor("#CC000000"))
+            }
             setPadding(dp(12), dp(6), dp(12), dp(6))
             setOnClickListener { fecharCard() }
         }
@@ -241,6 +291,7 @@ class OverlayService : Service() {
         const val EXTRA_VALOR_HORA_EFETIVO = "extra_valor_hora_efetivo"
         const val EXTRA_VALOR_MINUTO_EFETIVO = "extra_valor_minuto_efetivo"
         const val EXTRA_LUCRO = "extra_lucro"
+        const val EXTRA_PERCENTUAL_LUCRO = "extra_percentual_lucro"
         const val EXTRA_NIVEL = "extra_nivel"
 
         private const val DURACAO_EXIBICAO_MS = 30000L
