@@ -246,6 +246,10 @@ class RideAccessibilityService : AccessibilityService() {
         handler.removeCallbacks(pollRunnable)
         OverlayService.aoFechar = { handler.post(pollRunnable) }
 
+        val percentualLucro = if (resultado.lucroLiquidoEstimado != null && ride.valorTotal > 0) {
+            (resultado.lucroLiquidoEstimado / ride.valorTotal) * 100.0
+        } else null
+
         val intent = Intent(this, OverlayService::class.java).apply {
             putExtra(OverlayService.EXTRA_REGISTRO_ID, registroId)
             putExtra(OverlayService.EXTRA_NIVEL, resultado.nivel.ordinal)
@@ -253,6 +257,7 @@ class RideAccessibilityService : AccessibilityService() {
             resultado.valorPorHoraEfetivo?.let { putExtra(OverlayService.EXTRA_VALOR_HORA_EFETIVO, it) }
             resultado.valorPorMinutoEfetivo?.let { putExtra(OverlayService.EXTRA_VALOR_MINUTO_EFETIVO, it) }
             resultado.lucroLiquidoEstimado?.let { putExtra(OverlayService.EXTRA_LUCRO, it) }
+            percentualLucro?.let { putExtra(OverlayService.EXTRA_PERCENTUAL_LUCRO, it) }
         }
         startService(intent)
 
