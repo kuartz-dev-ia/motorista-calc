@@ -12,18 +12,14 @@ import java.util.Locale
 
 class HistoricoActivity : AppCompatActivity() {
 
-    private lateinit var containerBoas: LinearLayout
     private lateinit var containerAceitas: LinearLayout
-    private lateinit var txtResumoBoas: TextView
     private lateinit var txtResumoAceitas: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_historico)
 
-        txtResumoBoas = findViewById(R.id.txtResumoBoas)
         txtResumoAceitas = findViewById(R.id.txtResumoAceitas)
-        containerBoas = findViewById(R.id.containerBoas)
         containerAceitas = findViewById(R.id.containerAceitas)
     }
 
@@ -34,36 +30,14 @@ class HistoricoActivity : AppCompatActivity() {
 
     private fun atualizarTela() {
         val registros = HistoricoStorage.listarDoDia(this)
-        val boas = registros.filter { it.valeAPena }
         val aceitas = registros.filter { it.aceita && !it.cancelada }
 
-        txtResumoBoas.text = montarResumo(boas)
-        renderizarLista(
-            container = containerBoas,
-            lista = boas,
-            rotuloBotao = "Aceitei",
-            mostrarBotao = { registro -> !registro.aceita },
-            acaoBotao = { registro ->
-                HistoricoStorage.marcarAceita(this, registro.id)
-                atualizarTela()
-            }
-        )
-
         txtResumoAceitas.text = montarResumo(aceitas)
-        renderizarLista(
-            container = containerAceitas,
-            lista = aceitas,
-            rotuloBotao = "Cancelei",
-            mostrarBotao = { true },
-            acaoBotao = { registro ->
-                HistoricoStorage.marcarCancelada(this, registro.id)
-                atualizarTela()
-            }
-        )
+        renderizarLista(containerAceitas, aceitas)
     }
 
     private fun montarResumo(lista: List<RegistroCorrida>): String {
-        if (lista.isEmpty()) return "Nenhuma corrida registrada hoje ainda."
+        if (lista.isEmpty()) return "Nenhuma corrida aceita hoje ainda."
 
         val totalGanho = lista.sumOf { it.valorTotal }
         val totalKm = lista.sumOf { it.distanciaTotalKm }
@@ -82,13 +56,7 @@ class HistoricoActivity : AppCompatActivity() {
         }
     }
 
-    private fun renderizarLista(
-        container: LinearLayout,
-        lista: List<RegistroCorrida>,
-        rotuloBotao: String,
-        mostrarBotao: (RegistroCorrida) -> Boolean,
-        acaoBotao: (RegistroCorrida) -> Unit
-    ) {
+    private fun renderizarLista(container: LinearLayout, lista: List<RegistroCorrida>) {
         container.removeAllViews()
         val formatoHora = SimpleDateFormat("HH:mm", Locale.getDefault())
 
@@ -109,18 +77,20 @@ class HistoricoActivity : AppCompatActivity() {
                     registro.valorPorKm?.let { append(" — R$/km %.2f".format(it)) }
                 }
                 textSize = 13f
+                setTextColor(android.graphics.Color.parseColor("#E4E7EC"))
                 layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
             }
             linha.addView(texto)
 
-            if (mostrarBotao(registro)) {
-                val btnAcao = Button(this).apply {
-                    text = rotuloBotao
-                    textSize = 11f
-                    setOnClickListener { acaoBotao(registro) }
+            val btnCancelar = Button(this).apply {
+                text = "Cancelei"
+                textSize = 11f
+                setOnClickListener {
+                    HistoricoStorage.marcarCancelada(this@HistoricoActivity, registro.id)
+                    atualizarTela()
                 }
-                linha.addView(btnAcao)
             }
+            linha.addView(btnCancelar)
 
             container.addView(linha)
         }
