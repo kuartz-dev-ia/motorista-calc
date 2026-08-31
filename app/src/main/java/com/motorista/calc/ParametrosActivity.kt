@@ -77,25 +77,11 @@ class ParametrosActivity : AppCompatActivity() {
         }
 
         atualizarStatus(txtStatus)
-        atualizarDebug()
     }
 
     override fun onResume() {
         super.onResume()
         findViewById<android.widget.TextView>(R.id.txtStatus)?.let { atualizarStatus(it) }
-        atualizarDebug()
-    }
-
-    private fun atualizarDebug() {
-        val txtDebug = findViewById<android.widget.TextView>(R.id.txtDebug) ?: return
-        val status = prefs.getString(RideAccessibilityService.PREF_STATUS_OCR, null)
-        val texto = prefs.getString(RideAccessibilityService.PREF_ULTIMO_TEXTO, null)
-        txtDebug.text = buildString {
-            append("### STATUS ###\n")
-            append(status ?: "Nenhum status ainda.")
-            append("\n\n### ÚLTIMO TEXTO LIDO (OCR) ###\n")
-            append(texto ?: "Nenhum texto capturado ainda.")
-        }
     }
 
     private fun atualizarStatus(txtStatus: android.widget.TextView) {
