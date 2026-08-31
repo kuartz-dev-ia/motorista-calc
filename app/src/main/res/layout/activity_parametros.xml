@@ -19,211 +19,217 @@
             android:textStyle="bold"
             android:layout_marginBottom="16dp" />
 
-        <TextView
-            android:id="@+id/txtStatus"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="#E4E7EC"
-            android:layout_marginBottom="16dp" />
+            android:orientation="vertical"
+            android:background="@drawable/bg_card_dark"
+            android:padding="16dp"
+            android:layout_marginBottom="12dp">
 
-        <Button
-            android:id="@+id/btnAtivarAcessibilidade"
+            <TextView
+                android:id="@+id/txtStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="#E4E7EC"
+                android:layout_marginBottom="12dp" />
+
+            <Button
+                android:id="@+id/btnAtivarAcessibilidade"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="1. Ativar serviço de acessibilidade" />
+
+            <Button
+                android:id="@+id/btnPermitirOverlay"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="2. Permitir exibir sobre outros apps" />
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="1. Ativar serviço de acessibilidade" />
+            android:orientation="vertical"
+            android:background="@drawable/bg_card_dark"
+            android:padding="16dp"
+            android:layout_marginBottom="12dp">
 
-        <Button
-            android:id="@+id/btnPermitirOverlay"
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Parâmetros de cálculo"
+                android:textColor="#F4F5F7"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="R$/km mínimo aceitável"
+                android:textColor="#9AA4B2" />
+            <EditText
+                android:id="@+id/edtMinKm"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="#F4F5F7"
+                android:inputType="numberDecimal" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="R$/hora mínimo aceitável"
+                android:textColor="#9AA4B2" />
+            <EditText
+                android:id="@+id/edtMinHora"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="#F4F5F7"
+                android:inputType="numberDecimal" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="Consumo do carro (km por litro)"
+                android:textColor="#9AA4B2" />
+            <EditText
+                android:id="@+id/edtConsumo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="#F4F5F7"
+                android:inputType="numberDecimal" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="Preço do combustível (R$/litro)"
+                android:textColor="#9AA4B2" />
+            <EditText
+                android:id="@+id/edtPrecoCombustivel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="#F4F5F7"
+                android:inputType="numberDecimal" />
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="2. Permitir exibir sobre outros apps" />
+            android:orientation="vertical"
+            android:background="@drawable/bg_card_dark"
+            android:padding="16dp"
+            android:layout_marginBottom="12dp">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="Parâmetros de cálculo"
-            android:textColor="#F4F5F7"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Custos fixos mensais"
+                android:textColor="#F4F5F7"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="R$/km mínimo aceitável"
-            android:textColor="#9AA4B2" />
-        <EditText
-            android:id="@+id/edtMinKm"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="#F4F5F7"
-            android:inputType="numberDecimal" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Financiamento do carro (R$/mês)"
+                android:textColor="#9AA4B2" />
+            <EditText
+                android:id="@+id/edtFinanciamento"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="#F4F5F7"
+                android:inputType="numberDecimal" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="R$/hora mínimo aceitável"
-            android:textColor="#9AA4B2" />
-        <EditText
-            android:id="@+id/edtMinHora"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="#F4F5F7"
-            android:inputType="numberDecimal" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="Seguro do carro (R$/mês)"
+                android:textColor="#9AA4B2" />
+            <EditText
+                android:id="@+id/edtSeguro"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="#F4F5F7"
+                android:inputType="numberDecimal" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="Consumo do carro (km por litro)"
-            android:textColor="#9AA4B2" />
-        <EditText
-            android:id="@+id/edtConsumo"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="#F4F5F7"
-            android:inputType="numberDecimal" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="IPVA (R$/ano)"
+                android:textColor="#9AA4B2" />
+            <EditText
+                android:id="@+id/edtIpva"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="#F4F5F7"
+                android:inputType="numberDecimal" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="Preço do combustível (R$/litro)"
-            android:textColor="#9AA4B2" />
-        <EditText
-            android:id="@+id/edtPrecoCombustivel"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="#F4F5F7"
-            android:inputType="numberDecimal" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="Licenciamento (R$/ano)"
+                android:textColor="#9AA4B2" />
+            <EditText
+                android:id="@+id/edtLicenciamento"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="#F4F5F7"
+                android:inputType="numberDecimal" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="Custos fixos mensais"
-            android:textColor="#F4F5F7"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="Manutenção programada (R$/mês)"
+                android:textColor="#9AA4B2" />
+            <EditText
+                android:id="@+id/edtManutencao"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="#F4F5F7"
+                android:inputType="numberDecimal" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="Financiamento do carro (R$/mês)"
-            android:textColor="#9AA4B2" />
-        <EditText
-            android:id="@+id/edtFinanciamento"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="#F4F5F7"
-            android:inputType="numberDecimal" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="Suas contas pessoais (R$/mês)"
+                android:textColor="#9AA4B2" />
+            <EditText
+                android:id="@+id/edtContasPessoais"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="#F4F5F7"
+                android:inputType="numberDecimal" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="Seguro do carro (R$/mês)"
-            android:textColor="#9AA4B2" />
-        <EditText
-            android:id="@+id/edtSeguro"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="#F4F5F7"
-            android:inputType="numberDecimal" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="IPVA (R$/ano)"
-            android:textColor="#9AA4B2" />
-        <EditText
-            android:id="@+id/edtIpva"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="#F4F5F7"
-            android:inputType="numberDecimal" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="Licenciamento (R$/ano)"
-            android:textColor="#9AA4B2" />
-        <EditText
-            android:id="@+id/edtLicenciamento"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="#F4F5F7"
-            android:inputType="numberDecimal" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="Manutenção programada (R$/mês)"
-            android:textColor="#9AA4B2" />
-        <EditText
-            android:id="@+id/edtManutencao"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="#F4F5F7"
-            android:inputType="numberDecimal" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="Suas contas pessoais (R$/mês)"
-            android:textColor="#9AA4B2" />
-        <EditText
-            android:id="@+id/edtContasPessoais"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="#F4F5F7"
-            android:inputType="numberDecimal" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="Quantos km você roda por mês (em média)"
-            android:textColor="#9AA4B2" />
-        <EditText
-            android:id="@+id/edtKmMes"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="#F4F5F7"
-            android:inputType="numberDecimal" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="Quantos km você roda por mês (em média)"
+                android:textColor="#9AA4B2" />
+            <EditText
+                android:id="@+id/edtKmMes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="#F4F5F7"
+                android:inputType="numberDecimal" />
+        </LinearLayout>
 
         <Button
             android:id="@+id/btnSalvar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
             android:text="Salvar configurações" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="🐛 Último texto capturado (debug)"
-            android:textColor="#F4F5F7"
-            android:textStyle="bold"
-            android:layout_marginTop="24dp" />
-
-        <TextView
-            android:id="@+id/txtDebug"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:textColor="#9AA4B2"
-            android:textIsSelectable="true"
-            android:fontFamily="monospace"
-            android:textSize="11sp" />
 
     </LinearLayout>
 </ScrollView>
