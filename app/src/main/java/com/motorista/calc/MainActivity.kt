@@ -1,6 +1,7 @@
 package com.motorista.calc
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 
@@ -13,9 +14,9 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         prefs = getSharedPreferences(RideAccessibilityService.PREFS_NAME, MODE_PRIVATE)
+        TrialManager.garantirInicializado(this)
 
         val switchAtivo = findViewById<android.widget.Switch>(R.id.switchAtivo)
-        switchAtivo.isChecked = prefs.getBoolean(RideAccessibilityService.PREF_MONITORAMENTO_ATIVO, true)
         switchAtivo.setOnCheckedChangeListener { _, ativado ->
             prefs.edit().putBoolean(RideAccessibilityService.PREF_MONITORAMENTO_ATIVO, ativado).apply()
         }
@@ -36,6 +37,7 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         atualizarResumoHoje()
+        atualizarTrial()
     }
 
     private fun atualizarResumoHoje() {
@@ -49,5 +51,24 @@ class MainActivity : AppCompatActivity() {
         findViewById<android.widget.TextView>(R.id.txtGanhoHoje).text = "R$ %.2f".format(ganhoLiquido)
         findViewById<android.widget.TextView>(R.id.txtResumoHoje).text =
             "${aceitas.size} corridas aceitas • %.1f km • %.1f h".format(km, horas)
+    }
+
+    private fun atualizarTrial() {
+        val txtTeste = findViewById<android.widget.TextView>(R.id.txtTeste)
+        val switchAtivo = findViewById<android.widget.Switch>(R.id.switchAtivo)
+
+        if (TrialManager.expirou(this)) {
+            txtTeste.text = "⛔ Período de teste encerrado (${TrialManager.DIAS_DE_TESTE} dias). Fale com quem te passou o app pra continuar usando."
+            txtTeste.setTextColor(Color.parseColor("#F7C1C1"))
+            switchAtivo.isChecked = false
+            switchAtivo.isEnabled = false
+            prefs.edit().putBoolean(RideAccessibilityService.PREF_MONITORAMENTO_ATIVO, false).apply()
+        } else {
+            val restantes = TrialManager.diasRestantes(this)
+            txtTeste.text = "🧪 Versão de teste: $restantes dia(s) restante(s)"
+            txtTeste.setTextColor(Color.parseColor("#9AA4B2"))
+            switchAtivo.isEnabled = true
+            switchAtivo.isChecked = prefs.getBoolean(RideAccessibilityService.PREF_MONITORAMENTO_ATIVO, true)
+        }
     }
 }
