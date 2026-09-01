@@ -37,7 +37,8 @@ class RideAccessibilityService : AccessibilityService() {
             try {
                 val monitoramentoAtivo = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
                     .getBoolean(PREF_MONITORAMENTO_ATIVO, true)
-                if (monitoramentoAtivo && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                val testeExpirado = TrialManager.expirou(this)
+                if (monitoramentoAtivo && !testeExpirado && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                     tentarCapturarEOcr()
                 }
             } catch (e: Exception) {
