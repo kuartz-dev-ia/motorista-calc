@@ -1,26 +1,32 @@
 package com.motorista.calc
 
 import android.content.Context
+import android.content.pm.PackageManager
 
-/** Controla o período de teste do app: grava a data da primeira abertura e
- * calcula quantos dias já se passaram, pra liberar/bloquear o uso. */
+/** Controla o período de teste do app usando a data de instalação do APK
+ * (informação do próprio Android, que não é apagada ao "limpar dados" do
+ * app — só some se a pessoa desinstalar e instalar de novo). */
 object TrialManager {
-    private const val PREFS_NAME = "motorista_calc_trial"
-    private const val CHAVE_PRIMEIRO_USO = "primeiro_uso_millis"
     const val DIAS_DE_TESTE = 10
 
-    private fun prefs(context: Context) = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-
-    fun garantirInicializado(context: Context) {
-        val p = prefs(context)
-        if (!p.contains(CHAVE_PRIMEIRO_USO)) {
-            p.edit().putLong(CHAVE_PRIMEIRO_USO, System.currentTimeMillis()).apply()
+    private fun dataDeInstalacaoMillis(context: Context): Long {
+        return try {
+            @Suppress("DEPRECATION")
+            val info = context.packageManager.getPackageInfo(context.packageName, 0)
+            info.firstInstallTime
+        } catch (e: PackageManager.NameNotFoundException) {
+            System.currentTimeMillis()
         }
     }
 
+    fun garantirInicializado(context: Context) {
+        // Não precisa mais salvar nada manualmente — a data de instalação
+        // já é mantida pelo próprio sistema Android.
+    }
+
     fun diasUsados(context: Context): Int {
-        val inicio = prefs(context).getLong(CHAVE_PRIMEIRO_USO, System.currentTimeMillis())
-        val diffMillis = System.currentTimeMillis() - inicio
+        val inicio = dataDeInstalacaoMillis(context)
+        val diffMillis = (System.currentTimeMillis() - inicio).coerceAtLeast(0)
         return (diffMillis / (24L * 60 * 60 * 1000)).toInt()
     }
 
