@@ -294,7 +294,7 @@ class OverlayService : Service() {
         const val EXTRA_PERCENTUAL_LUCRO = "extra_percentual_lucro"
         const val EXTRA_NIVEL = "extra_nivel"
 
-        private const val DURACAO_EXIBICAO_MS = 30000L
+        private const val DURACAO_EXIBICAO_MS = 10000L
 
         @Volatile
         private var instanciaAtual: OverlayService? = null
