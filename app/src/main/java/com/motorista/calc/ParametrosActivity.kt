@@ -31,7 +31,7 @@ class ParametrosActivity : AppCompatActivity() {
         val edtManutencao = findViewById<android.widget.EditText>(R.id.edtManutencao)
         val edtContasPessoais = findViewById<android.widget.EditText>(R.id.edtContasPessoais)
         val edtKmMes = findViewById<android.widget.EditText>(R.id.edtKmMes)
-        val btnSalvar = findViewById<android.widget.Button>(R.id.btnSalvar)
+        val btnSalvar = findViewById<android.widget.TextView>(R.id.btnSalvar)
         val txtStatus = findViewById<android.widget.TextView>(R.id.txtStatus)
 
         // Só preenche o campo se já existir um valor salvo — senão fica vazio,
