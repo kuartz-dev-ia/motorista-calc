@@ -34,17 +34,19 @@ class ParametrosActivity : AppCompatActivity() {
         val btnSalvar = findViewById<android.widget.Button>(R.id.btnSalvar)
         val txtStatus = findViewById<android.widget.TextView>(R.id.txtStatus)
 
-        edtMinKm.setText(prefs.getFloat(RideAccessibilityService.PREF_MIN_KM, 1.50f).toString())
-        edtMinHora.setText(prefs.getFloat(RideAccessibilityService.PREF_MIN_HORA, 25.0f).toString())
-        edtConsumo.setText(prefs.getFloat(RideAccessibilityService.PREF_CONSUMO, 12.0f).toString())
-        edtPrecoCombustivel.setText(prefs.getFloat(RideAccessibilityService.PREF_PRECO_COMBUSTIVEL, 6.10f).toString())
-        edtFinanciamento.setText(prefs.getFloat(RideAccessibilityService.PREF_FINANCIAMENTO, 0f).toString())
-        edtSeguro.setText(prefs.getFloat(RideAccessibilityService.PREF_SEGURO, 0f).toString())
-        edtIpva.setText(prefs.getFloat(RideAccessibilityService.PREF_IPVA, 0f).toString())
-        edtLicenciamento.setText(prefs.getFloat(RideAccessibilityService.PREF_LICENCIAMENTO, 0f).toString())
-        edtManutencao.setText(prefs.getFloat(RideAccessibilityService.PREF_MANUTENCAO, 0f).toString())
-        edtContasPessoais.setText(prefs.getFloat(RideAccessibilityService.PREF_CONTAS_PESSOAIS, 0f).toString())
-        edtKmMes.setText(prefs.getFloat(RideAccessibilityService.PREF_KM_MES, 3000f).toString())
+        // Só preenche o campo se já existir um valor salvo — senão fica vazio,
+        // pronto pra você digitar.
+        preencherSeExistir(edtMinKm, RideAccessibilityService.PREF_MIN_KM)
+        preencherSeExistir(edtMinHora, RideAccessibilityService.PREF_MIN_HORA)
+        preencherSeExistir(edtConsumo, RideAccessibilityService.PREF_CONSUMO)
+        preencherSeExistir(edtPrecoCombustivel, RideAccessibilityService.PREF_PRECO_COMBUSTIVEL)
+        preencherSeExistir(edtFinanciamento, RideAccessibilityService.PREF_FINANCIAMENTO)
+        preencherSeExistir(edtSeguro, RideAccessibilityService.PREF_SEGURO)
+        preencherSeExistir(edtIpva, RideAccessibilityService.PREF_IPVA)
+        preencherSeExistir(edtLicenciamento, RideAccessibilityService.PREF_LICENCIAMENTO)
+        preencherSeExistir(edtManutencao, RideAccessibilityService.PREF_MANUTENCAO)
+        preencherSeExistir(edtContasPessoais, RideAccessibilityService.PREF_CONTAS_PESSOAIS)
+        preencherSeExistir(edtKmMes, RideAccessibilityService.PREF_KM_MES)
 
         btnAtivarAcessibilidade.setOnClickListener {
             startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
@@ -77,6 +79,12 @@ class ParametrosActivity : AppCompatActivity() {
         }
 
         atualizarStatus(txtStatus)
+    }
+
+    private fun preencherSeExistir(campo: android.widget.EditText, chave: String) {
+        if (prefs.contains(chave)) {
+            campo.setText(prefs.getFloat(chave, 0f).toString())
+        }
     }
 
     override fun onResume() {
