@@ -193,7 +193,24 @@
                     android:layout_marginTop="4dp" />
             </LinearLayout>
         </LinearLayout>
+        
+        <TextView
+            android:id="@+id/btnAbastecimentos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="14dp"
+            android:gravity="center"
+            android:background="@drawable/bg_card_dark"
+            android:text="⛽ Abastecimentos e consumo real"
+            android:textColor="#9AA4B2"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="12dp"
+            android:clickable="true"
+            android:focusable="true" />
 
+        <TextView
+            android:id="@+id/btnResumoSemanal"
         <TextView
             android:id="@+id/btnResumoSemanal"
             android:layout_width="match_parent"
