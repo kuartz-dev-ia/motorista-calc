@@ -1,13 +1,18 @@
 package com.motorista.calc
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var prefs: android.content.SharedPreferences
+    private val CODIGO_PERMISSAO_GRAVACAO = 501
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,8 +34,16 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, PrintsActivity::class.java))
         }
 
+        findViewById<android.view.View>(R.id.btnGravacoes).setOnClickListener {
+            startActivity(Intent(this, RecordingsActivity::class.java))
+        }
+
         findViewById<android.view.View>(R.id.btnParametros).setOnClickListener {
             startActivity(Intent(this, ParametrosActivity::class.java))
+        }
+
+        findViewById<android.widget.TextView>(R.id.btnGravar).setOnClickListener {
+            alternarGravacao()
         }
     }
 
@@ -38,6 +51,7 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         atualizarResumoHoje()
         atualizarTrial()
+        atualizarBotaoGravar()
     }
 
     private fun atualizarResumoHoje() {
@@ -70,5 +84,56 @@ class MainActivity : AppCompatActivity() {
             switchAtivo.isEnabled = true
             switchAtivo.isChecked = prefs.getBoolean(RideAccessibilityService.PREF_MONITORAMENTO_ATIVO, true)
         }
+    }
+
+    private fun atualizarBotaoGravar() {
+        val btnGravar = findViewById<android.widget.TextView>(R.id.btnGravar)
+        if (RideRecorderService.emGravacao) {
+            btnGravar.text = "⏺️ Gravando... toque para parar"
+            btnGravar.setTextColor(Color.parseColor("#C0DD97"))
+        } else {
+            btnGravar.text = "🔴 Iniciar gravação da corrida"
+            btnGravar.setTextColor(Color.parseColor("#F7C1C1"))
+        }
+    }
+
+    private fun alternarGravacao() {
+        if (RideRecorderService.emGravacao) {
+            startService(Intent(this, RideRecorderService::class.java).apply { action = RideRecorderService.ACTION_STOP })
+            atualizarBotaoGravar()
+            return
+        }
+
+        val temCamera = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
+        val temMic = ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
+
+        if (!temCamera || !temMic) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO),
+                CODIGO_PERMISSAO_GRAVACAO
+            )
+            return
+        }
+
+        iniciarServicoDeGravacao()
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == CODIGO_PERMISSAO_GRAVACAO) {
+            val concedidas = grantResults.isNotEmpty() && grantResults.all { it == PackageManager.PERMISSION_GRANTED }
+            if (concedidas) {
+                iniciarServicoDeGravacao()
+            } else {
+                android.widget.Toast.makeText(this, "Permissão de câmera/microfone é necessária para gravar", android.widget.Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
+    private fun iniciarServicoDeGravacao() {
+        val intent = Intent(this, RideRecorderService::class.java).apply { action = RideRecorderService.ACTION_START }
+        ContextCompat.startForegroundService(this, intent)
+        atualizarBotaoGravar()
     }
 }
