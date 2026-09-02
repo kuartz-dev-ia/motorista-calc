@@ -446,19 +446,36 @@
             </LinearLayout>
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/btnSalvar"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/bg_hero_green"
-            android:padding="14dp"
-            android:gravity="center"
-            android:text="Salvar configurações"
-            android:textColor="#EAF3DE"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:clickable="true"
-            android:focusable="true" />
+            android:orientation="vertical"
+            android:background="@drawable/bg_card_dark"
+            android:padding="16dp"
+            android:layout_marginBottom="12dp">
 
-    </LinearLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Segurança"
+                android:textColor="#F4F5F7"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Avisar pausa a cada quantas horas dirigindo"
+                android:textColor="#9AA4B2" />
+            <EditText
+                android:id="@+id/edtLimitePausa"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="#F4F5F7"
+                android:inputType="numberDecimal" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/btnSalvar"
 </ScrollView>
