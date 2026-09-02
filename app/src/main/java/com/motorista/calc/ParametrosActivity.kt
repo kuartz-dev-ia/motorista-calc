@@ -31,11 +31,10 @@ class ParametrosActivity : AppCompatActivity() {
         val edtManutencao = findViewById<android.widget.EditText>(R.id.edtManutencao)
         val edtContasPessoais = findViewById<android.widget.EditText>(R.id.edtContasPessoais)
         val edtKmMes = findViewById<android.widget.EditText>(R.id.edtKmMes)
+        val edtLimitePausa = findViewById<android.widget.EditText>(R.id.edtLimitePausa)
         val btnSalvar = findViewById<android.widget.TextView>(R.id.btnSalvar)
         val txtStatus = findViewById<android.widget.TextView>(R.id.txtStatus)
 
-        // Só preenche o campo se já existir um valor salvo — senão fica vazio,
-        // pronto pra você digitar.
         preencherSeExistir(edtMinKm, RideAccessibilityService.PREF_MIN_KM)
         preencherSeExistir(edtMinHora, RideAccessibilityService.PREF_MIN_HORA)
         preencherSeExistir(edtConsumo, RideAccessibilityService.PREF_CONSUMO)
@@ -47,6 +46,7 @@ class ParametrosActivity : AppCompatActivity() {
         preencherSeExistir(edtManutencao, RideAccessibilityService.PREF_MANUTENCAO)
         preencherSeExistir(edtContasPessoais, RideAccessibilityService.PREF_CONTAS_PESSOAIS)
         preencherSeExistir(edtKmMes, RideAccessibilityService.PREF_KM_MES)
+        preencherSeExistir(edtLimitePausa, RideAccessibilityService.PREF_LIMITE_PAUSA_HORAS)
 
         btnAtivarAcessibilidade.setOnClickListener {
             startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
@@ -73,6 +73,7 @@ class ParametrosActivity : AppCompatActivity() {
                 putFloat(RideAccessibilityService.PREF_MANUTENCAO, edtManutencao.text.toString().toFloatOrNull() ?: 0f)
                 putFloat(RideAccessibilityService.PREF_CONTAS_PESSOAIS, edtContasPessoais.text.toString().toFloatOrNull() ?: 0f)
                 putFloat(RideAccessibilityService.PREF_KM_MES, edtKmMes.text.toString().toFloatOrNull() ?: 3000f)
+                putFloat(RideAccessibilityService.PREF_LIMITE_PAUSA_HORAS, edtLimitePausa.text.toString().toFloatOrNull() ?: 3.0f)
                 apply()
             }
             android.widget.Toast.makeText(this, "Configurações salvas", android.widget.Toast.LENGTH_SHORT).show()
