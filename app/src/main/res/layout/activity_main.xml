@@ -44,41 +44,6 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@drawable/bg_hero_green"
-            android:padding="16dp"
-            android:layout_marginBottom="14dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="GANHO LÍQUIDO HOJE"
-                android:textColor="#C0DD97"
-                android:textSize="11sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/txtGanhoHoje"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="R$ 0,00"
-                android:textColor="#FFFFFF"
-                android:textSize="28sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/txtResumoHoje"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="0 corridas aceitas • 0,0 km • 0,0 h"
-                android:textColor="#8FB868"
-                android:textSize="11sp"
-                android:layout_marginTop="2dp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
             android:background="@drawable/bg_card_dark"
@@ -117,12 +82,14 @@
             android:focusable="true" />
 
         <LinearLayout
+            android:id="@+id/cardAviso"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:background="@drawable/bg_card_dark"
             android:padding="12dp"
-            android:layout_marginBottom="12dp">
+            android:layout_marginBottom="12dp"
+            android:visibility="gone">
 
             <TextView
                 android:id="@+id/txtTeste"
