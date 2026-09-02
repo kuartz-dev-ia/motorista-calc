@@ -10,6 +10,7 @@
         android:orientation="vertical"
         android:padding="20dp">
 
+        <!-- TÍTULO -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -19,6 +20,7 @@
             android:textStyle="bold"
             android:layout_marginBottom="16dp" />
 
+        <!-- ACESSIBILIDADE -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -46,8 +48,10 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:text="2. Permitir exibir sobre outros apps" />
+
         </LinearLayout>
 
+        <!-- PARÂMETROS DE CÁLCULO -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -65,6 +69,7 @@
                 android:textStyle="bold"
                 android:layout_marginBottom="10dp" />
 
+            <!-- R$/KM E R$/HORA -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -99,6 +104,7 @@
                         android:textSize="16sp"
                         android:textStyle="bold"
                         android:inputType="numberDecimal" />
+
                 </LinearLayout>
 
                 <LinearLayout
@@ -129,9 +135,12 @@
                         android:textSize="16sp"
                         android:textStyle="bold"
                         android:inputType="numberDecimal" />
+
                 </LinearLayout>
+
             </LinearLayout>
 
+            <!-- CONSUMO E COMBUSTÍVEL -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -165,6 +174,7 @@
                         android:textSize="16sp"
                         android:textStyle="bold"
                         android:inputType="numberDecimal" />
+
                 </LinearLayout>
 
                 <LinearLayout
@@ -195,10 +205,14 @@
                         android:textSize="16sp"
                         android:textStyle="bold"
                         android:inputType="numberDecimal" />
+
                 </LinearLayout>
+
             </LinearLayout>
+
         </LinearLayout>
 
+        <!-- CUSTOS FIXOS -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -216,6 +230,7 @@
                 android:textStyle="bold"
                 android:layout_marginBottom="10dp" />
 
+            <!-- FINANCIAMENTO E SEGURO -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -250,6 +265,7 @@
                         android:textSize="16sp"
                         android:textStyle="bold"
                         android:inputType="numberDecimal" />
+
                 </LinearLayout>
 
                 <LinearLayout
@@ -280,9 +296,12 @@
                         android:textSize="16sp"
                         android:textStyle="bold"
                         android:inputType="numberDecimal" />
+
                 </LinearLayout>
+
             </LinearLayout>
 
+            <!-- IPVA E LICENCIAMENTO -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -317,6 +336,7 @@
                         android:textSize="16sp"
                         android:textStyle="bold"
                         android:inputType="numberDecimal" />
+
                 </LinearLayout>
 
                 <LinearLayout
@@ -347,9 +367,12 @@
                         android:textSize="16sp"
                         android:textStyle="bold"
                         android:inputType="numberDecimal" />
+
                 </LinearLayout>
+
             </LinearLayout>
 
+            <!-- MANUTENÇÃO E CONTAS PESSOAIS -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -384,6 +407,7 @@
                         android:textSize="16sp"
                         android:textStyle="bold"
                         android:inputType="numberDecimal" />
+
                 </LinearLayout>
 
                 <LinearLayout
@@ -414,9 +438,12 @@
                         android:textSize="16sp"
                         android:textStyle="bold"
                         android:inputType="numberDecimal" />
+
                 </LinearLayout>
+
             </LinearLayout>
 
+            <!-- KM MENSAL -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -443,9 +470,12 @@
                     android:textSize="16sp"
                     android:textStyle="bold"
                     android:inputType="numberDecimal" />
+
             </LinearLayout>
+
         </LinearLayout>
 
+        <!-- SEGURANÇA -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -467,15 +497,24 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Avisar pausa a cada quantas horas dirigindo"
-                android:textColor="#9AA4B2" />
+                android:textColor="#9AA4B2"
+                android:layout_marginBottom="8dp" />
+
             <EditText
-                android:id="@+id/edtLimitePausa"
+                android:id="@+id/edtHorasPausa"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="#F4F5F7"
+                android:layout_height="44dp"
+                android:background="@drawable/bg_input_verde"
+                android:gravity="center"
+                android:textColor="#EAF3DE"
+                android:textColorHint="#3F5A34"
+                android:hint="Ex.: 4"
+                android:textSize="16sp"
+                android:textStyle="bold"
                 android:inputType="numberDecimal" />
+
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/btnSalvar"
+    </LinearLayout>
+
 </ScrollView>
