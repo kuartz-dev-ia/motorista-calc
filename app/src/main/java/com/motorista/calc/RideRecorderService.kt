@@ -109,7 +109,7 @@ class RideRecorderService : Service() {
         }
 
         val caracteristicas = cameraManager.getCameraCharacteristics(idFrontal)
-        val sensorOrientation = caracteristicas.get(CameraCharacteristics.SENSOR_ORIENTATION) ?: 90
+        val sensorOrientation = caracteristicas.get(CameraCharacteristics.SENSOR_ORIENTATION) ?: 270
 
         mediaRecorder = criarMediaRecorder(sensorOrientation)
 
@@ -142,13 +142,15 @@ class RideRecorderService : Service() {
         recorder.setOutputFile(arquivoAtual!!.absolutePath)
         recorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264)
         recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
-        recorder.setVideoSize(1280, 720)
+        // Tamanho invertido (720x1280) pra gravar em formato vertical (retrato),
+        // já que o celular fica na posição normal (em pé) durante a corrida.
+        recorder.setVideoSize(720, 1280)
         recorder.setVideoFrameRate(25)
         recorder.setVideoEncodingBitRate(4_000_000)
         recorder.setAudioEncodingBitRate(128_000)
         recorder.setAudioSamplingRate(44100)
-        val hint = (360 - ((sensorOrientation + 270) % 360)) % 360
-        recorder.setOrientationHint(hint)
+        // Assume celular segurado na vertical (posição normal de uso).
+        recorder.setOrientationHint(sensorOrientation)
         recorder.prepare()
         return recorder
     }
@@ -172,6 +174,7 @@ class RideRecorderService : Service() {
                     agendarParadaAutomatica()
                     mainHandler.post {
                         Toast.makeText(this@RideRecorderService, "🔴 Gravação iniciada", Toast.LENGTH_SHORT).show()
+                        aoMudarEstado?.invoke()
                     }
                 } catch (e: Exception) {
                     Log.e(TAG, "Erro ao iniciar gravação: ${e.message}")
@@ -220,6 +223,7 @@ class RideRecorderService : Service() {
         if (estavaGravando) {
             mainHandler.post {
                 Toast.makeText(this, "⏹️ Gravação encerrada", Toast.LENGTH_SHORT).show()
+                aoMudarEstado?.invoke()
             }
         }
 
@@ -249,5 +253,8 @@ class RideRecorderService : Service() {
         @Volatile
         var emGravacao: Boolean = false
             private set
+
+        @Volatile
+        var aoMudarEstado: (() -> Unit)? = null
     }
 }
