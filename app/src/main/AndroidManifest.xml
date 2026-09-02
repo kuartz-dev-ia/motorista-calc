@@ -43,9 +43,9 @@
             android:label="Prints salvos" />
 
         <activity
-            android:name=".RecordingsActivity"
+            android:name=".WeeklyActivity"
             android:exported="false"
-            android:label="Gravações" />
+            android:label="Resumo semanal" />
 
         <activity
             android:name=".ParametrosActivity"
