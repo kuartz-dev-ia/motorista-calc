@@ -193,7 +193,7 @@
                     android:layout_marginTop="4dp" />
             </LinearLayout>
         </LinearLayout>
-        
+
         <TextView
             android:id="@+id/btnAbastecimentos"
             android:layout_width="match_parent"
@@ -209,8 +209,6 @@
             android:clickable="true"
             android:focusable="true" />
 
-        <TextView
-            android:id="@+id/btnResumoSemanal"
         <TextView
             android:id="@+id/btnResumoSemanal"
             android:layout_width="match_parent"
