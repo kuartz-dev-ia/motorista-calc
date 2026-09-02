@@ -51,7 +51,7 @@
             android:name=".WeeklyActivity"
             android:exported="false"
             android:label="Resumo semanal" />
-        
+
         <activity
             android:name=".AbastecimentosActivity"
             android:exported="false"
@@ -61,6 +61,11 @@
             android:name=".ManutencoesActivity"
             android:exported="false"
             android:label="Manutenções" />
+
+        <activity
+            android:name=".DocumentosActivity"
+            android:exported="false"
+            android:label="Documentos" />
 
         <activity
             android:name=".ParametrosActivity"
