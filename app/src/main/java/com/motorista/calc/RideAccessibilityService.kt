@@ -171,6 +171,19 @@ class RideAccessibilityService : AccessibilityService() {
         }
     }
 
+    private fun detectarPlataforma(): String {
+        return try {
+            val pacote = rootInActiveWindow?.packageName?.toString() ?: ""
+            when {
+                pacote.contains("ubercab") -> "Uber"
+                pacote.contains("app99") -> "99"
+                else -> "Outro"
+            }
+        } catch (e: Exception) {
+            "Outro"
+        }
+    }
+
     private fun processarTelaDeCorrida(texto: String) {
         val pernas = TriggerPatterns.extrairPernas(texto)
         val pernaPickup = pernas.firstOrNull()
@@ -228,6 +241,8 @@ class RideAccessibilityService : AccessibilityService() {
 
         val distanciaTotalKm = (ride.distanciaPickupKm ?: 0.0) + (ride.distanciaCorridaKm ?: 0.0)
         val tempoTotalMin = ride.tempoEfetivoMin ?: 0
+        val plataforma = detectarPlataforma()
+
         val (registroId, registroNovo) = HistoricoStorage.adicionarRegistro(
             context = this,
             valorTotal = ride.valorTotal,
@@ -236,7 +251,8 @@ class RideAccessibilityService : AccessibilityService() {
             valorPorKm = resultado.valorPorKmCalculado,
             valorPorHora = resultado.valorPorHoraEfetivo,
             lucroLiquido = resultado.lucroLiquidoEstimado,
-            valeAPena = resultado.valeAPena
+            valeAPena = resultado.valeAPena,
+            plataforma = plataforma
         )
 
         if (!registroNovo) {
@@ -324,6 +340,6 @@ class RideAccessibilityService : AccessibilityService() {
         const val PREF_MANUTENCAO = "manutencao_mensal"
         const val PREF_CONTAS_PESSOAIS = "contas_pessoais_mensal"
         const val PREF_KM_MES = "km_rodados_mes"
-        private const val VALOR_MAXIMO_PLAUSIVEL = 500.0
+        private const val VALOR_MAXIMO_PLAUSIVEL = 300.0
     }
 }
