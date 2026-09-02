@@ -58,6 +58,11 @@
             android:label="Abastecimentos" />
 
         <activity
+            android:name=".ManutencoesActivity"
+            android:exported="false"
+            android:label="Manutenções" />
+
+        <activity
             android:name=".ParametrosActivity"
             android:exported="false"
             android:label="Parâmetros" />
