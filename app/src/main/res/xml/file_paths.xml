@@ -2,4 +2,5 @@
 <paths xmlns:android="http://schemas.android.com/android">
     <external-files-path name="prints" path="prints/" />
     <external-files-path name="gravacoes" path="gravacoes/" />
+    <external-files-path name="exportacoes" path="exportacoes/" />
 </paths>
