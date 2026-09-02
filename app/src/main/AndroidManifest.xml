@@ -51,6 +51,11 @@
             android:name=".WeeklyActivity"
             android:exported="false"
             android:label="Resumo semanal" />
+        
+        <activity
+            android:name=".AbastecimentosActivity"
+            android:exported="false"
+            android:label="Abastecimentos" />
 
         <activity
             android:name=".ParametrosActivity"
