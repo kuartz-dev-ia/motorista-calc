@@ -52,6 +52,12 @@ class MainActivity : AppCompatActivity() {
         atualizarResumoHoje()
         atualizarTrial()
         atualizarBotaoGravar()
+        RideRecorderService.aoMudarEstado = { atualizarBotaoGravar() }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        RideRecorderService.aoMudarEstado = null
     }
 
     private fun atualizarResumoHoje() {
@@ -89,7 +95,7 @@ class MainActivity : AppCompatActivity() {
     private fun atualizarBotaoGravar() {
         val btnGravar = findViewById<android.widget.TextView>(R.id.btnGravar)
         if (RideRecorderService.emGravacao) {
-            btnGravar.text = "⏺️ Gravando... toque para parar"
+            btnGravar.text = "⏺️ Gravação iniciada — clique para encerrar"
             btnGravar.setTextColor(Color.parseColor("#C0DD97"))
         } else {
             btnGravar.text = "🔴 Iniciar gravação da corrida"
@@ -100,7 +106,6 @@ class MainActivity : AppCompatActivity() {
     private fun alternarGravacao() {
         if (RideRecorderService.emGravacao) {
             startService(Intent(this, RideRecorderService::class.java).apply { action = RideRecorderService.ACTION_STOP })
-            atualizarBotaoGravar()
             return
         }
 
@@ -134,6 +139,5 @@ class MainActivity : AppCompatActivity() {
     private fun iniciarServicoDeGravacao() {
         val intent = Intent(this, RideRecorderService::class.java).apply { action = RideRecorderService.ACTION_START }
         ContextCompat.startForegroundService(this, intent)
-        atualizarBotaoGravar()
     }
 }
