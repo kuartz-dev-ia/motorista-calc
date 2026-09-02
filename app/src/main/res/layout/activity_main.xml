@@ -194,6 +194,21 @@
             </LinearLayout>
         </LinearLayout>
 
+        <TextView
+            android:id="@+id/btnResumoSemanal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="14dp"
+            android:gravity="center"
+            android:background="@drawable/bg_card_dark"
+            android:text="📈 Resumo semanal e exportar dados"
+            android:textColor="#9AA4B2"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="12dp"
+            android:clickable="true"
+            android:focusable="true" />
+
         <LinearLayout
             android:id="@+id/btnParametros"
             android:layout_width="match_parent"
