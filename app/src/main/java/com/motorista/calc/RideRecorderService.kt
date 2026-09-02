@@ -64,13 +64,17 @@ class RideRecorderService : Service() {
             .build()
     }
 
+    private fun avisar(mensagem: String) {
+        mainHandler.post { Toast.makeText(this, mensagem, Toast.LENGTH_LONG).show() }
+    }
+
     private fun iniciarGravacao() {
         if (emGravacao) return
 
         val temPermissoes = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED &&
             ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
         if (!temPermissoes) {
-            Log.e(TAG, "Sem permissão de câmera/microfone")
+            avisar("Sem permissão de câmera/microfone")
             stopSelf()
             return
         }
@@ -90,7 +94,7 @@ class RideRecorderService : Service() {
         try {
             abrirCameraFrontal()
         } catch (e: Exception) {
-            Log.e(TAG, "Erro ao abrir câmera: ${e.message}")
+            avisar("Erro ao abrir câmera: ${e.message}")
             pararGravacao()
         }
     }
@@ -103,7 +107,7 @@ class RideRecorderService : Service() {
         } ?: cameraManager.cameraIdList.firstOrNull()
 
         if (idFrontal == null) {
-            Log.e(TAG, "Nenhuma câmera encontrada")
+            avisar("Nenhuma câmera encontrada")
             pararGravacao()
             return
         }
@@ -125,7 +129,7 @@ class RideRecorderService : Service() {
             }
 
             override fun onError(camera: CameraDevice, error: Int) {
-                Log.e(TAG, "Erro na câmera: $error")
+                avisar("Erro na câmera (código $error)")
                 camera.close()
                 cameraDevice = null
                 pararGravacao()
@@ -142,14 +146,16 @@ class RideRecorderService : Service() {
         recorder.setOutputFile(arquivoAtual!!.absolutePath)
         recorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264)
         recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
-        // Tamanho invertido (720x1280) pra gravar em formato vertical (retrato),
-        // já que o celular fica na posição normal (em pé) durante a corrida.
-        recorder.setVideoSize(720, 1280)
+        // Captura no tamanho "nativo" que a câmera realmente suporta (paisagem).
+        // A orientação final (vertical) é resolvida abaixo, via metadado de rotação,
+        // que é a forma correta e compatível de fazer isso — mudar o tamanho pra
+        // 720x1280 direto fazia a câmera recusar a gravação em muitos aparelhos.
+        recorder.setVideoSize(1280, 720)
         recorder.setVideoFrameRate(25)
         recorder.setVideoEncodingBitRate(4_000_000)
         recorder.setAudioEncodingBitRate(128_000)
         recorder.setAudioSamplingRate(44100)
-        // Assume celular segurado na vertical (posição normal de uso).
+        // Assume o celular segurado na posição normal (em pé/retrato).
         recorder.setOrientationHint(sensorOrientation)
         recorder.prepare()
         return recorder
@@ -177,13 +183,13 @@ class RideRecorderService : Service() {
                         aoMudarEstado?.invoke()
                     }
                 } catch (e: Exception) {
-                    Log.e(TAG, "Erro ao iniciar gravação: ${e.message}")
+                    avisar("Erro ao iniciar gravação: ${e.message}")
                     pararGravacao()
                 }
             }
 
             override fun onConfigureFailed(session: CameraCaptureSession) {
-                Log.e(TAG, "Falha ao configurar sessão de captura")
+                avisar("Falha ao configurar a câmera pra gravação")
                 pararGravacao()
             }
         }, backgroundHandler)
@@ -223,9 +229,11 @@ class RideRecorderService : Service() {
         if (estavaGravando) {
             mainHandler.post {
                 Toast.makeText(this, "⏹️ Gravação encerrada", Toast.LENGTH_SHORT).show()
-                aoMudarEstado?.invoke()
             }
         }
+        // Sempre avisa a tela pra atualizar o botão, mesmo se a gravação
+        // nunca chegou a começar de verdade (erro logo no início).
+        mainHandler.post { aoMudarEstado?.invoke() }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             stopForeground(STOP_FOREGROUND_REMOVE)
