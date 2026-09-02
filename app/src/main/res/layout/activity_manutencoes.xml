@@ -62,12 +62,13 @@
 
             <TextView
                 android:layout_width="match_parent"
-                android:layout_height="26dp"
+                android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="TIPO (ex: troca de óleo, pneu, freio)"
                 android:textColor="#8FB868"
                 android:textSize="10.5sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:paddingBottom="4dp" />
             <EditText
                 android:id="@+id/edtTipoManutencao"
                 android:layout_width="match_parent"
@@ -95,12 +96,13 @@
 
                     <TextView
                         android:layout_width="match_parent"
-                        android:layout_height="26dp"
+                        android:layout_height="wrap_content"
                         android:gravity="center"
                         android:text="KM ATUAL"
                         android:textColor="#8FB868"
                         android:textSize="10.5sp"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:paddingBottom="4dp" />
 
                     <EditText
                         android:id="@+id/edtKmManutencao"
@@ -125,12 +127,13 @@
 
                     <TextView
                         android:layout_width="match_parent"
-                        android:layout_height="26dp"
+                        android:layout_height="wrap_content"
                         android:gravity="center"
                         android:text="CUSTO (R$)"
                         android:textColor="#8FB868"
                         android:textSize="10.5sp"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:paddingBottom="4dp" />
 
                     <EditText
                         android:id="@+id/edtCustoManutencao"
@@ -170,12 +173,13 @@
 
                     <TextView
                         android:layout_width="match_parent"
-                        android:layout_height="26dp"
+                        android:layout_height="wrap_content"
                         android:gravity="center"
                         android:text="AVISAR A CADA (KM)"
                         android:textColor="#8FB868"
                         android:textSize="10.5sp"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:paddingBottom="4dp" />
 
                     <EditText
                         android:id="@+id/edtIntervaloKm"
@@ -199,12 +203,13 @@
 
                     <TextView
                         android:layout_width="match_parent"
-                        android:layout_height="26dp"
+                        android:layout_height="wrap_content"
                         android:gravity="center"
                         android:text="AVISAR A CADA (DIAS)"
                         android:textColor="#8FB868"
                         android:textSize="10.5sp"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:paddingBottom="4dp" />
 
                     <EditText
                         android:id="@+id/edtIntervaloDias"
