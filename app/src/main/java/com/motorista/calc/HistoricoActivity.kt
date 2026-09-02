@@ -46,6 +46,9 @@ class HistoricoActivity : AppCompatActivity() {
         val mediaPorKm = if (totalKm > 0) totalGanho / totalKm else null
         val mediaPorHora = if (horas > 0) totalGanho / horas else null
 
+        val porPlataforma = lista.groupBy { it.plataforma }
+            .mapValues { it.value.sumOf { r -> r.valorTotal } }
+
         return buildString {
             append("Corridas: ${lista.size}\n")
             append("Ganho total: R$ %.2f\n".format(totalGanho))
@@ -53,6 +56,10 @@ class HistoricoActivity : AppCompatActivity() {
             append("Tempo total: %.1f h\n".format(horas))
             mediaPorKm?.let { append("Média R$/km: %.2f\n".format(it)) }
             mediaPorHora?.let { append("Média R$/hora: %.2f\n".format(it)) }
+            if (porPlataforma.size > 1) {
+                append("\nPor plataforma:\n")
+                porPlataforma.forEach { (nome, valor) -> append("  $nome: R$ %.2f\n".format(valor)) }
+            }
         }
     }
 
@@ -69,8 +76,15 @@ class HistoricoActivity : AppCompatActivity() {
                 gravity = Gravity.CENTER_VERTICAL
             }
 
+            val emoji = when (registro.plataforma) {
+                "Uber" -> "⬛"
+                "99" -> "🟡"
+                else -> "🚗"
+            }
+
             val texto = TextView(this).apply {
                 text = buildString {
+                    append("$emoji ")
                     append(formatoHora.format(Date(registro.dataHora)))
                     append(" — R$ %.2f".format(registro.valorTotal))
                     append(" (%.1f km)".format(registro.distanciaTotalKm))
