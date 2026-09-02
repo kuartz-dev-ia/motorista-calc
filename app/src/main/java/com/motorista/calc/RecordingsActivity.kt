@@ -9,6 +9,7 @@ import android.view.Gravity
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import java.io.File
@@ -22,13 +23,40 @@ class RecordingsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_recordings)
-        container = findViewById(R.id.containerGravacoes)
+        try {
+            setContentView(R.layout.activity_recordings)
+            container = findViewById(R.id.containerGravacoes)
+        } catch (e: Exception) {
+            mostrarErroNaTela("Erro ao abrir a tela: ${e.message}")
+        }
     }
 
     override fun onResume() {
         super.onResume()
-        atualizarLista()
+        try {
+            atualizarLista()
+        } catch (e: Exception) {
+            mostrarErroNaTela("Erro ao listar gravações: ${e.message}")
+        }
+    }
+
+    private fun mostrarErroNaTela(mensagem: String) {
+        Toast.makeText(this, mensagem, Toast.LENGTH_LONG).show()
+        try {
+            val layoutSeguranca = LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL
+                setPadding(40, 80, 40, 40)
+                setBackgroundColor(Color.parseColor("#0E1013"))
+            }
+            layoutSeguranca.addView(TextView(this).apply {
+                text = "Ocorreu um erro nesta tela:\n\n$mensagem"
+                setTextColor(Color.parseColor("#F7C1C1"))
+                textSize = 13f
+            })
+            setContentView(layoutSeguranca)
+        } catch (e: Exception) {
+            // Se nem isso funcionar, ao menos o Toast já apareceu.
+        }
     }
 
     private fun uriDoArquivo(file: File): Uri =
@@ -42,7 +70,9 @@ class RecordingsActivity : AppCompatActivity() {
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
             startActivity(Intent.createChooser(intent, "Abrir gravação"))
-        } catch (e: Exception) { }
+        } catch (e: Exception) {
+            Toast.makeText(this, "Erro ao abrir vídeo: ${e.message}", Toast.LENGTH_LONG).show()
+        }
     }
 
     private fun compartilharVideo(file: File) {
@@ -54,7 +84,9 @@ class RecordingsActivity : AppCompatActivity() {
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
             startActivity(Intent.createChooser(intent, "Enviar gravação (Drive, Gmail, etc.)"))
-        } catch (e: Exception) { }
+        } catch (e: Exception) {
+            Toast.makeText(this, "Erro ao compartilhar: ${e.message}", Toast.LENGTH_LONG).show()
+        }
     }
 
     private fun atualizarLista() {
@@ -90,8 +122,12 @@ class RecordingsActivity : AppCompatActivity() {
                 text = "Apagar dia"
                 textSize = 11f
                 setOnClickListener {
-                    RecordingsStorage.apagarTodosDoDia(this@RecordingsActivity, dataChave)
-                    atualizarLista()
+                    try {
+                        RecordingsStorage.apagarTodosDoDia(this@RecordingsActivity, dataChave)
+                        atualizarLista()
+                    } catch (e: Exception) {
+                        Toast.makeText(this@RecordingsActivity, "Erro ao apagar: ${e.message}", Toast.LENGTH_LONG).show()
+                    }
                 }
             }
             cabecalho.addView(txtData)
@@ -106,7 +142,11 @@ class RecordingsActivity : AppCompatActivity() {
                 }
 
                 val txtHora = TextView(this).apply {
-                    text = "🎬 " + formatoHora.format(Date(arquivo.lastModified())) + "  (%.1f MB)".format(arquivo.length() / 1024.0 / 1024.0)
+                    text = try {
+                        "🎬 " + formatoHora.format(Date(arquivo.lastModified())) + "  (%.1f MB)".format(arquivo.length() / 1024.0 / 1024.0)
+                    } catch (e: Exception) {
+                        "🎬 gravação"
+                    }
                     textSize = 12f
                     setTextColor(Color.parseColor("#E4E7EC"))
                     layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
@@ -123,8 +163,12 @@ class RecordingsActivity : AppCompatActivity() {
                     text = "Apagar"
                     textSize = 11f
                     setOnClickListener {
-                        RecordingsStorage.apagar(arquivo)
-                        atualizarLista()
+                        try {
+                            RecordingsStorage.apagar(arquivo)
+                            atualizarLista()
+                        } catch (e: Exception) {
+                            Toast.makeText(this@RecordingsActivity, "Erro ao apagar: ${e.message}", Toast.LENGTH_LONG).show()
+                        }
                     }
                 }
 
