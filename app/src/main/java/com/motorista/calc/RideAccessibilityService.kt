@@ -1,6 +1,8 @@
 package com.motorista.calc
 
 import android.accessibilityservice.AccessibilityService
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Build
@@ -9,6 +11,7 @@ import android.os.Looper
 import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import androidx.annotation.RequiresApi
+import androidx.core.app.NotificationCompat
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
@@ -38,8 +41,11 @@ class RideAccessibilityService : AccessibilityService() {
                 val monitoramentoAtivo = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
                     .getBoolean(PREF_MONITORAMENTO_ATIVO, true)
                 val testeExpirado = TrialManager.expirou(this@RideAccessibilityService)
-                if (monitoramentoAtivo && !testeExpirado && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    tentarCapturarEOcr()
+                if (monitoramentoAtivo && !testeExpirado) {
+                    verificarLembretePausa()
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                        tentarCapturarEOcr()
+                    }
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Erro no ciclo de captura: ${e.message}")
@@ -53,6 +59,7 @@ class RideAccessibilityService : AccessibilityService() {
     override fun onServiceConnected() {
         super.onServiceConnected()
         Log.d(TAG, "Serviço de acessibilidade conectado (modo print + OCR)")
+        criarCanalPausa()
         try {
             handler.post(pollRunnable)
         } catch (e: Exception) {
@@ -63,6 +70,42 @@ class RideAccessibilityService : AccessibilityService() {
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
         // O reconhecimento roda via print + OCR em polling (função abaixo), não
         // depende deste evento. Método mantido só porque a classe exige.
+    }
+
+    private fun criarCanalPausa() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val canal = NotificationChannel(CANAL_PAUSA_ID, "Lembrete de pausa", NotificationManager.IMPORTANCE_DEFAULT)
+            (getSystemService(NOTIFICATION_SERVICE) as NotificationManager).createNotificationChannel(canal)
+        }
+    }
+
+    private fun verificarLembretePausa() {
+        val prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+        val inicioSessao = prefs.getLong(PREF_INICIO_SESSAO, 0L)
+        if (inicioSessao <= 0L) return
+
+        val limiteHoras = prefs.getFloat(PREF_LIMITE_PAUSA_HORAS, 3.0f)
+        val horasDecorridas = (System.currentTimeMillis() - inicioSessao) / 3_600_000.0
+
+        if (horasDecorridas >= limiteHoras) {
+            enviarNotificacaoPausa(horasDecorridas)
+            // Reinicia a contagem, pra avisar de novo só depois de outro intervalo completo.
+            prefs.edit().putLong(PREF_INICIO_SESSAO, System.currentTimeMillis()).apply()
+        }
+    }
+
+    private fun enviarNotificacaoPausa(horas: Double) {
+        try {
+            val notificacao = NotificationCompat.Builder(this, CANAL_PAUSA_ID)
+                .setContentTitle("☕ Que tal uma pausa?")
+                .setContentText("Você já está rodando há %.1f horas seguidas.".format(horas))
+                .setSmallIcon(android.R.drawable.ic_popup_reminder)
+                .setAutoCancel(true)
+                .build()
+            (getSystemService(NOTIFICATION_SERVICE) as NotificationManager).notify(NOTIFICACAO_PAUSA_ID, notificacao)
+        } catch (e: Exception) {
+            Log.e(TAG, "Erro ao notificar pausa: ${e.message}")
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.R)
@@ -340,6 +383,10 @@ class RideAccessibilityService : AccessibilityService() {
         const val PREF_MANUTENCAO = "manutencao_mensal"
         const val PREF_CONTAS_PESSOAIS = "contas_pessoais_mensal"
         const val PREF_KM_MES = "km_rodados_mes"
+        const val PREF_INICIO_SESSAO = "inicio_sessao_millis"
+        const val PREF_LIMITE_PAUSA_HORAS = "limite_pausa_horas"
         private const val VALOR_MAXIMO_PLAUSIVEL = 300.0
+        private const val CANAL_PAUSA_ID = "lembrete_pausa"
+        private const val NOTIFICACAO_PAUSA_ID = 772
     }
 }
