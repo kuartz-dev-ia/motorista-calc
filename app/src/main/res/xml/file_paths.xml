@@ -1,4 +1,6 @@
+
 <?xml version="1.0" encoding="utf-8"?>
 <paths xmlns:android="http://schemas.android.com/android">
     <external-files-path name="prints" path="prints/" />
+    <external-files-path name="gravacoes" path="gravacoes/" />
 </paths>
