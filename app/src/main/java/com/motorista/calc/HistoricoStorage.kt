@@ -6,7 +6,6 @@ import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import kotlin.math.abs
 
 data class RegistroCorrida(
     val id: Long,
@@ -19,117 +18,49 @@ data class RegistroCorrida(
     val valorPorHora: Double?,
     val lucroLiquido: Double?,
     val valeAPena: Boolean,
-    val aceita: Boolean,
-    val cancelada: Boolean
+    val plataforma: String,
+    var aceita: Boolean = false,
+    var cancelada: Boolean = false
 )
 
 object HistoricoStorage {
     private const val PREFS_NAME = "motorista_calc_historico"
-    private const val CHAVE_REGISTROS = "registros"
+    private const val CHAVE_LISTA = "lista_registros"
     private const val MAX_REGISTROS = 500
     private const val JANELA_DEDUP_MS = 45_000L
 
-    private val formatoDia = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+    private fun prefs(context: Context) = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
-    fun diaChaveDeHoje(): String = formatoDia.format(Date())
-
-    /** Retorna (id, foiRegistroNovo). Se a mesma oferta (valor + distância
-     * parecidos) já tiver sido registrada há pouco, reaproveita o id existente
-     * e sinaliza que NÃO é nova — quem chamou não deve mostrar o card de novo. */
-    fun adicionarRegistro(
-        context: Context,
-        valorTotal: Double,
-        distanciaTotalKm: Double,
-        tempoTotalMin: Int,
-        valorPorKm: Double?,
-        valorPorHora: Double?,
-        lucroLiquido: Double?,
-        valeAPena: Boolean
-    ): Pair<Long, Boolean> {
-        val agora = System.currentTimeMillis()
-        val lista = lerTodos(context).toMutableList()
-
-        val existente = lista.lastOrNull { r ->
-            (agora - r.dataHora) < JANELA_DEDUP_MS &&
-                abs(r.valorTotal - valorTotal) < 0.05 &&
-                abs(r.distanciaTotalKm - distanciaTotalKm) < 0.15
-        }
-        if (existente != null) return existente.id to false
-
-        val id = agora
-        val registro = RegistroCorrida(
-            id = id,
-            dataHora = id,
-            diaChave = diaChaveDeHoje(),
-            valorTotal = valorTotal,
-            distanciaTotalKm = distanciaTotalKm,
-            tempoTotalMin = tempoTotalMin,
-            valorPorKm = valorPorKm,
-            valorPorHora = valorPorHora,
-            lucroLiquido = lucroLiquido,
-            valeAPena = valeAPena,
-            aceita = false,
-            cancelada = false
-        )
-        lista.add(registro)
-        val podado = if (lista.size > MAX_REGISTROS) lista.takeLast(MAX_REGISTROS) else lista
-        salvarTodos(context, podado)
-        return id to true
-    }
-
-    fun marcarAceita(context: Context, id: Long) {
-        val lista = lerTodos(context).toMutableList()
-        val idx = lista.indexOfFirst { it.id == id }
-        if (idx >= 0) {
-            lista[idx] = lista[idx].copy(aceita = true)
-            salvarTodos(context, lista)
-        }
-    }
-
-    fun marcarCancelada(context: Context, id: Long) {
-        val lista = lerTodos(context).toMutableList()
-        val idx = lista.indexOfFirst { it.id == id }
-        if (idx >= 0) {
-            lista[idx] = lista[idx].copy(cancelada = true)
-            salvarTodos(context, lista)
-        }
-    }
-
-    fun listarDoDia(context: Context): List<RegistroCorrida> {
-        val hoje = diaChaveDeHoje()
-        return lerTodos(context).filter { it.diaChave == hoje }
-    }
-
-    private fun lerTodos(context: Context): List<RegistroCorrida> {
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        val json = prefs.getString(CHAVE_REGISTROS, null) ?: return emptyList()
-        return try {
-            val array = JSONArray(json)
-            (0 until array.length()).mapNotNull { i ->
-                val obj = array.optJSONObject(i) ?: return@mapNotNull null
+    private fun carregarTudo(context: Context): MutableList<RegistroCorrida> {
+        val json = prefs(context).getString(CHAVE_LISTA, null) ?: return mutableListOf()
+        val array = try { JSONArray(json) } catch (e: Exception) { return mutableListOf() }
+        val lista = mutableListOf<RegistroCorrida>()
+        for (i in 0 until array.length()) {
+            val obj = array.getJSONObject(i)
+            lista.add(
                 RegistroCorrida(
-                    id = obj.optLong("id"),
-                    dataHora = obj.optLong("dataHora"),
-                    diaChave = obj.optString("diaChave"),
-                    valorTotal = obj.optDouble("valorTotal"),
-                    distanciaTotalKm = obj.optDouble("distanciaTotalKm"),
-                    tempoTotalMin = obj.optInt("tempoTotalMin"),
-                    valorPorKm = if (obj.has("valorPorKm") && !obj.isNull("valorPorKm")) obj.optDouble("valorPorKm") else null,
-                    valorPorHora = if (obj.has("valorPorHora") && !obj.isNull("valorPorHora")) obj.optDouble("valorPorHora") else null,
-                    lucroLiquido = if (obj.has("lucroLiquido") && !obj.isNull("lucroLiquido")) obj.optDouble("lucroLiquido") else null,
-                    valeAPena = obj.optBoolean("valeAPena"),
-                    aceita = obj.optBoolean("aceita"),
-                    cancelada = obj.optBoolean("cancelada")
+                    id = obj.getLong("id"),
+                    dataHora = obj.getLong("dataHora"),
+                    diaChave = obj.getString("diaChave"),
+                    valorTotal = obj.getDouble("valorTotal"),
+                    distanciaTotalKm = obj.getDouble("distanciaTotalKm"),
+                    tempoTotalMin = obj.getInt("tempoTotalMin"),
+                    valorPorKm = if (obj.has("valorPorKm") && !obj.isNull("valorPorKm")) obj.getDouble("valorPorKm") else null,
+                    valorPorHora = if (obj.has("valorPorHora") && !obj.isNull("valorPorHora")) obj.getDouble("valorPorHora") else null,
+                    lucroLiquido = if (obj.has("lucroLiquido") && !obj.isNull("lucroLiquido")) obj.getDouble("lucroLiquido") else null,
+                    valeAPena = obj.optBoolean("valeAPena", true),
+                    plataforma = obj.optString("plataforma", "Outro"),
+                    aceita = obj.optBoolean("aceita", false),
+                    cancelada = obj.optBoolean("cancelada", false)
                 )
-            }
-        } catch (e: Exception) {
-            emptyList()
+            )
         }
+        return lista
     }
 
-    private fun salvarTodos(context: Context, lista: List<RegistroCorrida>) {
+    private fun salvarTudo(context: Context, lista: List<RegistroCorrida>) {
         val array = JSONArray()
-        lista.forEach { r ->
+        for (r in lista) {
             val obj = JSONObject()
             obj.put("id", r.id)
             obj.put("dataHora", r.dataHora)
@@ -141,11 +72,80 @@ object HistoricoStorage {
             r.valorPorHora?.let { obj.put("valorPorHora", it) }
             r.lucroLiquido?.let { obj.put("lucroLiquido", it) }
             obj.put("valeAPena", r.valeAPena)
+            obj.put("plataforma", r.plataforma)
             obj.put("aceita", r.aceita)
             obj.put("cancelada", r.cancelada)
             array.put(obj)
         }
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        prefs.edit().putString(CHAVE_REGISTROS, array.toString()).apply()
+        prefs(context).edit().putString(CHAVE_LISTA, array.toString()).apply()
+    }
+
+    fun adicionarRegistro(
+        context: Context,
+        valorTotal: Double,
+        distanciaTotalKm: Double,
+        tempoTotalMin: Int,
+        valorPorKm: Double?,
+        valorPorHora: Double?,
+        lucroLiquido: Double?,
+        valeAPena: Boolean,
+        plataforma: String
+    ): Pair<Long, Boolean> {
+        val lista = carregarTudo(context)
+        val agora = System.currentTimeMillis()
+
+        val duplicado = lista.firstOrNull {
+            (agora - it.dataHora) < JANELA_DEDUP_MS &&
+                Math.abs(it.valorTotal - valorTotal) < 0.05 &&
+                Math.abs(it.distanciaTotalKm - distanciaTotalKm) < 0.15
+        }
+        if (duplicado != null) {
+            return Pair(duplicado.id, false)
+        }
+
+        val id = agora
+        val diaChave = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date(agora))
+
+        val novo = RegistroCorrida(
+            id = id,
+            dataHora = agora,
+            diaChave = diaChave,
+            valorTotal = valorTotal,
+            distanciaTotalKm = distanciaTotalKm,
+            tempoTotalMin = tempoTotalMin,
+            valorPorKm = valorPorKm,
+            valorPorHora = valorPorHora,
+            lucroLiquido = lucroLiquido,
+            valeAPena = valeAPena,
+            plataforma = plataforma
+        )
+
+        lista.add(0, novo)
+        val limitada = if (lista.size > MAX_REGISTROS) lista.take(MAX_REGISTROS) else lista
+        salvarTudo(context, limitada)
+
+        return Pair(id, true)
+    }
+
+    fun marcarAceita(context: Context, id: Long) {
+        val lista = carregarTudo(context)
+        lista.find { it.id == id }?.aceita = true
+        salvarTudo(context, lista)
+    }
+
+    fun marcarCancelada(context: Context, id: Long) {
+        val lista = carregarTudo(context)
+        lista.find { it.id == id }?.cancelada = true
+        salvarTudo(context, lista)
+    }
+
+    fun listarDoDia(context: Context): List<RegistroCorrida> {
+        val hoje = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+        return carregarTudo(context).filter { it.diaChave == hoje }
+    }
+
+    fun listarUltimosDias(context: Context, dias: Int): List<RegistroCorrida> {
+        val limite = System.currentTimeMillis() - dias.toLong() * 24 * 60 * 60 * 1000
+        return carregarTudo(context).filter { it.dataHora >= limite }
     }
 }
