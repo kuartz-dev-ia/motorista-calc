@@ -1,15 +1,21 @@
 package com.motorista.calc
 
 import android.app.Service
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.PixelFormat
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
+import android.media.AudioManager
+import android.media.ToneGenerator
 import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.os.VibratorManager
 import android.view.Gravity
 import android.view.WindowManager
 import android.widget.LinearLayout
@@ -51,6 +57,48 @@ class OverlayService : Service() {
         if (hasExtra(key)) getDoubleExtra(key, Double.NaN).takeIf { !it.isNaN() } else null
 
     private fun dp(valor: Int): Int = (valor * resources.displayMetrics.density).toInt()
+
+    private fun alertarComSomEVibracao(nivel: NivelCorrida) {
+        try {
+            val vibrator: Vibrator? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                (getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as? VibratorManager)?.defaultVibrator
+            } else {
+                @Suppress("DEPRECATION")
+                getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
+            }
+
+            val tone = ToneGenerator(AudioManager.STREAM_NOTIFICATION, 90)
+
+            when (nivel) {
+                NivelCorrida.RUIM -> {
+                    tone.startTone(ToneGenerator.TONE_CDMA_LOW_L, 250)
+                    vibrarPadrao(vibrator, longArrayOf(0, 200, 100, 200))
+                }
+                NivelCorrida.MEDIO -> {
+                    tone.startTone(ToneGenerator.TONE_PROP_BEEP, 150)
+                    vibrarPadrao(vibrator, longArrayOf(0, 150))
+                }
+                NivelCorrida.BOM -> {
+                    tone.startTone(ToneGenerator.TONE_CDMA_HIGH_L, 200)
+                    vibrarPadrao(vibrator, longArrayOf(0, 80, 60, 80))
+                }
+            }
+
+            handler.postDelayed({ tone.release() }, 500)
+        } catch (e: Exception) {
+            // Se der erro no som/vibração, não deve travar a exibição do card.
+        }
+    }
+
+    private fun vibrarPadrao(vibrator: Vibrator?, padrao: LongArray) {
+        vibrator ?: return
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            vibrator.vibrate(VibrationEffect.createWaveform(padrao, -1))
+        } else {
+            @Suppress("DEPRECATION")
+            vibrator.vibrate(padrao, -1)
+        }
+    }
 
     private fun mostrarOverlay(
         registroId: Long?,
@@ -171,6 +219,8 @@ class OverlayService : Service() {
 
         overlayView = container
         windowManager?.addView(overlayView, paramsCard)
+
+        alertarComSomEVibracao(nivel)
 
         val barra = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
 
