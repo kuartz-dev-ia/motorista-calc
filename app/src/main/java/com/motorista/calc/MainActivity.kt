@@ -24,6 +24,13 @@ class MainActivity : AppCompatActivity() {
         val switchAtivo = findViewById<android.widget.Switch>(R.id.switchAtivo)
         switchAtivo.setOnCheckedChangeListener { _, ativado ->
             prefs.edit().putBoolean(RideAccessibilityService.PREF_MONITORAMENTO_ATIVO, ativado).apply()
+            if (ativado) {
+                if (prefs.getLong(RideAccessibilityService.PREF_INICIO_SESSAO, 0L) <= 0L) {
+                    prefs.edit().putLong(RideAccessibilityService.PREF_INICIO_SESSAO, System.currentTimeMillis()).apply()
+                }
+            } else {
+                prefs.edit().putLong(RideAccessibilityService.PREF_INICIO_SESSAO, 0L).apply()
+            }
         }
 
         findViewById<android.view.View>(R.id.btnHistorico).setOnClickListener {
@@ -36,6 +43,10 @@ class MainActivity : AppCompatActivity() {
 
         findViewById<android.view.View>(R.id.btnGravacoes).setOnClickListener {
             startActivity(Intent(this, RecordingsActivity::class.java))
+        }
+
+        findViewById<android.view.View>(R.id.btnResumoSemanal).setOnClickListener {
+            startActivity(Intent(this, WeeklyActivity::class.java))
         }
 
         findViewById<android.view.View>(R.id.btnParametros).setOnClickListener {
