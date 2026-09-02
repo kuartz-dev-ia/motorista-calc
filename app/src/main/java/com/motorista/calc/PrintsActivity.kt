@@ -2,6 +2,7 @@ package com.motorista.calc
 
 import android.content.Intent
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.graphics.Typeface
 import android.net.Uri
 import android.os.Bundle
@@ -43,9 +44,7 @@ class PrintsActivity : AppCompatActivity() {
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
             startActivity(Intent.createChooser(intent, "Abrir print"))
-        } catch (e: Exception) {
-            // ignora falha ao abrir
-        }
+        } catch (e: Exception) { }
     }
 
     private fun compartilharImagem(file: File) {
@@ -57,9 +56,7 @@ class PrintsActivity : AppCompatActivity() {
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
             startActivity(Intent.createChooser(intent, "Compartilhar print"))
-        } catch (e: Exception) {
-            // ignora falha ao compartilhar
-        }
+        } catch (e: Exception) { }
     }
 
     private fun atualizarLista() {
@@ -69,6 +66,7 @@ class PrintsActivity : AppCompatActivity() {
         if (arquivos.isEmpty()) {
             container.addView(TextView(this).apply {
                 text = "Nenhum print salvo ainda."
+                setTextColor(Color.parseColor("#9AA4B2"))
                 textSize = 14f
             })
             return
@@ -86,6 +84,7 @@ class PrintsActivity : AppCompatActivity() {
             val txtData = TextView(this).apply {
                 text = "📅 $dataChave (${listaDoDia.size})"
                 textSize = 16f
+                setTextColor(Color.parseColor("#F4F5F7"))
                 setTypeface(typeface, Typeface.BOLD)
                 layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
             }
@@ -105,36 +104,38 @@ class PrintsActivity : AppCompatActivity() {
                 val linha = LinearLayout(this).apply {
                     orientation = LinearLayout.HORIZONTAL
                     gravity = Gravity.CENTER_VERTICAL
-                    setPadding(0, 8, 0, 8)
+                    setPadding(16, 12, 16, 12)
+                    background = androidx.core.content.ContextCompat.getDrawable(this@PrintsActivity, R.drawable.bg_card_dark)
+                    layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT).apply {
+                        bottomMargin = 10
+                    }
                 }
 
                 val thumb = ImageView(this).apply {
-                    layoutParams = LinearLayout.LayoutParams(140, 140)
+                    layoutParams = LinearLayout.LayoutParams(120, 120).apply { marginEnd = 16 }
                     try {
                         val opcoes = BitmapFactory.Options().apply { inSampleSize = 6 }
                         setImageBitmap(BitmapFactory.decodeFile(arquivo.absolutePath, opcoes))
-                    } catch (e: Exception) {
-                        // ignora falha ao gerar miniatura
-                    }
+                    } catch (e: Exception) { }
                     setOnClickListener { abrirImagem(arquivo) }
                 }
 
                 val txtHora = TextView(this).apply {
                     text = formatoHora.format(Date(arquivo.lastModified()))
                     textSize = 12f
-                    setPadding(16, 0, 16, 0)
+                    setTextColor(Color.parseColor("#E4E7EC"))
                     layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
                 }
 
                 val btnCompartilhar = Button(this).apply {
-                    text = "Compartilhar"
-                    textSize = 11f
+                    text = "☁️"
+                    textSize = 13f
                     setOnClickListener { compartilharImagem(arquivo) }
                 }
 
                 val btnApagar = Button(this).apply {
-                    text = "Apagar"
-                    textSize = 11f
+                    text = "🗑️"
+                    textSize = 13f
                     setOnClickListener {
                         PrintsStorage.apagar(arquivo)
                         atualizarLista()
