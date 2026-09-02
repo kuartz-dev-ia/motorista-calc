@@ -44,6 +44,7 @@ class MainActivity : AppCompatActivity() {
         findViewById<android.view.View>(R.id.btnGravacoes).setOnClickListener {
             startActivity(Intent(this, RecordingsActivity::class.java))
         }
+
         findViewById<android.view.View>(R.id.btnManutencoes).setOnClickListener {
             startActivity(Intent(this, ManutencoesActivity::class.java))
         }
@@ -51,14 +52,11 @@ class MainActivity : AppCompatActivity() {
         findViewById<android.view.View>(R.id.btnAbastecimentos).setOnClickListener {
             startActivity(Intent(this, AbastecimentosActivity::class.java))
         }
-        
-        findViewById<android.view.View>(R.id.btnAbastecimentos).setOnClickListener {
-            startActivity(Intent(this, AbastecimentosActivity::class.java))
+
+        findViewById<android.view.View>(R.id.btnDocumentos).setOnClickListener {
+            startActivity(Intent(this, DocumentosActivity::class.java))
         }
 
-        findViewById<android.view.View>(R.id.btnResumoSemanal).setOnClickListener {
-            startActivity(Intent(this, WeeklyActivity::class.java))
-        }
         findViewById<android.view.View>(R.id.btnResumoSemanal).setOnClickListener {
             startActivity(Intent(this, WeeklyActivity::class.java))
         }
