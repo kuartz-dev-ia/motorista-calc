@@ -2,7 +2,7 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0E1013">
+    android:background="#0A0E17">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -13,11 +13,243 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Resumo da semana"
-            android:textColor="#F4F5F7"
+            android:text="Relatórios"
+            android:textColor="#FFFFFF"
             android:textSize="22sp"
             android:textStyle="bold"
             android:layout_marginBottom="16dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="14dp">
+
+            <TextView
+                android:id="@+id/tabHoje"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="4dp"
+                android:background="@drawable/bg_chip_unselected"
+                android:gravity="center"
+                android:padding="10dp"
+                android:text="Hoje"
+                android:textColor="#8B96AC"
+                android:textSize="12sp"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <TextView
+                android:id="@+id/tabSemana"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="4dp"
+                android:background="@drawable/bg_chip_selected"
+                android:gravity="center"
+                android:padding="10dp"
+                android:text="Semana"
+                android:textColor="#08131A"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <TextView
+                android:id="@+id/tabMes"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="4dp"
+                android:background="@drawable/bg_chip_unselected"
+                android:gravity="center"
+                android:padding="10dp"
+                android:text="Mês"
+                android:textColor="#8B96AC"
+                android:textSize="12sp"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <TextView
+                android:id="@+id/tabTudo"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/bg_chip_unselected"
+                android:gravity="center"
+                android:padding="10dp"
+                android:text="Tudo"
+                android:textColor="#8B96AC"
+                android:textSize="12sp"
+                android:clickable="true"
+                android:focusable="true" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="10dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:background="@drawable/bg_card_dark"
+                android:padding="14dp"
+                android:layout_marginEnd="6dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="💲 Total Ganho"
+                    android:textColor="#8B96AC"
+                    android:textSize="10.5sp" />
+
+                <TextView
+                    android:id="@+id/txtTotalGanho"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="R$ 0,00"
+                    android:textColor="#1FE7A0"
+                    android:textSize="17sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:background="@drawable/bg_card_dark"
+                android:padding="14dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🕐 Horas"
+                    android:textColor="#8B96AC"
+                    android:textSize="10.5sp" />
+
+                <TextView
+                    android:id="@+id/txtHorasTrabalhadas"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="00:00"
+                    android:textColor="#3DB8F5"
+                    android:textSize="17sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="14dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:background="@drawable/bg_card_dark"
+                android:padding="14dp"
+                android:layout_marginEnd="6dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="📈 Média/h"
+                    android:textColor="#8B96AC"
+                    android:textSize="10.5sp" />
+
+                <TextView
+                    android:id="@+id/txtMediaPorHora"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="R$ 0,00"
+                    android:textColor="#F5A623"
+                    android:textSize="17sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:background="@drawable/bg_card_dark"
+                android:padding="14dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🚗 Km Rodados"
+                    android:textColor="#8B96AC"
+                    android:textSize="10.5sp" />
+
+                <TextView
+                    android:id="@+id/txtKmRodados"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textColor="#9B6BF5"
+                    android:textSize="17sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/bg_card_dark"
+            android:padding="16dp"
+            android:layout_marginBottom="14dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Taxa Média de Meta"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:id="@+id/txtTaxaMeta"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0%"
+                android:textColor="#F5A623"
+                android:textSize="28sp"
+                android:textStyle="bold" />
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="8dp"
+                android:background="#1A2236"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="6dp">
+
+                <View
+                    android:id="@+id/barraMeta"
+                    android:layout_width="4dp"
+                    android:layout_height="match_parent"
+                    android:background="#F5A623" />
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/txtQtdJornadas"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0 jornada(s) no período"
+                android:textColor="#8B96AC"
+                android:textSize="11sp" />
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -26,6 +258,15 @@
             android:background="@drawable/bg_card_dark"
             android:padding="14dp"
             android:layout_marginBottom="14dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Faturamento (últimos 7 dias)"
+                android:textColor="#FFFFFF"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="10dp" />
 
             <LinearLayout
                 android:id="@+id/containerBarras"
@@ -40,77 +281,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal" />
-
-            <TextView
-                android:id="@+id/txtTotalSemana"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="#9AA4B2"
-                android:textSize="12sp"
-                android:layout_marginTop="10dp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="14dp">
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:background="@drawable/bg_card_dark"
-                android:padding="14dp"
-                android:layout_marginEnd="6dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="MELHOR DIA"
-                    android:textColor="#8FB868"
-                    android:textSize="10sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/txtMelhorDia"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="—"
-                    android:textColor="#F4F5F7"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:background="@drawable/bg_card_dark"
-                android:padding="14dp"
-                android:layout_marginStart="6dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="MÉDIA R$/H"
-                    android:textColor="#8FB868"
-                    android:textSize="10sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/txtMediaHora"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="R$ 0"
-                    android:textColor="#F4F5F7"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
         </LinearLayout>
 
         <TextView
@@ -119,11 +289,11 @@
             android:layout_height="wrap_content"
             android:background="@drawable/bg_card_dark"
             android:padding="14dp"
-            android:text="📄 Exportar histórico (CSV — últimos 30 dias)"
+            android:gravity="center"
+            android:text="📄 Exportar jornadas (CSV)"
             android:textColor="#9AA4B2"
             android:textSize="13sp"
             android:textStyle="bold"
-            android:gravity="center"
             android:clickable="true"
             android:focusable="true" />
 
