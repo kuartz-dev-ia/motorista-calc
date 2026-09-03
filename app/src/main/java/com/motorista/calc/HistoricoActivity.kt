@@ -16,6 +16,7 @@ import java.util.Locale
 class HistoricoActivity : AppCompatActivity() {
 
     private lateinit var container: LinearLayout
+    private val expandidos = mutableSetOf<Long>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,6 +69,8 @@ class HistoricoActivity : AppCompatActivity() {
             val cabecalho = LinearLayout(this).apply {
                 orientation = LinearLayout.HORIZONTAL
                 gravity = Gravity.CENTER_VERTICAL
+                isClickable = true
+                isFocusable = true
             }
             val textoCabecalho = TextView(this).apply {
                 text = "${formatoData.format(Date(jornada.dataInicioMillis))}\n${formatoHora.format(Date(jornada.dataInicioMillis))} • %.1f km".format(stats.kmRodados)
@@ -89,8 +92,15 @@ class HistoricoActivity : AppCompatActivity() {
                     setTextColor(Color.parseColor("#F5A623"))
                 }
             }
+            val setaExpandir = TextView(this).apply {
+                text = if (jornada.id in expandidos) "▲" else "▼"
+                setTextColor(Color.parseColor("#8B96AC"))
+                textSize = 13f
+                setPadding(16, 0, 0, 0)
+            }
             cabecalho.addView(textoCabecalho)
             cabecalho.addView(badgeMeta)
+            cabecalho.addView(setaExpandir)
             card.addView(cabecalho)
 
             val linhaMetricas = LinearLayout(this).apply {
@@ -110,6 +120,26 @@ class HistoricoActivity : AppCompatActivity() {
                 setPadding(0, 0, 0, 12)
             }
             card.addView(txtLucro)
+
+            val containerDetalhes = LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL
+                setPadding(0, 8, 0, 12)
+                visibility = if (jornada.id in expandidos) android.view.View.VISIBLE else android.view.View.GONE
+            }
+            montarDetalhesDaJornada(containerDetalhes, jornada, stats)
+            card.addView(containerDetalhes)
+
+            cabecalho.setOnClickListener {
+                if (jornada.id in expandidos) {
+                    expandidos.remove(jornada.id)
+                    containerDetalhes.visibility = android.view.View.GONE
+                    setaExpandir.text = "▼"
+                } else {
+                    expandidos.add(jornada.id)
+                    containerDetalhes.visibility = android.view.View.VISIBLE
+                    setaExpandir.text = "▲"
+                }
+            }
 
             val btnExcluir = TextView(this).apply {
                 text = "🗑️ Excluir"
@@ -134,6 +164,56 @@ class HistoricoActivity : AppCompatActivity() {
         }
     }
 
+    private fun montarDetalhesDaJornada(container: LinearLayout, jornada: Jornada, stats: JornadaStats) {
+        val fim = jornada.dataFimMillis ?: System.currentTimeMillis()
+        val corridas = HistoricoStorage.listarEntre(this, jornada.dataInicioMillis, fim).filter { it.aceita && !it.cancelada }
+        val formatoHora = SimpleDateFormat("HH:mm", Locale.getDefault())
+
+        val separador = android.view.View(this).apply {
+            setBackgroundColor(Color.parseColor("#1A2236"))
+            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 2).apply { bottomMargin = 10 }
+        }
+        container.addView(separador)
+
+        container.addView(TextView(this).apply {
+            text = "Custo combustível: R$ %.2f  •  Custo fixo: R$ %.2f".format(stats.custoCombustivel, stats.custoFixo)
+            setTextColor(Color.parseColor("#8B96AC"))
+            textSize = 11f
+            setPadding(0, 0, 0, 10)
+        })
+
+        if (corridas.isEmpty()) {
+            container.addView(TextView(this).apply {
+                text = "Nenhuma corrida individual registrada nessa jornada."
+                setTextColor(Color.parseColor("#8B96AC"))
+                textSize = 11f
+            })
+            return
+        }
+
+        container.addView(TextView(this).apply {
+            text = "Corridas desta jornada:"
+            setTextColor(Color.parseColor("#FFFFFF"))
+            textSize = 12f
+            setTypeface(typeface, Typeface.BOLD)
+            setPadding(0, 0, 0, 6)
+        })
+
+        for (corrida in corridas.sortedByDescending { it.dataHora }) {
+            val emoji = when (corrida.plataforma) {
+                "Uber" -> "⬛"
+                "99" -> "🟡"
+                else -> "🚗"
+            }
+            container.addView(TextView(this).apply {
+                text = "$emoji ${formatoHora.format(Date(corrida.dataHora))} — R$ %.2f (%.1f km)".format(corrida.valorTotal, corrida.distanciaTotalKm)
+                setTextColor(Color.parseColor("#E4E7EC"))
+                textSize = 11.5f
+                setPadding(0, 4, 0, 4)
+            })
+        }
+    }
+
     private fun criarColuna(rotulo: String, valor: String, cor: String): LinearLayout {
         return LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
@@ -151,4 +231,4 @@ class HistoricoActivity : AppCompatActivity() {
             })
         }
     }
-}
+}     
