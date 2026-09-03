@@ -20,7 +20,10 @@ data class JornadaStats(
     val tempoTrabalhadoMin: Int,
     val valorPorHora: Double,
     val valorPorKm: Double,
-    val percentualMeta: Double
+    val percentualMeta: Double,
+    val custoCombustivel: Double,
+    val custoFixo: Double,
+    val lucroLiquido: Double
 )
 
 object JornadaStorage {
@@ -85,6 +88,27 @@ object JornadaStorage {
         }
     }
 
+    fun apagar(context: Context, id: Long) {
+        salvarTudo(context, listarTodas(context).filter { it.id != id })
+    }
+
+    private fun obterPrecoEConsumoAtivos(prefs: android.content.SharedPreferences): Pair<Double, Double> {
+        return when (prefs.getString(RideAccessibilityService.PREF_COMBUSTIVEL_ATIVO, "etanol")) {
+            "gasolina" -> Pair(
+                prefs.getFloat(RideAccessibilityService.PREF_PRECO_GASOLINA, 6.10f).toDouble(),
+                prefs.getFloat(RideAccessibilityService.PREF_CONSUMO_GASOLINA, 10.0f).toDouble()
+            )
+            "gnv" -> Pair(
+                prefs.getFloat(RideAccessibilityService.PREF_PRECO_GNV, 4.50f).toDouble(),
+                prefs.getFloat(RideAccessibilityService.PREF_CONSUMO_GNV, 12.0f).toDouble()
+            )
+            else -> Pair(
+                prefs.getFloat(RideAccessibilityService.PREF_PRECO_ETANOL, 4.20f).toDouble(),
+                prefs.getFloat(RideAccessibilityService.PREF_CONSUMO_ETANOL, 7.0f).toDouble()
+            )
+        }
+    }
+
     fun calcularStats(context: Context, jornada: Jornada): JornadaStats {
         val fim = jornada.dataFimMillis ?: System.currentTimeMillis()
         val registros = HistoricoStorage.listarEntre(context, jornada.dataInicioMillis, fim).filter { it.aceita && !it.cancelada }
@@ -97,6 +121,23 @@ object JornadaStorage {
         val valorPorKm = if (kmRodados > 0) ganhoBruto / kmRodados else 0.0
         val percentualMeta = if (jornada.metaDiaria > 0) (ganhoBruto / jornada.metaDiaria) * 100 else 0.0
 
-        return JornadaStats(ganhoBruto, kmRodados, tempoTrabalhadoMin, valorPorHora, valorPorKm, percentualMeta)
+        val prefs = context.getSharedPreferences(RideAccessibilityService.PREFS_NAME, Context.MODE_PRIVATE)
+        val (precoAtivo, consumoAtivo) = obterPrecoEConsumoAtivos(prefs)
+        val custoCombustivel = if (consumoAtivo > 0) (kmRodados / consumoAtivo) * precoAtivo else 0.0
+
+        val financiamento = prefs.getFloat(RideAccessibilityService.PREF_FINANCIAMENTO, 0f).toDouble()
+        val seguro = prefs.getFloat(RideAccessibilityService.PREF_SEGURO, 0f).toDouble()
+        val ipvaAnual = prefs.getFloat(RideAccessibilityService.PREF_IPVA, 0f).toDouble()
+        val licenciamentoAnual = prefs.getFloat(RideAccessibilityService.PREF_LICENCIAMENTO, 0f).toDouble()
+        val manutencao = prefs.getFloat(RideAccessibilityService.PREF_MANUTENCAO, 0f).toDouble()
+        val contasPessoais = prefs.getFloat(RideAccessibilityService.PREF_CONTAS_PESSOAIS, 0f).toDouble()
+        val kmMes = prefs.getFloat(RideAccessibilityService.PREF_KM_MES, 3000f).toDouble()
+        val custoFixoMensal = financiamento + seguro + (ipvaAnual / 12.0) + (licenciamentoAnual / 12.0) + manutencao + contasPessoais
+        val custoFixoPorKm = if (kmMes > 0) custoFixoMensal / kmMes else 0.0
+        val custoFixo = custoFixoPorKm * kmRodados
+
+        val lucroLiquido = ganhoBruto - custoCombustivel - custoFixo
+
+        return JornadaStats(ganhoBruto, kmRodados, tempoTrabalhadoMin, valorPorHora, valorPorKm, percentualMeta, custoCombustivel, custoFixo, lucroLiquido)
     }
 }
