@@ -89,7 +89,6 @@ class RideAccessibilityService : AccessibilityService() {
 
         if (horasDecorridas >= limiteHoras) {
             enviarNotificacaoPausa(horasDecorridas)
-            // Reinicia a contagem, pra avisar de novo só depois de outro intervalo completo.
             prefs.edit().putLong(PREF_INICIO_SESSAO, System.currentTimeMillis()).apply()
         }
     }
@@ -227,6 +226,25 @@ class RideAccessibilityService : AccessibilityService() {
         }
     }
 
+    /** Retorna (preço por litro, consumo km/l) do combustível marcado como
+     * ativo em Config. Cada tipo tem seu próprio par de valores salvos. */
+    private fun obterPrecoEConsumoAtivos(prefs: android.content.SharedPreferences): Pair<Double, Double> {
+        return when (prefs.getString(PREF_COMBUSTIVEL_ATIVO, "etanol")) {
+            "gasolina" -> Pair(
+                prefs.getFloat(PREF_PRECO_GASOLINA, 6.10f).toDouble(),
+                prefs.getFloat(PREF_CONSUMO_GASOLINA, 10.0f).toDouble()
+            )
+            "gnv" -> Pair(
+                prefs.getFloat(PREF_PRECO_GNV, 4.50f).toDouble(),
+                prefs.getFloat(PREF_CONSUMO_GNV, 12.0f).toDouble()
+            )
+            else -> Pair(
+                prefs.getFloat(PREF_PRECO_ETANOL, 4.20f).toDouble(),
+                prefs.getFloat(PREF_CONSUMO_ETANOL, 7.0f).toDouble()
+            )
+        }
+    }
+
     private fun processarTelaDeCorrida(texto: String) {
         val pernas = TriggerPatterns.extrairPernas(texto)
         val pernaPickup = pernas.firstOrNull()
@@ -270,9 +288,11 @@ class RideAccessibilityService : AccessibilityService() {
             (licenciamentoAnual / 12.0) + manutencao + contasPessoais
         val custoFixoPorKm = if (kmMes > 0) custoFixoMensal / kmMes else 0.0
 
+        val (precoAtivo, consumoAtivo) = obterPrecoEConsumoAtivos(prefs)
+
         val engine = CalculationEngine(
-            precoCombustivelPorLitro = prefs.getFloat(PREF_PRECO_COMBUSTIVEL, 6.10f).toDouble(),
-            consumoKmPorLitro = prefs.getFloat(PREF_CONSUMO, 12.0f).toDouble(),
+            precoCombustivelPorLitro = precoAtivo,
+            consumoKmPorLitro = consumoAtivo,
             minimoValorPorKm = prefs.getFloat(PREF_MIN_KM, 1.50f).toDouble(),
             minimoValorPorHora = prefs.getFloat(PREF_MIN_HORA, 25.0f).toDouble(),
             custoFixoPorKm = custoFixoPorKm
@@ -385,6 +405,13 @@ class RideAccessibilityService : AccessibilityService() {
         const val PREF_KM_MES = "km_rodados_mes"
         const val PREF_INICIO_SESSAO = "inicio_sessao_millis"
         const val PREF_LIMITE_PAUSA_HORAS = "limite_pausa_horas"
+        const val PREF_COMBUSTIVEL_ATIVO = "combustivel_ativo"
+        const val PREF_PRECO_GASOLINA = "preco_gasolina"
+        const val PREF_CONSUMO_GASOLINA = "consumo_gasolina"
+        const val PREF_PRECO_ETANOL = "preco_etanol"
+        const val PREF_CONSUMO_ETANOL = "consumo_etanol"
+        const val PREF_PRECO_GNV = "preco_gnv"
+        const val PREF_CONSUMO_GNV = "consumo_gnv"
         private const val VALOR_MAXIMO_PLAUSIVEL = 300.0
         private const val CANAL_PAUSA_ID = "lembrete_pausa"
         private const val NOTIFICACAO_PAUSA_ID = 772
