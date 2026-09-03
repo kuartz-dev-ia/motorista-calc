@@ -2,7 +2,7 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0E1013">
+    android:background="#0A0E17">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -14,7 +14,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="📄 Documentos"
-            android:textColor="#F4F5F7"
+            android:textColor="#FFFFFF"
             android:textSize="22sp"
             android:textStyle="bold"
             android:layout_marginBottom="16dp" />
@@ -31,7 +31,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Pendências"
-                android:textColor="#F4F5F7"
+                android:textColor="#FFFFFF"
                 android:textSize="15sp"
                 android:textStyle="bold"
                 android:layout_marginBottom="8dp" />
@@ -55,7 +55,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Novo documento"
-                android:textColor="#F4F5F7"
+                android:textColor="#FFFFFF"
                 android:textSize="15sp"
                 android:textStyle="bold"
                 android:layout_marginBottom="10dp" />
@@ -65,7 +65,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="TIPO (ex: IPVA, Seguro, Licenciamento)"
-                android:textColor="#8FB868"
+                android:textColor="#1FE7A0"
                 android:textSize="10.5sp"
                 android:textStyle="bold"
                 android:paddingBottom="4dp" />
@@ -75,8 +75,8 @@
                 android:layout_height="44dp"
                 android:background="@drawable/bg_input_verde"
                 android:gravity="center"
-                android:textColor="#EAF3DE"
-                android:textColorHint="#3F5A34"
+                android:textColor="#FFFFFF"
+                android:textColorHint="#8B96AC"
                 android:hint="Tipo"
                 android:textSize="14sp"
                 android:layout_marginBottom="10dp" />
@@ -86,7 +86,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="DATA DE VENCIMENTO (DD/MM/AAAA)"
-                android:textColor="#8FB868"
+                android:textColor="#1FE7A0"
                 android:textSize="10.5sp"
                 android:textStyle="bold"
                 android:paddingBottom="4dp" />
@@ -96,8 +96,8 @@
                 android:layout_height="44dp"
                 android:background="@drawable/bg_input_verde"
                 android:gravity="center"
-                android:textColor="#EAF3DE"
-                android:textColorHint="#3F5A34"
+                android:textColor="#FFFFFF"
+                android:textColorHint="#8B96AC"
                 android:hint="dd/mm/aaaa"
                 android:textSize="14sp"
                 android:inputType="date"
@@ -111,7 +111,7 @@
                 android:padding="12dp"
                 android:gravity="center"
                 android:text="Salvar documento"
-                android:textColor="#EAF3DE"
+                android:textColor="#08131A"
                 android:textSize="13sp"
                 android:textStyle="bold"
                 android:clickable="true"
@@ -129,7 +129,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Todos os documentos"
-                android:textColor="#F4F5F7"
+                android:textColor="#FFFFFF"
                 android:textSize="15sp"
                 android:textStyle="bold"
                 android:layout_marginBottom="6dp" />
@@ -142,4 +142,4 @@
         </LinearLayout>
 
     </LinearLayout>
-</ScrollView>
+</ScrollView>          
