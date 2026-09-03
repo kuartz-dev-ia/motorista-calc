@@ -139,6 +139,33 @@ object HistoricoStorage {
         salvarTudo(context, lista)
     }
 
+    /** Edita o valor de uma corrida já registrada (ex: gorjeta ou reajuste),
+     * recalculando R$/km, R$/hora e lucro líquido a partir do novo valor. */
+    fun editarValor(context: Context, id: Long, novoValor: Double) {
+        val lista = carregarTudo(context)
+        val idx = lista.indexOfFirst { it.id == id }
+        if (idx < 0) return
+
+        val r = lista[idx]
+        val custoAssociado = r.valorTotal - (r.lucroLiquido ?: r.valorTotal)
+        val novoValorPorKm = if (r.distanciaTotalKm > 0) novoValor / r.distanciaTotalKm else r.valorPorKm
+        val horas = r.tempoTotalMin / 60.0
+        val novoValorPorHora = if (horas > 0) novoValor / horas else r.valorPorHora
+        val novoLucro = novoValor - custoAssociado
+
+        lista[idx] = r.copy(
+            valorTotal = novoValor,
+            valorPorKm = novoValorPorKm,
+            valorPorHora = novoValorPorHora,
+            lucroLiquido = novoLucro
+        )
+        salvarTudo(context, lista)
+    }
+
+    fun apagarRegistro(context: Context, id: Long) {
+        salvarTudo(context, carregarTudo(context).filter { it.id != id })
+    }
+
     fun listarDoDia(context: Context): List<RegistroCorrida> {
         val hoje = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
         return carregarTudo(context).filter { it.diaChave == hoje }
