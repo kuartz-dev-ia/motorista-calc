@@ -166,7 +166,11 @@ class MainActivity : AppCompatActivity() {
             .putLong(RideAccessibilityService.PREF_INICIO_SESSAO, 0L)
             .apply()
 
-        Toast.makeText(this, "Jornada encerrada — ganho R$ %.2f".format(stats.ganhoBruto), Toast.LENGTH_LONG).show()
+        Toast.makeText(
+            this,
+            "Jornada encerrada — ganho R$ %.2f, lucro líquido R$ %.2f".format(stats.ganhoBruto, stats.lucroLiquido),
+            Toast.LENGTH_LONG
+        ).show()
         atualizarTelaJornada()
     }
 
@@ -192,6 +196,10 @@ class MainActivity : AppCompatActivity() {
             findViewById<TextView>(R.id.txtJornadaGanho).text = "R$ %.2f".format(stats.ganhoBruto)
             findViewById<TextView>(R.id.txtJornadaRPorHora).text = "R$ %.2f".format(stats.valorPorHora)
             findViewById<TextView>(R.id.txtJornadaKm).text = "%.1f".format(stats.kmRodados)
+
+            val txtLucro = findViewById<TextView>(R.id.txtJornadaLucro)
+            txtLucro.text = "Lucro líquido real: R$ %.2f".format(stats.lucroLiquido)
+            txtLucro.setTextColor(Color.parseColor(if (stats.lucroLiquido >= 0) "#1FE7A0" else "#F55757"))
         }
 
         atualizarBotaoGravar()
