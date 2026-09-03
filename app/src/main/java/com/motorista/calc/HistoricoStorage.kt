@@ -148,4 +148,8 @@ object HistoricoStorage {
         val limite = System.currentTimeMillis() - dias.toLong() * 24 * 60 * 60 * 1000
         return carregarTudo(context).filter { it.dataHora >= limite }
     }
+
+    fun listarEntre(context: Context, inicioMillis: Long, fimMillis: Long): List<RegistroCorrida> {
+        return carregarTudo(context).filter { it.dataHora in inicioMillis..fimMillis }
+    }
 }
