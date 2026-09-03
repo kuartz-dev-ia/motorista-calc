@@ -5,6 +5,8 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
@@ -21,6 +23,14 @@ class MainActivity : AppCompatActivity() {
     private lateinit var edtCargaHoraria: EditText
     private lateinit var edtOdometroInicial: EditText
     private lateinit var txtMetaPorHoraPreview: TextView
+
+    private val handler = Handler(Looper.getMainLooper())
+    private val tickerRunnable = object : Runnable {
+        override fun run() {
+            atualizarTelaJornada()
+            handler.postDelayed(this, 15_000L)
+        }
+    }
 
     private val chipsMeta by lazy {
         listOf(
@@ -89,11 +99,14 @@ class MainActivity : AppCompatActivity() {
         atualizarTrial()
         atualizarTelaJornada()
         RideRecorderService.aoMudarEstado = { atualizarBotaoGravar() }
+        handler.removeCallbacks(tickerRunnable)
+        handler.postDelayed(tickerRunnable, 15_000L)
     }
 
     override fun onPause() {
         super.onPause()
         RideRecorderService.aoMudarEstado = null
+        handler.removeCallbacks(tickerRunnable)
     }
 
     private fun selecionarChipMeta(selecionado: TextView, valor: String) {
