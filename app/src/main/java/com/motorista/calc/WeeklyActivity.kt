@@ -18,7 +18,10 @@ import java.util.Locale
 class WeeklyActivity : AppCompatActivity() {
 
     private enum class Periodo { HOJE, SEMANA, MES, TUDO }
+    private enum class SubAba { RESUMO, LISTA }
+
     private var periodoAtual = Periodo.SEMANA
+    private var subAbaAtual = SubAba.RESUMO
 
     private val diasSemana = arrayOf("D", "S", "T", "Q", "Q", "S", "S")
 
@@ -31,6 +34,9 @@ class WeeklyActivity : AppCompatActivity() {
         findViewById<android.view.View>(R.id.tabMes).setOnClickListener { selecionarPeriodo(Periodo.MES) }
         findViewById<android.view.View>(R.id.tabTudo).setOnClickListener { selecionarPeriodo(Periodo.TUDO) }
 
+        findViewById<android.view.View>(R.id.subTabResumo).setOnClickListener { selecionarSubAba(SubAba.RESUMO) }
+        findViewById<android.view.View>(R.id.subTabLista).setOnClickListener { selecionarSubAba(SubAba.LISTA) }
+
         findViewById<android.view.View>(R.id.btnExportarCsv).setOnClickListener { exportarCsv() }
 
         selecionarPeriodo(Periodo.SEMANA)
@@ -38,11 +44,32 @@ class WeeklyActivity : AppCompatActivity() {
 
     private fun selecionarPeriodo(periodo: Periodo) {
         periodoAtual = periodo
-        atualizarTabs()
-        montarResumo()
+        atualizarTabsPeriodo()
+        atualizarConteudo()
     }
 
-    private fun atualizarTabs() {
+    private fun selecionarSubAba(subAba: SubAba) {
+        subAbaAtual = subAba
+        atualizarSubAbas()
+        atualizarConteudo()
+    }
+
+    private fun atualizarConteudo() {
+        val grupoResumo = findViewById<android.view.View>(R.id.grupoResumo)
+        val grupoLista = findViewById<android.view.View>(R.id.grupoLista)
+
+        if (subAbaAtual == SubAba.RESUMO) {
+            grupoResumo.visibility = android.view.View.VISIBLE
+            grupoLista.visibility = android.view.View.GONE
+            montarResumo()
+        } else {
+            grupoResumo.visibility = android.view.View.GONE
+            grupoLista.visibility = android.view.View.VISIBLE
+            montarLista()
+        }
+    }
+
+    private fun atualizarTabsPeriodo() {
         val tabs = mapOf(
             Periodo.HOJE to R.id.tabHoje,
             Periodo.SEMANA to R.id.tabSemana,
@@ -58,6 +85,17 @@ class WeeklyActivity : AppCompatActivity() {
         }
     }
 
+    private fun atualizarSubAbas() {
+        val subTabResumo = findViewById<TextView>(R.id.subTabResumo)
+        val subTabLista = findViewById<TextView>(R.id.subTabLista)
+
+        subTabResumo.setTextColor(Color.parseColor(if (subAbaAtual == SubAba.RESUMO) "#1FE7A0" else "#8B96AC"))
+        subTabResumo.setTypeface(subTabResumo.typeface, if (subAbaAtual == SubAba.RESUMO) Typeface.BOLD else Typeface.NORMAL)
+
+        subTabLista.setTextColor(Color.parseColor(if (subAbaAtual == SubAba.LISTA) "#1FE7A0" else "#8B96AC"))
+        subTabLista.setTypeface(subTabLista.typeface, if (subAbaAtual == SubAba.LISTA) Typeface.BOLD else Typeface.NORMAL)
+    }
+
     private fun inicioDoPeriodo(): Long {
         val cal = Calendar.getInstance()
         return when (periodoAtual) {
@@ -71,9 +109,10 @@ class WeeklyActivity : AppCompatActivity() {
         }
     }
 
+    private fun jornadasDoPeriodo() = JornadaStorage.listarTodas(this).filter { it.dataInicioMillis >= inicioDoPeriodo() }
+
     private fun montarResumo() {
-        val inicio = inicioDoPeriodo()
-        val jornadas = JornadaStorage.listarTodas(this).filter { it.dataInicioMillis >= inicio }
+        val jornadas = jornadasDoPeriodo()
         val statsPorJornada = jornadas.map { JornadaStorage.calcularStats(this, it) }
 
         val totalGanho = statsPorJornada.sumOf { it.ganhoBruto }
@@ -101,6 +140,54 @@ class WeeklyActivity : AppCompatActivity() {
         barraMeta.requestLayout()
 
         montarGraficoUltimosDias()
+    }
+
+    private fun montarLista() {
+        val container = findViewById<LinearLayout>(R.id.containerListaJornadas)
+        container.removeAllViews()
+
+        val jornadas = jornadasDoPeriodo().sortedByDescending { it.dataInicioMillis }
+        val formatoData = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+
+        if (jornadas.isEmpty()) {
+            container.addView(TextView(this).apply {
+                text = "Nenhuma jornada nesse período."
+                setTextColor(Color.parseColor("#8B96AC"))
+                textSize = 13f
+            })
+            return
+        }
+
+        for (jornada in jornadas) {
+            val stats = JornadaStorage.calcularStats(this, jornada)
+            val linha = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = android.view.Gravity.CENTER_VERTICAL
+                background = ContextCompat.getDrawable(this@WeeklyActivity, R.drawable.bg_card_dark)
+                setPadding(24, 20, 24, 20)
+                layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT).apply {
+                    bottomMargin = 10
+                }
+            }
+
+            val texto = TextView(this).apply {
+                text = "${formatoData.format(java.util.Date(jornada.dataInicioMillis))}${if (jornada.dataFimMillis == null) " (em andamento)" else ""}\n%.1f km".format(stats.kmRodados)
+                setTextColor(Color.parseColor("#FFFFFF"))
+                textSize = 12f
+                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+            }
+            linha.addView(texto)
+
+            val ganho = TextView(this).apply {
+                text = "R$ %.2f".format(stats.ganhoBruto)
+                setTextColor(Color.parseColor("#1FE7A0"))
+                textSize = 14f
+                setTypeface(typeface, Typeface.BOLD)
+            }
+            linha.addView(ganho)
+
+            container.addView(linha)
+        }
     }
 
     private fun montarGraficoUltimosDias() {
@@ -203,4 +290,4 @@ class WeeklyActivity : AppCompatActivity() {
             android.widget.Toast.makeText(this, "Erro ao exportar: ${e.message}", android.widget.Toast.LENGTH_LONG).show()
         }
     }
-}
+}           
