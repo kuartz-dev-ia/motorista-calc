@@ -1,12 +1,14 @@
 package com.motorista.calc
 
 import android.Manifest
+import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.text.InputType
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
@@ -79,8 +81,11 @@ class MainActivity : AppCompatActivity() {
         edtCargaHoraria.addTextChangedListener(watcherAtualizaPreview)
 
         findViewById<TextView>(R.id.btnIniciarJornada).setOnClickListener { iniciarJornada() }
-        findViewById<TextView>(R.id.btnEncerrarJornada).setOnClickListener { encerrarJornada() }
+        findViewById<TextView>(R.id.btnEncerrarJornada).setOnClickListener { confirmarEncerramentoComOdometro() }
         findViewById<TextView>(R.id.btnGravar).setOnClickListener { alternarGravacao() }
+        findViewById<TextView>(R.id.btnVerCorridas).setOnClickListener {
+            startActivity(Intent(this, CorridasDaJornadaActivity::class.java))
+        }
 
         findViewById<TextView>(R.id.btnManutencoes).setOnClickListener { startActivity(Intent(this, ManutencoesActivity::class.java)) }
         findViewById<TextView>(R.id.btnAbastecimentos).setOnClickListener { startActivity(Intent(this, AbastecimentosActivity::class.java)) }
@@ -151,24 +156,51 @@ class MainActivity : AppCompatActivity() {
         prefs.edit()
             .putBoolean(RideAccessibilityService.PREF_MONITORAMENTO_ATIVO, true)
             .putLong(RideAccessibilityService.PREF_INICIO_SESSAO, System.currentTimeMillis())
+            .putLong(RideAccessibilityService.PREF_ULTIMO_LEMBRETE_META, System.currentTimeMillis())
             .apply()
 
         atualizarTelaJornada()
     }
 
-    private fun encerrarJornada() {
+    private fun confirmarEncerramentoComOdometro() {
         val jornada = JornadaStorage.jornadaAtiva(this) ?: return
-        val stats = JornadaStorage.calcularStats(this, jornada)
-        JornadaStorage.encerrar(this, jornada.id, jornada.odometroInicial + stats.kmRodados)
+
+        val input = EditText(this).apply {
+            hint = "Ex: 125350"
+            inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
+            setTextColor(Color.WHITE)
+            setHintTextColor(Color.parseColor("#8B96AC"))
+            setPadding(48, 32, 48, 32)
+        }
+
+        AlertDialog.Builder(this)
+            .setTitle("Odômetro final")
+            .setMessage("Informe o odômetro atual do carro (odômetro inicial foi %.0f). Isso garante que km sem corrida também entrem no cálculo real.".format(jornada.odometroInicial))
+            .setView(input)
+            .setPositiveButton("Encerrar jornada") { _, _ -> encerrarJornada(jornada, input.text.toString().toDoubleOrNull()) }
+            .setNegativeButton("Cancelar", null)
+            .show()
+    }
+
+    private fun encerrarJornada(jornada: Jornada, odometroFinal: Double?) {
+        if (odometroFinal == null || odometroFinal < jornada.odometroInicial) {
+            Toast.makeText(this, "Odômetro inválido — precisa ser maior que o inicial (%.0f)".format(jornada.odometroInicial), Toast.LENGTH_LONG).show()
+            return
+        }
+
+        JornadaStorage.encerrar(this, jornada.id, odometroFinal)
 
         prefs.edit()
             .putBoolean(RideAccessibilityService.PREF_MONITORAMENTO_ATIVO, false)
             .putLong(RideAccessibilityService.PREF_INICIO_SESSAO, 0L)
             .apply()
 
+        val jornadaAtualizada = JornadaStorage.listarTodas(this).first { it.id == jornada.id }
+        val stats = JornadaStorage.calcularStats(this, jornadaAtualizada)
+
         Toast.makeText(
             this,
-            "Jornada encerrada — ganho R$ %.2f, lucro líquido R$ %.2f".format(stats.ganhoBruto, stats.lucroLiquido),
+            "Jornada encerrada — ganho R$ %.2f, lucro líquido R$ %.2f (%.1f km reais)".format(stats.ganhoBruto, stats.lucroLiquido, stats.kmRodados),
             Toast.LENGTH_LONG
         ).show()
         atualizarTelaJornada()
@@ -196,6 +228,8 @@ class MainActivity : AppCompatActivity() {
             findViewById<TextView>(R.id.txtJornadaGanho).text = "R$ %.2f".format(stats.ganhoBruto)
             findViewById<TextView>(R.id.txtJornadaRPorHora).text = "R$ %.2f".format(stats.valorPorHora)
             findViewById<TextView>(R.id.txtJornadaKm).text = "%.1f".format(stats.kmRodados)
+
+            findViewById<TextView>(R.id.txtJornadaCombustivel).text = "⛽ Combustível: R$ %.2f".format(stats.custoCombustivel)
 
             val txtLucro = findViewById<TextView>(R.id.txtJornadaLucro)
             txtLucro.text = "Lucro líquido real: R$ %.2f".format(stats.lucroLiquido)
