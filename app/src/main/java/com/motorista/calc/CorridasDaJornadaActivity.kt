@@ -10,6 +10,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -60,7 +61,7 @@ class CorridasDaJornadaActivity : AppCompatActivity() {
         for (corrida in corridas) {
             val card = LinearLayout(this).apply {
                 orientation = LinearLayout.VERTICAL
-                background = androidx.core.content.ContextCompat.getDrawable(this@CorridasDaJornadaActivity, R.drawable.bg_card_dark)
+                background = ContextCompat.getDrawable(this@CorridasDaJornadaActivity, R.drawable.bg_card_dark)
                 setPadding(24, 20, 24, 20)
                 layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT).apply {
                     bottomMargin = 12
@@ -117,10 +118,12 @@ class CorridasDaJornadaActivity : AppCompatActivity() {
             setText("%.2f".format(corrida.valorTotal))
             inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
             setTextColor(Color.WHITE)
-            setPadding(48, 32, 48, 32)
+            setHintTextColor(Color.parseColor("#8B96AC"))
+            background = ContextCompat.getDrawable(this@CorridasDaJornadaActivity, R.drawable.bg_input_verde)
+            setPadding(32, 24, 32, 24)
         }
 
-        AlertDialog.Builder(this)
+        AlertDialog.Builder(this, R.style.DialogTemaEscuro)
             .setTitle("Editar valor da corrida")
             .setMessage("Use isso pra ajustar gorjeta ou reajuste de valor após aceitar.")
             .setView(input)
@@ -138,7 +141,7 @@ class CorridasDaJornadaActivity : AppCompatActivity() {
     }
 
     private fun confirmarExclusao(corrida: RegistroCorrida) {
-        AlertDialog.Builder(this)
+        AlertDialog.Builder(this, R.style.DialogTemaEscuro)
             .setTitle("Excluir corrida")
             .setMessage("Tem certeza que quer excluir essa corrida do registro?")
             .setPositiveButton("Excluir") { _, _ ->
