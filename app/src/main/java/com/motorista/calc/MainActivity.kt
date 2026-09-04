@@ -1,14 +1,12 @@
 package com.motorista.calc
 
 import android.Manifest
-import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.text.InputType
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
@@ -81,7 +79,9 @@ class MainActivity : AppCompatActivity() {
         edtCargaHoraria.addTextChangedListener(watcherAtualizaPreview)
 
         findViewById<TextView>(R.id.btnIniciarJornada).setOnClickListener { iniciarJornada() }
-        findViewById<TextView>(R.id.btnEncerrarJornada).setOnClickListener { confirmarEncerramentoComOdometro() }
+        findViewById<TextView>(R.id.btnEncerrarJornada).setOnClickListener {
+            startActivity(Intent(this, EncerrarJornadaActivity::class.java))
+        }
         findViewById<TextView>(R.id.btnGravar).setOnClickListener { alternarGravacao() }
         findViewById<TextView>(R.id.btnVerCorridas).setOnClickListener {
             startActivity(Intent(this, CorridasDaJornadaActivity::class.java))
@@ -92,6 +92,8 @@ class MainActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.btnDocumentos).setOnClickListener { startActivity(Intent(this, DocumentosActivity::class.java)) }
         findViewById<TextView>(R.id.btnPrints).setOnClickListener { startActivity(Intent(this, PrintsActivity::class.java)) }
         findViewById<TextView>(R.id.btnGravacoes).setOnClickListener { startActivity(Intent(this, RecordingsActivity::class.java)) }
+
+        findViewById<android.view.View>(R.id.headerMaisOpcoes).setOnClickListener { alternarMaisOpcoes() }
 
         findViewById<android.view.View>(R.id.navInicio).setOnClickListener { }
         findViewById<android.view.View>(R.id.navRelatorios).setOnClickListener { startActivity(Intent(this, WeeklyActivity::class.java)) }
@@ -112,6 +114,18 @@ class MainActivity : AppCompatActivity() {
         super.onPause()
         RideRecorderService.aoMudarEstado = null
         handler.removeCallbacks(tickerRunnable)
+    }
+
+    private fun alternarMaisOpcoes() {
+        val container = findViewById<android.view.View>(R.id.containerMaisOpcoes)
+        val seta = findViewById<TextView>(R.id.setaMaisOpcoes)
+        if (container.visibility == android.view.View.VISIBLE) {
+            container.visibility = android.view.View.GONE
+            seta.text = "▼"
+        } else {
+            container.visibility = android.view.View.VISIBLE
+            seta.text = "▲"
+        }
     }
 
     private fun selecionarChipMeta(selecionado: TextView, valor: String) {
@@ -159,50 +173,6 @@ class MainActivity : AppCompatActivity() {
             .putLong(RideAccessibilityService.PREF_ULTIMO_LEMBRETE_META, System.currentTimeMillis())
             .apply()
 
-        atualizarTelaJornada()
-    }
-
-    private fun confirmarEncerramentoComOdometro() {
-        val jornada = JornadaStorage.jornadaAtiva(this) ?: return
-
-        val input = EditText(this).apply {
-            hint = "Ex: 125350"
-            inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
-            setTextColor(Color.WHITE)
-            setHintTextColor(Color.parseColor("#8B96AC"))
-            setPadding(48, 32, 48, 32)
-        }
-
-        AlertDialog.Builder(this)
-            .setTitle("Odômetro final")
-            .setMessage("Informe o odômetro atual do carro (odômetro inicial foi %.0f). Isso garante que km sem corrida também entrem no cálculo real.".format(jornada.odometroInicial))
-            .setView(input)
-            .setPositiveButton("Encerrar jornada") { _, _ -> encerrarJornada(jornada, input.text.toString().toDoubleOrNull()) }
-            .setNegativeButton("Cancelar", null)
-            .show()
-    }
-
-    private fun encerrarJornada(jornada: Jornada, odometroFinal: Double?) {
-        if (odometroFinal == null || odometroFinal < jornada.odometroInicial) {
-            Toast.makeText(this, "Odômetro inválido — precisa ser maior que o inicial (%.0f)".format(jornada.odometroInicial), Toast.LENGTH_LONG).show()
-            return
-        }
-
-        JornadaStorage.encerrar(this, jornada.id, odometroFinal)
-
-        prefs.edit()
-            .putBoolean(RideAccessibilityService.PREF_MONITORAMENTO_ATIVO, false)
-            .putLong(RideAccessibilityService.PREF_INICIO_SESSAO, 0L)
-            .apply()
-
-        val jornadaAtualizada = JornadaStorage.listarTodas(this).first { it.id == jornada.id }
-        val stats = JornadaStorage.calcularStats(this, jornadaAtualizada)
-
-        Toast.makeText(
-            this,
-            "Jornada encerrada — ganho R$ %.2f, lucro líquido R$ %.2f (%.1f km reais)".format(stats.ganhoBruto, stats.lucroLiquido, stats.kmRodados),
-            Toast.LENGTH_LONG
-        ).show()
         atualizarTelaJornada()
     }
 
