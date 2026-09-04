@@ -1,6 +1,7 @@
 package com.motorista.calc
 
 import android.Manifest
+import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -94,6 +95,7 @@ class MainActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.btnGravacoes).setOnClickListener { startActivity(Intent(this, RecordingsActivity::class.java)) }
 
         findViewById<android.view.View>(R.id.headerMaisOpcoes).setOnClickListener { alternarMaisOpcoes() }
+        findViewById<TextView>(R.id.btnVerDicas).setOnClickListener { mostrarDicas() }
 
         findViewById<android.view.View>(R.id.navInicio).setOnClickListener { }
         findViewById<android.view.View>(R.id.navRelatorios).setOnClickListener { startActivity(Intent(this, WeeklyActivity::class.java)) }
@@ -194,19 +196,67 @@ class MainActivity : AppCompatActivity() {
             val minutos = stats.tempoTrabalhadoMin % 60
 
             findViewById<TextView>(R.id.txtJornadaTempo).text = "%02d:%02d".format(horas, minutos)
-            findViewById<TextView>(R.id.txtJornadaMeta).text = "Meta: R$ %.0f (%.0f%% atingida)".format(jornada.metaDiaria, stats.percentualMeta)
+            findViewById<TextView>(R.id.txtJornadaMeta).text = "R$%.0f".format(jornada.metaDiaria)
+            findViewById<TextView>(R.id.txtJornadaPercentual).text = "%.0f%%".format(stats.percentualMeta)
             findViewById<TextView>(R.id.txtJornadaGanho).text = "R$ %.2f".format(stats.ganhoBruto)
             findViewById<TextView>(R.id.txtJornadaRPorHora).text = "R$ %.2f".format(stats.valorPorHora)
             findViewById<TextView>(R.id.txtJornadaKm).text = "%.1f".format(stats.kmRodados)
-
-            findViewById<TextView>(R.id.txtJornadaCombustivel).text = "⛽ Combustível: R$ %.2f".format(stats.custoCombustivel)
+            findViewById<TextView>(R.id.txtJornadaCombustivel).text = "R$ %.2f".format(stats.custoCombustivel)
 
             val txtLucro = findViewById<TextView>(R.id.txtJornadaLucro)
-            txtLucro.text = "Lucro líquido real: R$ %.2f".format(stats.lucroLiquido)
+            txtLucro.text = "R$ %.2f".format(stats.lucroLiquido)
             txtLucro.setTextColor(Color.parseColor(if (stats.lucroLiquido >= 0) "#1FE7A0" else "#F55757"))
+
+            val anel = findViewById<android.view.View>(R.id.anelMeta)
+            anel.setBackgroundResource(if (stats.percentualMeta >= 100) R.drawable.bg_ring_progress else R.drawable.bg_ring_progress_baixo)
         }
 
         atualizarBotaoGravar()
+    }
+
+    private fun mostrarDicas() {
+        val dicas = mutableListOf<String>()
+
+        val jornadaAtiva = JornadaStorage.jornadaAtiva(this)
+        val ultimaJornada = jornadaAtiva ?: JornadaStorage.listarTodas(this).firstOrNull { it.dataFimMillis != null }
+
+        if (ultimaJornada != null) {
+            val stats = JornadaStorage.calcularStats(this, ultimaJornada)
+            if (stats.ganhoBruto > 0) {
+                val percentualCombustivel = (stats.custoCombustivel / stats.ganhoBruto) * 100
+                if (percentualCombustivel > 25) {
+                    dicas.add("⛽ O combustível está consumindo %.0f%% do seu ganho bruto — considere revisar o consumo do carro ou o combustível usado em Config.".format(percentualCombustivel))
+                }
+            }
+            if (stats.valorPorHora > 0 && stats.valorPorHora < 20) {
+                dicas.add("🕐 Seu R$/hora está em R$ %.2f, abaixo do recomendado. Avalie evitar corridas muito longas em horários de trânsito parado.".format(stats.valorPorHora))
+            }
+        }
+
+        val consumoMedio = AbastecimentoStorage.consumoMedio(AbastecimentoStorage.listarTodos(this))
+        if (consumoMedio != null) {
+            dicas.add("📊 Seu consumo real medido é de %.1f km/l — confira se esse valor está atualizado em Config > Combustível.".format(consumoMedio))
+        }
+
+        val manutencoesPendentes = ManutencaoStorage.pendencias(this)
+        if (manutencoesPendentes.isNotEmpty()) {
+            dicas.add("🔧 Você tem ${manutencoesPendentes.size} manutenção(ões) pendente(s) — resolver isso evita gastos maiores depois.")
+        }
+
+        val documentosPendentes = DocumentoStorage.pendencias(this)
+        if (documentosPendentes.isNotEmpty()) {
+            dicas.add("📄 Tem documento(s) vencendo ou vencido(s) — dá uma olhada na aba Documentos.")
+        }
+
+        if (dicas.isEmpty()) {
+            dicas.add("✅ Está tudo em ordem por enquanto! Continue registrando corridas, abastecimentos e manutenções pra eu te dar dicas cada vez mais precisas.")
+        }
+
+        AlertDialog.Builder(this, R.style.DialogTemaEscuro)
+            .setTitle("🤖 Dicas do Agente financeiro")
+            .setMessage(dicas.joinToString("\n\n"))
+            .setPositiveButton("Entendi", null)
+            .show()
     }
 
     private fun atualizarTrial() {
@@ -225,11 +275,11 @@ class MainActivity : AppCompatActivity() {
     private fun atualizarBotaoGravar() {
         val btnGravar = findViewById<TextView>(R.id.btnGravar)
         if (RideRecorderService.emGravacao) {
-            btnGravar.text = "⏺️ Gravação iniciada — clique para encerrar"
-            btnGravar.setTextColor(Color.parseColor("#1FE7A0"))
+            btnGravar.text = "⏺️  Gravação iniciada — toque para encerrar"
+            btnGravar.background = ContextCompat.getDrawable(this, R.drawable.bg_cta_stop)
         } else {
-            btnGravar.text = "🔴 Iniciar gravação da corrida"
-            btnGravar.setTextColor(Color.parseColor("#F55757"))
+            btnGravar.text = "▶  Iniciar Gravação da Corrida"
+            btnGravar.background = ContextCompat.getDrawable(this, R.drawable.bg_cta_start)
         }
     }
 
