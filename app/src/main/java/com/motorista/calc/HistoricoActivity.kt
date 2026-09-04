@@ -4,9 +4,12 @@ import android.app.AlertDialog
 import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
+import android.text.InputType
 import android.view.Gravity
+import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import java.text.SimpleDateFormat
@@ -142,7 +145,7 @@ class HistoricoActivity : AppCompatActivity() {
             }
 
             val btnExcluir = TextView(this).apply {
-                text = "🗑️ Excluir"
+                text = "🗑️ Excluir jornada"
                 setTextColor(Color.parseColor("#F55757"))
                 textSize = 12f
                 setTypeface(typeface, Typeface.BOLD)
@@ -176,9 +179,10 @@ class HistoricoActivity : AppCompatActivity() {
         container.addView(separador)
 
         container.addView(TextView(this).apply {
-            text = "Custo combustível: R$ %.2f  •  Custo fixo: R$ %.2f".format(stats.custoCombustivel, stats.custoFixo)
-            setTextColor(Color.parseColor("#8B96AC"))
-            textSize = 11f
+            text = "⛽ Custo combustível: R$ %.2f  •  Custo fixo: R$ %.2f".format(stats.custoCombustivel, stats.custoFixo)
+            setTextColor(Color.parseColor("#F5A623"))
+            textSize = 12f
+            setTypeface(typeface, Typeface.BOLD)
             setPadding(0, 0, 0, 10)
         })
 
@@ -205,13 +209,71 @@ class HistoricoActivity : AppCompatActivity() {
                 "99" -> "🟡"
                 else -> "🚗"
             }
-            container.addView(TextView(this).apply {
+
+            val linha = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = Gravity.CENTER_VERTICAL
+                setPadding(0, 4, 0, 4)
+            }
+
+            linha.addView(TextView(this).apply {
                 text = "$emoji ${formatoHora.format(Date(corrida.dataHora))} — R$ %.2f (%.1f km)".format(corrida.valorTotal, corrida.distanciaTotalKm)
                 setTextColor(Color.parseColor("#E4E7EC"))
                 textSize = 11.5f
-                setPadding(0, 4, 0, 4)
+                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
             })
+
+            linha.addView(TextView(this).apply {
+                text = "✏️"
+                textSize = 13f
+                setPadding(12, 0, 12, 0)
+                setOnClickListener { abrirDialogoEditar(corrida) }
+            })
+
+            linha.addView(TextView(this).apply {
+                text = "🗑️"
+                textSize = 13f
+                setOnClickListener { confirmarExclusaoCorrida(corrida) }
+            })
+
+            container.addView(linha)
         }
+    }
+
+    private fun abrirDialogoEditar(corrida: RegistroCorrida) {
+        val input = EditText(this).apply {
+            setText("%.2f".format(corrida.valorTotal))
+            inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
+            setTextColor(Color.WHITE)
+            setPadding(48, 32, 48, 32)
+        }
+
+        AlertDialog.Builder(this)
+            .setTitle("Editar valor da corrida")
+            .setView(input)
+            .setPositiveButton("Salvar") { _, _ ->
+                val novoValor = input.text.toString().toDoubleOrNull()
+                if (novoValor == null || novoValor <= 0) {
+                    Toast.makeText(this, "Valor inválido", Toast.LENGTH_LONG).show()
+                    return@setPositiveButton
+                }
+                HistoricoStorage.editarValor(this, corrida.id, novoValor)
+                atualizarTela()
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
+    }
+
+    private fun confirmarExclusaoCorrida(corrida: RegistroCorrida) {
+        AlertDialog.Builder(this)
+            .setTitle("Excluir corrida")
+            .setMessage("Tem certeza que quer excluir essa corrida?")
+            .setPositiveButton("Excluir") { _, _ ->
+                HistoricoStorage.apagarRegistro(this, corrida.id)
+                atualizarTela()
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
     }
 
     private fun criarColuna(rotulo: String, valor: String, cor: String): LinearLayout {
@@ -231,4 +293,4 @@ class HistoricoActivity : AppCompatActivity() {
             })
         }
     }
-}     
+}
