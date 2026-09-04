@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#0A0E17">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="⏹ Encerrar Jornada"
+            android:textColor="#FFFFFF"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="6dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Preencha os valores finais pra fechar o dia com precisão"
+            android:textColor="#8B96AC"
+            android:textSize="12sp"
+            android:layout_marginBottom="16dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/bg_card_dark"
+            android:padding="16dp"
+            android:layout_marginBottom="12dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="VALOR FEITO NA UBER (R$)"
+                android:textColor="#1FE7A0"
+                android:textSize="10.5sp"
+                android:textStyle="bold"
+                android:paddingBottom="4dp" />
+            <EditText
+                android:id="@+id/edtValorUberFinal"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/bg_input_verde"
+                android:gravity="center"
+                android:textColor="#FFFFFF"
+                android:textColorHint="#8B96AC"
+                android:hint="0"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:inputType="numberDecimal"
+                android:layout_marginBottom="12dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="VALOR FEITO NA 99 (R$)"
+                android:textColor="#1FE7A0"
+                android:textSize="10.5sp"
+                android:textStyle="bold"
+                android:paddingBottom="4dp" />
+            <EditText
+                android:id="@+id/edtValor99Final"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/bg_input_verde"
+                android:gravity="center"
+                android:textColor="#FFFFFF"
+                android:textColorHint="#8B96AC"
+                android:hint="0"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:inputType="numberDecimal"
+                android:layout_marginBottom="12dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="KM TOTAL RODADO NO DIA"
+                android:textColor="#1FE7A0"
+                android:textSize="10.5sp"
+                android:textStyle="bold"
+                android:paddingBottom="4dp" />
+            <EditText
+                android:id="@+id/edtKmTotalFinal"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/bg_input_verde"
+                android:gravity="center"
+                android:textColor="#FFFFFF"
+                android:textColorHint="#8B96AC"
+                android:hint="0"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:inputType="numberDecimal" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="@drawable/bg_card_accent"
+            android:padding="14dp"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Total ganho no dia"
+                android:textColor="#8B96AC"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/txtTotalPreview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="R$ 0,00"
+                android:textColor="#1FE7A0"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/btnConfirmarEncerramento"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_hero_green"
+            android:padding="14dp"
+            android:gravity="center"
+            android:text="✅ Confirmar e encerrar"
+            android:textColor="#08131A"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="12dp"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <TextView
+            android:id="@+id/btnCancelarEncerramento"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="12dp"
+            android:gravity="center"
+            android:text="Cancelar"
+            android:textColor="#8B96AC"
+            android:textSize="13sp"
+            android:clickable="true"
+            android:focusable="true" />
+
+    </LinearLayout>
+</ScrollView>
