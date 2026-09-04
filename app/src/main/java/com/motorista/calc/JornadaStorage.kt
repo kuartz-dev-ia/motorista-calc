@@ -79,6 +79,9 @@ object JornadaStorage {
         return nova
     }
 
+    /** Encerra a jornada com o odômetro final informado manualmente pelo
+     * motorista — isso garante que km rodados sem corrida (ex: voltando pra
+     * casa vazio) também entrem no cálculo real de custo/lucro. */
     fun encerrar(context: Context, id: Long, odometroFinal: Double) {
         val lista = listarTodas(context).toMutableList()
         val idx = lista.indexOfFirst { it.id == id }
@@ -114,7 +117,16 @@ object JornadaStorage {
         val registros = HistoricoStorage.listarEntre(context, jornada.dataInicioMillis, fim).filter { it.aceita && !it.cancelada }
 
         val ganhoBruto = registros.sumOf { it.valorTotal }
-        val kmRodados = registros.sumOf { it.distanciaTotalKm }
+
+        // Se a jornada já foi encerrada com odômetro final informado, usa o km
+        // REAL rodado (inclui trajetos sem corrida). Enquanto está em
+        // andamento, usa a soma das corridas capturadas (estimativa).
+        val kmRodados = if (jornada.dataFimMillis != null && jornada.odometroFinal != null) {
+            (jornada.odometroFinal!! - jornada.odometroInicial).coerceAtLeast(0.0)
+        } else {
+            registros.sumOf { it.distanciaTotalKm }
+        }
+
         val tempoTrabalhadoMin = ((fim - jornada.dataInicioMillis) / 60000).toInt()
         val horas = tempoTrabalhadoMin / 60.0
         val valorPorHora = if (horas > 0) ganhoBruto / horas else 0.0
