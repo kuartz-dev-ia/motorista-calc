@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="DialogTemaEscuro" parent="Theme.MaterialComponents.DayNight.Dialog.Alert">
+    <style name="DialogTemaEscuro" parent="Theme.MaterialComponents.Dialog.Alert">
         <item name="colorAccent">#1FE7A0</item>
         <item name="colorPrimary">#1FE7A0</item>
-        <item name="android:colorBackground">#141B2D</item>
+        <item name="android:colorBackground">#0F1B2D</item>
         <item name="android:textColorPrimary">#FFFFFF</item>
         <item name="android:textColorSecondary">#8B96AC</item>
+        <item name="android:windowBackground">@drawable/bg_card_dark</item>
     </style>
 </resources>
