@@ -68,6 +68,11 @@
             android:label="Documentos" />
 
         <activity
+            android:name=".CorridasDaJornadaActivity"
+            android:exported="false"
+            android:label="Corridas de hoje" />
+
+        <activity
             android:name=".ParametrosActivity"
             android:exported="false"
             android:label="Parâmetros" />
