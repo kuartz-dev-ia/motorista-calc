@@ -574,69 +574,96 @@
                 android:background="@drawable/bg_card_dark"
                 android:padding="14dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Mais opções"
-                    android:textColor="#8B96AC"
-                    android:textSize="11sp"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="8dp" />
-
-                <TextView
-                    android:id="@+id/btnManutencoes"
+                <LinearLayout
+                    android:id="@+id/headerMaisOpcoes"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="10dp"
-                    android:text="🔧 Manutenções do veículo"
-                    android:textColor="#FFFFFF"
-                    android:textSize="13sp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
                     android:clickable="true"
-                    android:focusable="true" />
+                    android:focusable="true">
 
-                <TextView
-                    android:id="@+id/btnAbastecimentos"
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Mais opções"
+                        android:textColor="#8B96AC"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/setaMaisOpcoes"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="▼"
+                        android:textColor="#8B96AC"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/containerMaisOpcoes"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="10dp"
-                    android:text="⛽ Abastecimentos"
-                    android:textColor="#FFFFFF"
-                    android:textSize="13sp"
-                    android:clickable="true"
-                    android:focusable="true" />
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    android:layout_marginTop="8dp">
 
-                <TextView
-                    android:id="@+id/btnDocumentos"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="10dp"
-                    android:text="📄 Documentos"
-                    android:textColor="#FFFFFF"
-                    android:textSize="13sp"
-                    android:clickable="true"
-                    android:focusable="true" />
+                    <TextView
+                        android:id="@+id/btnManutencoes"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="10dp"
+                        android:text="🔧 Manutenções do veículo"
+                        android:textColor="#FFFFFF"
+                        android:textSize="13sp"
+                        android:clickable="true"
+                        android:focusable="true" />
 
-                <TextView
-                    android:id="@+id/btnPrints"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="10dp"
-                    android:text="🖼️ Prints salvos"
-                    android:textColor="#FFFFFF"
-                    android:textSize="13sp"
-                    android:clickable="true"
-                    android:focusable="true" />
+                    <TextView
+                        android:id="@+id/btnAbastecimentos"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="10dp"
+                        android:text="⛽ Abastecimentos"
+                        android:textColor="#FFFFFF"
+                        android:textSize="13sp"
+                        android:clickable="true"
+                        android:focusable="true" />
 
-                <TextView
-                    android:id="@+id/btnGravacoes"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="10dp"
-                    android:text="🎬 Gravações salvas"
-                    android:textColor="#FFFFFF"
-                    android:textSize="13sp"
-                    android:clickable="true"
-                    android:focusable="true" />
+                    <TextView
+                        android:id="@+id/btnDocumentos"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="10dp"
+                        android:text="📄 Documentos"
+                        android:textColor="#FFFFFF"
+                        android:textSize="13sp"
+                        android:clickable="true"
+                        android:focusable="true" />
+
+                    <TextView
+                        android:id="@+id/btnPrints"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="10dp"
+                        android:text="🖼️ Prints salvos"
+                        android:textColor="#FFFFFF"
+                        android:textSize="13sp"
+                        android:clickable="true"
+                        android:focusable="true" />
+
+                    <TextView
+                        android:id="@+id/btnGravacoes"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="10dp"
+                        android:text="🎬 Gravações salvas"
+                        android:textColor="#FFFFFF"
+                        android:textSize="13sp"
+                        android:clickable="true"
+                        android:focusable="true" />
+                </LinearLayout>
             </LinearLayout>
 
         </LinearLayout>
