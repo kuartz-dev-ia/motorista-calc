@@ -5,6 +5,8 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Intent
 import android.graphics.Bitmap
+import android.media.AudioAttributes
+import android.media.RingtoneManager
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
@@ -43,6 +45,7 @@ class RideAccessibilityService : AccessibilityService() {
                 val testeExpirado = TrialManager.expirou(this@RideAccessibilityService)
                 if (monitoramentoAtivo && !testeExpirado) {
                     verificarLembretePausa()
+                    verificarLembreteMeta()
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                         tentarCapturarEOcr()
                     }
@@ -60,6 +63,7 @@ class RideAccessibilityService : AccessibilityService() {
         super.onServiceConnected()
         Log.d(TAG, "Serviço de acessibilidade conectado (modo print + OCR)")
         criarCanalPausa()
+        criarCanalMeta()
         try {
             handler.post(pollRunnable)
         } catch (e: Exception) {
@@ -75,6 +79,22 @@ class RideAccessibilityService : AccessibilityService() {
     private fun criarCanalPausa() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val canal = NotificationChannel(CANAL_PAUSA_ID, "Lembrete de pausa", NotificationManager.IMPORTANCE_DEFAULT)
+            (getSystemService(NOTIFICATION_SERVICE) as NotificationManager).createNotificationChannel(canal)
+        }
+    }
+
+    private fun criarCanalMeta() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val canal = NotificationChannel(CANAL_META_ID, "Lembrete de meta", NotificationManager.IMPORTANCE_HIGH).apply {
+                enableVibration(true)
+                vibrationPattern = longArrayOf(0, 300, 200, 300, 200, 300)
+                val somUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+                val atributos = AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_ALARM)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .build()
+                setSound(somUri, atributos)
+            }
             (getSystemService(NOTIFICATION_SERVICE) as NotificationManager).createNotificationChannel(canal)
         }
     }
@@ -104,6 +124,46 @@ class RideAccessibilityService : AccessibilityService() {
             (getSystemService(NOTIFICATION_SERVICE) as NotificationManager).notify(NOTIFICACAO_PAUSA_ID, notificacao)
         } catch (e: Exception) {
             Log.e(TAG, "Erro ao notificar pausa: ${e.message}")
+        }
+    }
+
+    private fun verificarLembreteMeta() {
+        val jornada = JornadaStorage.jornadaAtiva(this) ?: return
+        val prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+        val ultimoLembrete = prefs.getLong(PREF_ULTIMO_LEMBRETE_META, jornada.dataInicioMillis)
+
+        if (System.currentTimeMillis() - ultimoLembrete < INTERVALO_LEMBRETE_META_MS) return
+
+        val stats = JornadaStorage.calcularStats(this, jornada)
+        val horasDecorridas = stats.tempoTrabalhadoMin / 60.0
+        val metaPorHora = if (jornada.cargaHorariaHoras > 0) jornada.metaDiaria / jornada.cargaHorariaHoras else 0.0
+        val metaAcumuladaAgora = metaPorHora * horasDecorridas
+        val faltaRitmo = (metaAcumuladaAgora - stats.ganhoBruto).coerceAtLeast(0.0)
+        val faltaMetaDia = (jornada.metaDiaria - stats.ganhoBruto).coerceAtLeast(0.0)
+
+        enviarNotificacaoMeta(faltaRitmo, faltaMetaDia, jornada.metaDiaria)
+        prefs.edit().putLong(PREF_ULTIMO_LEMBRETE_META, System.currentTimeMillis()).apply()
+    }
+
+    private fun enviarNotificacaoMeta(faltaRitmo: Double, faltaMetaDia: Double, metaDiaria: Double) {
+        try {
+            val texto = if (faltaRitmo <= 0.01 && faltaMetaDia <= 0.01) {
+                "🎉 Você está em dia com as metas! Continue assim."
+            } else {
+                "Faltam R$ %.2f pra ficar em dia com o ritmo da hora. Faltam R$ %.2f pra bater a meta do dia (R$ %.0f).".format(faltaRitmo, faltaMetaDia, metaDiaria)
+            }
+            val notificacao = NotificationCompat.Builder(this, CANAL_META_ID)
+                .setContentTitle("🎯 Status da meta")
+                .setContentText(texto)
+                .setStyle(NotificationCompat.BigTextStyle().bigText(texto))
+                .setSmallIcon(android.R.drawable.ic_dialog_info)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setCategory(NotificationCompat.CATEGORY_ALARM)
+                .setAutoCancel(true)
+                .build()
+            (getSystemService(NOTIFICATION_SERVICE) as NotificationManager).notify(NOTIFICACAO_META_ID, notificacao)
+        } catch (e: Exception) {
+            Log.e(TAG, "Erro ao notificar meta: ${e.message}")
         }
     }
 
@@ -226,8 +286,6 @@ class RideAccessibilityService : AccessibilityService() {
         }
     }
 
-    /** Retorna (preço por litro, consumo km/l) do combustível marcado como
-     * ativo em Config. Cada tipo tem seu próprio par de valores salvos. */
     private fun obterPrecoEConsumoAtivos(prefs: android.content.SharedPreferences): Pair<Double, Double> {
         return when (prefs.getString(PREF_COMBUSTIVEL_ATIVO, "etanol")) {
             "gasolina" -> Pair(
@@ -412,8 +470,12 @@ class RideAccessibilityService : AccessibilityService() {
         const val PREF_CONSUMO_ETANOL = "consumo_etanol"
         const val PREF_PRECO_GNV = "preco_gnv"
         const val PREF_CONSUMO_GNV = "consumo_gnv"
+        const val PREF_ULTIMO_LEMBRETE_META = "ultimo_lembrete_meta_millis"
         private const val VALOR_MAXIMO_PLAUSIVEL = 300.0
         private const val CANAL_PAUSA_ID = "lembrete_pausa"
         private const val NOTIFICACAO_PAUSA_ID = 772
+        private const val CANAL_META_ID = "lembrete_meta"
+        private const val NOTIFICACAO_META_ID = 773
+        private const val INTERVALO_LEMBRETE_META_MS = 30L * 60 * 1000
     }
 }
