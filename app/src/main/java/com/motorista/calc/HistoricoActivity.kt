@@ -150,7 +150,7 @@ class HistoricoActivity : AppCompatActivity() {
                 textSize = 12f
                 setTypeface(typeface, Typeface.BOLD)
                 setOnClickListener {
-                    AlertDialog.Builder(this@HistoricoActivity)
+                    AlertDialog.Builder(this@HistoricoActivity, R.style.DialogTemaEscuro)
                         .setTitle("Excluir jornada")
                         .setMessage("Tem certeza que quer excluir esta jornada?")
                         .setPositiveButton("Excluir") { _, _ ->
@@ -245,10 +245,12 @@ class HistoricoActivity : AppCompatActivity() {
             setText("%.2f".format(corrida.valorTotal))
             inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
             setTextColor(Color.WHITE)
-            setPadding(48, 32, 48, 32)
+            setHintTextColor(Color.parseColor("#8B96AC"))
+            background = ContextCompat.getDrawable(this@HistoricoActivity, R.drawable.bg_input_verde)
+            setPadding(32, 24, 32, 24)
         }
 
-        AlertDialog.Builder(this)
+        AlertDialog.Builder(this, R.style.DialogTemaEscuro)
             .setTitle("Editar valor da corrida")
             .setView(input)
             .setPositiveButton("Salvar") { _, _ ->
@@ -265,7 +267,7 @@ class HistoricoActivity : AppCompatActivity() {
     }
 
     private fun confirmarExclusaoCorrida(corrida: RegistroCorrida) {
-        AlertDialog.Builder(this)
+        AlertDialog.Builder(this, R.style.DialogTemaEscuro)
             .setTitle("Excluir corrida")
             .setMessage("Tem certeza que quer excluir essa corrida?")
             .setPositiveButton("Excluir") { _, _ ->
