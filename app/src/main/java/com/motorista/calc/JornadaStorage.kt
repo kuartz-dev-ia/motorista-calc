@@ -11,7 +11,10 @@ data class Jornada(
     val metaDiaria: Double,
     val cargaHorariaHoras: Double,
     val odometroInicial: Double,
-    var odometroFinal: Double?
+    var odometroFinal: Double?,
+    var valorFinalUber: Double? = null,
+    var valorFinal99: Double? = null,
+    var kmFinalInformado: Double? = null
 )
 
 data class JornadaStats(
@@ -46,7 +49,10 @@ object JornadaStorage {
                     metaDiaria = obj.getDouble("metaDiaria"),
                     cargaHorariaHoras = obj.getDouble("cargaHorariaHoras"),
                     odometroInicial = obj.getDouble("odometroInicial"),
-                    odometroFinal = if (obj.has("odometroFinal") && !obj.isNull("odometroFinal")) obj.getDouble("odometroFinal") else null
+                    odometroFinal = if (obj.has("odometroFinal") && !obj.isNull("odometroFinal")) obj.getDouble("odometroFinal") else null,
+                    valorFinalUber = if (obj.has("valorFinalUber") && !obj.isNull("valorFinalUber")) obj.getDouble("valorFinalUber") else null,
+                    valorFinal99 = if (obj.has("valorFinal99") && !obj.isNull("valorFinal99")) obj.getDouble("valorFinal99") else null,
+                    kmFinalInformado = if (obj.has("kmFinalInformado") && !obj.isNull("kmFinalInformado")) obj.getDouble("kmFinalInformado") else null
                 )
             )
         }
@@ -64,6 +70,9 @@ object JornadaStorage {
             obj.put("cargaHorariaHoras", j.cargaHorariaHoras)
             obj.put("odometroInicial", j.odometroInicial)
             j.odometroFinal?.let { obj.put("odometroFinal", it) }
+            j.valorFinalUber?.let { obj.put("valorFinalUber", it) }
+            j.valorFinal99?.let { obj.put("valorFinal99", it) }
+            j.kmFinalInformado?.let { obj.put("kmFinalInformado", it) }
             array.put(obj)
         }
         prefs(context).edit().putString(CHAVE_LISTA, array.toString()).apply()
@@ -79,14 +88,21 @@ object JornadaStorage {
         return nova
     }
 
-    /** Encerra a jornada com o odômetro final informado manualmente pelo
-     * motorista — isso garante que km rodados sem corrida (ex: voltando pra
-     * casa vazio) também entrem no cálculo real de custo/lucro. */
-    fun encerrar(context: Context, id: Long, odometroFinal: Double) {
+    /** Encerra a jornada com o resumo final informado manualmente pelo
+     * motorista: quanto fez na Uber, quanto fez na 99, e o km total rodado.
+     * Isso vira a fonte "oficial" de ganho/km daquela jornada — mais preciso
+     * que a soma automática, já que cobre gorjetas, ajustes e trajetos sem
+     * corrida (ex: voltando pra casa vazio). */
+    fun encerrarComResumo(context: Context, id: Long, valorUber: Double, valor99: Double, kmTotal: Double) {
         val lista = listarTodas(context).toMutableList()
         val idx = lista.indexOfFirst { it.id == id }
         if (idx >= 0) {
-            lista[idx] = lista[idx].copy(dataFimMillis = System.currentTimeMillis(), odometroFinal = odometroFinal)
+            lista[idx] = lista[idx].copy(
+                dataFimMillis = System.currentTimeMillis(),
+                valorFinalUber = valorUber,
+                valorFinal99 = valor99,
+                kmFinalInformado = kmTotal
+            )
             salvarTudo(context, lista)
         }
     }
@@ -114,17 +130,23 @@ object JornadaStorage {
 
     fun calcularStats(context: Context, jornada: Jornada): JornadaStats {
         val fim = jornada.dataFimMillis ?: System.currentTimeMillis()
-        val registros = HistoricoStorage.listarEntre(context, jornada.dataInicioMillis, fim).filter { it.aceita && !it.cancelada }
+        val temResumoManual = jornada.dataFimMillis != null &&
+            jornada.valorFinalUber != null && jornada.valorFinal99 != null && jornada.kmFinalInformado != null
 
-        val ganhoBruto = registros.sumOf { it.valorTotal }
+        val ganhoBruto: Double
+        val kmRodados: Double
 
-        // Se a jornada já foi encerrada com odômetro final informado, usa o km
-        // REAL rodado (inclui trajetos sem corrida). Enquanto está em
-        // andamento, usa a soma das corridas capturadas (estimativa).
-        val kmRodados = if (jornada.dataFimMillis != null && jornada.odometroFinal != null) {
-            (jornada.odometroFinal!! - jornada.odometroInicial).coerceAtLeast(0.0)
+        if (temResumoManual) {
+            ganhoBruto = (jornada.valorFinalUber ?: 0.0) + (jornada.valorFinal99 ?: 0.0)
+            kmRodados = jornada.kmFinalInformado ?: 0.0
         } else {
-            registros.sumOf { it.distanciaTotalKm }
+            val registros = HistoricoStorage.listarEntre(context, jornada.dataInicioMillis, fim).filter { it.aceita && !it.cancelada }
+            ganhoBruto = registros.sumOf { it.valorTotal }
+            kmRodados = if (jornada.dataFimMillis != null && jornada.odometroFinal != null) {
+                (jornada.odometroFinal!! - jornada.odometroInicial).coerceAtLeast(0.0)
+            } else {
+                registros.sumOf { it.distanciaTotalKm }
+            }
         }
 
         val tempoTrabalhadoMin = ((fim - jornada.dataInicioMillis) / 60000).toInt()
