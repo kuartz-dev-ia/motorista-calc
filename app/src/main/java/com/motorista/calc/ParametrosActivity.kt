@@ -40,8 +40,8 @@ class ParametrosActivity : AppCompatActivity() {
         txtCustoPorKmPreview = findViewById(R.id.txtCustoPorKmPreview)
         txtResumoCombustiveis = findViewById(R.id.txtResumoCombustiveis)
 
-        val btnAtivarAcessibilidade = findViewById<android.widget.Button>(R.id.btnAtivarAcessibilidade)
-        val btnPermitirOverlay = findViewById<android.widget.Button>(R.id.btnPermitirOverlay)
+        val btnAtivarAcessibilidade = findViewById<TextView>(R.id.btnAtivarAcessibilidade)
+        val btnPermitirOverlay = findViewById<TextView>(R.id.btnPermitirOverlay)
         val edtMinKm = findViewById<EditText>(R.id.edtMinKm)
         val edtMinHora = findViewById<EditText>(R.id.edtMinHora)
         val edtFinanciamento = findViewById<EditText>(R.id.edtFinanciamento)
