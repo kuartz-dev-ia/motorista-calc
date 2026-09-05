@@ -73,6 +73,11 @@
             android:label="Corridas de hoje" />
 
         <activity
+            android:name=".AdicionarCorridaActivity"
+            android:exported="false"
+            android:label="Adicionar Corrida" />
+
+        <activity
             android:name=".EncerrarJornadaActivity"
             android:exported="false"
             android:label="Encerrar Jornada" />
