@@ -35,7 +35,7 @@
         <activity
             android:name=".HistoricoActivity"
             android:exported="false"
-            android:label="Histórico de hoje" />
+            android:label="Histórico" />
 
         <activity
             android:name=".PrintsActivity"
@@ -50,7 +50,7 @@
         <activity
             android:name=".WeeklyActivity"
             android:exported="false"
-            android:label="Resumo semanal" />
+            android:label="Relatórios" />
 
         <activity
             android:name=".AbastecimentosActivity"
@@ -83,9 +83,14 @@
             android:label="Encerrar Jornada" />
 
         <activity
+            android:name=".MaisOpcoesActivity"
+            android:exported="false"
+            android:label="Mais opções" />
+
+        <activity
             android:name=".ParametrosActivity"
             android:exported="false"
-            android:label="Parâmetros" />
+            android:label="Config" />
 
         <service
             android:name=".RideAccessibilityService"
