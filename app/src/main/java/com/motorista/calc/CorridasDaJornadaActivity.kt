@@ -128,7 +128,7 @@ class CorridasDaJornadaActivity : AppCompatActivity() {
             setPadding(32, 24, 32, 24)
         }
 
-        AlertDialog.Builder(this, R.style.DialogTemaEscuro)
+        val dialog = AlertDialog.Builder(this, R.style.DialogTemaEscuro)
             .setTitle("Editar valor da corrida")
             .setMessage("Use isso pra ajustar gorjeta ou reajuste de valor após aceitar.")
             .setView(input)
@@ -143,17 +143,24 @@ class CorridasDaJornadaActivity : AppCompatActivity() {
             }
             .setNegativeButton("Cancelar", null)
             .show()
+        DialogUtils.aplicarCoresBotoes(dialog)
     }
 
     private fun confirmarExclusao(corrida: RegistroCorrida) {
-        AlertDialog.Builder(this, R.style.DialogTemaEscuro)
+        val dialog = AlertDialog.Builder(this, R.style.DialogTemaEscuro)
             .setTitle("Excluir corrida")
             .setMessage("Tem certeza que quer excluir essa corrida do registro?")
-            .setPositiveButton("Excluir") { _, _ ->
+            .setPositiveButton("Excluir", null)
+            .setNegativeButton("Cancelar", null)
+            .create()
+        dialog.setOnShowListener {
+            dialog.getButton(android.content.DialogInterface.BUTTON_POSITIVE).setOnClickListener {
                 HistoricoStorage.apagarRegistro(this, corrida.id)
                 atualizarLista()
+                dialog.dismiss()
             }
-            .setNegativeButton("Cancelar", null)
-            .show()
+        }
+        dialog.show()
+        DialogUtils.aplicarCoresBotoes(dialog)
     }
 }
