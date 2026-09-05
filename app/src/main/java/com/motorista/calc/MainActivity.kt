@@ -87,6 +87,9 @@ class MainActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.btnVerCorridas).setOnClickListener {
             startActivity(Intent(this, CorridasDaJornadaActivity::class.java))
         }
+        findViewById<TextView>(R.id.btnAdicionarCorridaHome).setOnClickListener {
+            startActivity(Intent(this, AdicionarCorridaActivity::class.java))
+        }
 
         findViewById<TextView>(R.id.btnManutencoes).setOnClickListener { startActivity(Intent(this, ManutencoesActivity::class.java)) }
         findViewById<TextView>(R.id.btnAbastecimentos).setOnClickListener { startActivity(Intent(this, AbastecimentosActivity::class.java)) }
@@ -252,11 +255,12 @@ class MainActivity : AppCompatActivity() {
             dicas.add("✅ Está tudo em ordem por enquanto! Continue registrando corridas, abastecimentos e manutenções pra eu te dar dicas cada vez mais precisas.")
         }
 
-        AlertDialog.Builder(this, R.style.DialogTemaEscuro)
+        val dialog = AlertDialog.Builder(this, R.style.DialogTemaEscuro)
             .setTitle("🤖 Dicas do Agente financeiro")
             .setMessage(dicas.joinToString("\n\n"))
             .setPositiveButton("Entendi", null)
             .show()
+        DialogUtils.aplicarCoresBotoes(dialog)
     }
 
     private fun atualizarTrial() {
