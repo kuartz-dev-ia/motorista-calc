@@ -1,6 +1,7 @@
 package com.motorista.calc
 
 import android.app.AlertDialog
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.text.InputType
@@ -23,6 +24,10 @@ class CorridasDaJornadaActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_corridas_jornada)
         container = findViewById(R.id.containerCorridasJornada)
+
+        findViewById<android.view.View>(R.id.btnAdicionarCorrida).setOnClickListener {
+            startActivity(Intent(this, AdicionarCorridaActivity::class.java))
+        }
     }
 
     override fun onResume() {
