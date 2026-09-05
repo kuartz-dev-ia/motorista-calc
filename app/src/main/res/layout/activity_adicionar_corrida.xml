@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#070C14">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="#0F1B2D"
+            android:padding="16dp"
+            android:paddingBottom="18dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="➕ Adicionar Corrida"
+                android:textColor="#FFFFFF"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Registre uma corrida manualmente"
+                android:textColor="#8B96AC"
+                android:textSize="11sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_card_dark"
+                android:padding="16dp"
+                android:layout_marginBottom="12dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="VALOR DA CORRIDA (R$)"
+                    android:textColor="#1FE7A0"
+                    android:textSize="10.5sp"
+                    android:textStyle="bold"
+                    android:paddingBottom="4dp" />
+                <EditText
+                    android:id="@+id/edtValorCorridaManual"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@drawable/bg_input_verde"
+                    android:gravity="center"
+                    android:textColor="#FFFFFF"
+                    android:textColorHint="#8B96AC"
+                    android:hint="0"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:inputType="numberDecimal"
+                    android:layout_marginBottom="12dp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="KM PERCORRIDO"
+                    android:textColor="#1FE7A0"
+                    android:textSize="10.5sp"
+                    android:textStyle="bold"
+                    android:paddingBottom="4dp" />
+                <EditText
+                    android:id="@+id/edtKmCorridaManual"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@drawable/bg_input_verde"
+                    android:gravity="center"
+                    android:textColor="#FFFFFF"
+                    android:textColorHint="#8B96AC"
+                    android:hint="0"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:inputType="numberDecimal"
+                    android:layout_marginBottom="12dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Plataforma"
+                    android:textColor="#8B96AC"
+                    android:textSize="11sp"
+                    android:layout_marginBottom="6dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/chipPlataformaUber"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="4dp"
+                        android:background="@drawable/bg_chip_unselected"
+                        android:gravity="center"
+                        android:padding="10dp"
+                        android:text="⬛ Uber"
+                        android:textColor="#8B96AC"
+                        android:textSize="12sp"
+                        android:clickable="true"
+                        android:focusable="true" />
+
+                    <TextView
+                        android:id="@+id/chipPlataforma99"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="4dp"
+                        android:background="@drawable/bg_chip_unselected"
+                        android:gravity="center"
+                        android:padding="10dp"
+                        android:text="🟡 99"
+                        android:textColor="#8B96AC"
+                        android:textSize="12sp"
+                        android:clickable="true"
+                        android:focusable="true" />
+
+                    <TextView
+                        android:id="@+id/chipPlataformaOutro"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_chip_unselected"
+                        android:gravity="center"
+                        android:padding="10dp"
+                        android:text="🚗 Outro"
+                        android:textColor="#8B96AC"
+                        android:textSize="12sp"
+                        android:clickable="true"
+                        android:focusable="true" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/btnSalvarCorridaManual"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_cta_start"
+                android:padding="14dp"
+                android:gravity="center"
+                android:text="✅ Adicionar corrida"
+                android:textColor="#052018"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="12dp"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <TextView
+                android:id="@+id/btnCancelarCorridaManual"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="12dp"
+                android:gravity="center"
+                android:text="Cancelar"
+                android:textColor="#8B96AC"
+                android:textSize="13sp"
+                android:clickable="true"
+                android:focusable="true" />
+
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>
