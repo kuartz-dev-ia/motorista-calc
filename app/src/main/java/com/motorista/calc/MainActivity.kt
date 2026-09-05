@@ -91,13 +91,9 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, AdicionarCorridaActivity::class.java))
         }
 
-        findViewById<TextView>(R.id.btnManutencoes).setOnClickListener { startActivity(Intent(this, ManutencoesActivity::class.java)) }
-        findViewById<TextView>(R.id.btnAbastecimentos).setOnClickListener { startActivity(Intent(this, AbastecimentosActivity::class.java)) }
-        findViewById<TextView>(R.id.btnDocumentos).setOnClickListener { startActivity(Intent(this, DocumentosActivity::class.java)) }
-        findViewById<TextView>(R.id.btnPrints).setOnClickListener { startActivity(Intent(this, PrintsActivity::class.java)) }
-        findViewById<TextView>(R.id.btnGravacoes).setOnClickListener { startActivity(Intent(this, RecordingsActivity::class.java)) }
-
-        findViewById<android.view.View>(R.id.headerMaisOpcoes).setOnClickListener { alternarMaisOpcoes() }
+        findViewById<android.view.View>(R.id.btnAbrirMaisOpcoes).setOnClickListener {
+            startActivity(Intent(this, MaisOpcoesActivity::class.java))
+        }
         findViewById<TextView>(R.id.btnVerDicas).setOnClickListener { mostrarDicas() }
 
         findViewById<android.view.View>(R.id.navInicio).setOnClickListener { }
@@ -119,18 +115,6 @@ class MainActivity : AppCompatActivity() {
         super.onPause()
         RideRecorderService.aoMudarEstado = null
         handler.removeCallbacks(tickerRunnable)
-    }
-
-    private fun alternarMaisOpcoes() {
-        val container = findViewById<android.view.View>(R.id.containerMaisOpcoes)
-        val seta = findViewById<TextView>(R.id.setaMaisOpcoes)
-        if (container.visibility == android.view.View.VISIBLE) {
-            container.visibility = android.view.View.GONE
-            seta.text = "▼"
-        } else {
-            container.visibility = android.view.View.VISIBLE
-            seta.text = "▲"
-        }
     }
 
     private fun selecionarChipMeta(selecionado: TextView, valor: String) {
