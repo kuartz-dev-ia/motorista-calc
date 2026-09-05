@@ -108,21 +108,20 @@ class HistoricoActivity : AppCompatActivity() {
 
             val linhaMetricas = LinearLayout(this).apply {
                 orientation = LinearLayout.HORIZONTAL
-                setPadding(0, 20, 0, 12)
+                setPadding(0, 16, 0, 12)
             }
-            linhaMetricas.addView(criarColuna("Ganho", "R$ %.2f".format(stats.ganhoBruto), "#1FE7A0"))
-            linhaMetricas.addView(criarColuna("R$/h", "R$ %.2f".format(stats.valorPorHora), "#3DB8F5"))
-            linhaMetricas.addView(criarColuna("R$/km", "R$ %.2f".format(stats.valorPorKm), "#F5A623"))
+            linhaMetricas.addView(criarMiniCard("💲 Ganho", "R$ %.2f".format(stats.ganhoBruto), R.drawable.bg_tint_green, "#1FE7A0"))
+            linhaMetricas.addView(criarMiniCard("🕐 R$/h", "R$ %.2f".format(stats.valorPorHora), R.drawable.bg_tint_blue, "#3DB8F5"))
+            linhaMetricas.addView(criarMiniCard("📍 R$/km", "R$ %.2f".format(stats.valorPorKm), R.drawable.bg_tint_purple, "#9B6BF5"))
             card.addView(linhaMetricas)
 
-            val txtLucro = TextView(this).apply {
-                text = "Lucro líquido real: R$ %.2f".format(stats.lucroLiquido)
-                setTextColor(Color.parseColor(if (stats.lucroLiquido >= 0) "#1FE7A0" else "#F55757"))
-                textSize = 12f
-                setTypeface(typeface, Typeface.BOLD)
+            val linhaExtra = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
                 setPadding(0, 0, 0, 12)
             }
-            card.addView(txtLucro)
+            linhaExtra.addView(criarMiniCard("⛽ Combustível", "R$ %.2f".format(stats.custoCombustivel), R.drawable.bg_tint_red, "#F5576B"))
+            linhaExtra.addView(criarMiniCard("💧 Lucro líquido", "R$ %.2f".format(stats.lucroLiquido), R.drawable.bg_tint_green, if (stats.lucroLiquido >= 0) "#1FE7A0" else "#F5576B"))
+            card.addView(linhaExtra)
 
             val containerDetalhes = LinearLayout(this).apply {
                 orientation = LinearLayout.VERTICAL
@@ -167,6 +166,26 @@ class HistoricoActivity : AppCompatActivity() {
         }
     }
 
+    private fun criarMiniCard(rotulo: String, valor: String, fundoRes: Int, corValor: String): LinearLayout {
+        return LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            background = ContextCompat.getDrawable(this@HistoricoActivity, fundoRes)
+            setPadding(16, 14, 16, 14)
+            layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f).apply { marginEnd = 8 }
+            addView(TextView(this@HistoricoActivity).apply {
+                text = rotulo
+                setTextColor(Color.parseColor("#8B96AC"))
+                textSize = 9f
+            })
+            addView(TextView(this@HistoricoActivity).apply {
+                text = valor
+                setTextColor(Color.parseColor(corValor))
+                textSize = 13f
+                setTypeface(typeface, Typeface.BOLD)
+            })
+        }
+    }
+
     private fun montarDetalhesDaJornada(container: LinearLayout, jornada: Jornada, stats: JornadaStats) {
         val fim = jornada.dataFimMillis ?: System.currentTimeMillis()
         val corridas = HistoricoStorage.listarEntre(this, jornada.dataInicioMillis, fim).filter { it.aceita && !it.cancelada }
@@ -177,14 +196,6 @@ class HistoricoActivity : AppCompatActivity() {
             layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 2).apply { bottomMargin = 10 }
         }
         container.addView(separador)
-
-        container.addView(TextView(this).apply {
-            text = "⛽ Custo combustível: R$ %.2f  •  Custo fixo: R$ %.2f".format(stats.custoCombustivel, stats.custoFixo)
-            setTextColor(Color.parseColor("#F5A623"))
-            textSize = 12f
-            setTypeface(typeface, Typeface.BOLD)
-            setPadding(0, 0, 0, 10)
-        })
 
         if (corridas.isEmpty()) {
             container.addView(TextView(this).apply {
@@ -276,23 +287,5 @@ class HistoricoActivity : AppCompatActivity() {
             }
             .setNegativeButton("Cancelar", null)
             .show()
-    }
-
-    private fun criarColuna(rotulo: String, valor: String, cor: String): LinearLayout {
-        return LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
-            addView(TextView(this@HistoricoActivity).apply {
-                text = rotulo
-                setTextColor(Color.parseColor("#8B96AC"))
-                textSize = 10f
-            })
-            addView(TextView(this@HistoricoActivity).apply {
-                text = valor
-                setTextColor(Color.parseColor(cor))
-                textSize = 14f
-                setTypeface(typeface, Typeface.BOLD)
-            })
-        }
     }
 }
