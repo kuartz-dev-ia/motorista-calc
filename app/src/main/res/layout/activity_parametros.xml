@@ -198,4 +198,464 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation=
+                    android:orientation="horizontal"
+                    android:background="@drawable/bg_card_accent"
+                    android:padding="14dp"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="12dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="ℹ️ Custo por Km (Prévia)"
+                        android:textColor="#8B96AC"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/txtCustoPorKmPreview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="R$ 0,00/km"
+                        android:textColor="#1FE7A0"
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/btnSalvarCombustivel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_cta_start"
+                    android:padding="13dp"
+                    android:gravity="center"
+                    android:text="💾 Salvar Configurações"
+                    android:textColor="#052018"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="12dp"
+                    android:clickable="true"
+                    android:focusable="true" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Resumo dos Combustíveis"
+                    android:textColor="#FFFFFF"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="6dp" />
+
+                <TextView
+                    android:id="@+id/txtResumoCombustiveis"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="#8B96AC"
+                    android:textSize="12sp"
+                    android:layout_marginBottom="10dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:background="#26F5A623"
+                    android:padding="12dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="💡 Dica"
+                        android:textColor="#F5A623"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="O custo por km é calculado dividindo o preço do combustível pelo consumo do veículo. Mantenha esses valores atualizados para um cálculo de lucro líquido preciso."
+                        android:textColor="#F5A623"
+                        android:textSize="11sp"
+                        android:layout_marginTop="4dp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_card_dark"
+                android:padding="16dp"
+                android:layout_marginBottom="12dp">
+
+                <TextView
+                    android:id="@+id/txtStatus"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="#E4E7EC"
+                    android:layout_marginBottom="12dp" />
+
+                <TextView
+                    android:id="@+id/btnAtivarAcessibilidade"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_input_verde"
+                    android:padding="12dp"
+                    android:gravity="center"
+                    android:text="1. Ativar serviço de acessibilidade"
+                    android:textColor="#3DB8F5"
+                    android:textSize="12.5sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="8dp"
+                    android:clickable="true"
+                    android:focusable="true" />
+
+                <TextView
+                    android:id="@+id/btnPermitirOverlay"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_input_verde"
+                    android:padding="12dp"
+                    android:gravity="center"
+                    android:text="2. Permitir exibir sobre outros apps"
+                    android:textColor="#3DB8F5"
+                    android:textSize="12.5sp"
+                    android:textStyle="bold"
+                    android:clickable="true"
+                    android:focusable="true" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_card_dark"
+                android:padding="16dp"
+                android:layout_marginBottom="12dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="R$/km mínimo aceitável"
+                    android:textColor="#8B96AC"
+                    android:textSize="11sp" />
+                <EditText
+                    android:id="@+id/edtMinKm"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@drawable/bg_input_verde"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp"
+                    android:gravity="center_vertical"
+                    android:textColor="#FFFFFF"
+                    android:inputType="numberDecimal"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginBottom="12dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="R$/hora mínimo aceitável"
+                    android:textColor="#8B96AC"
+                    android:textSize="11sp" />
+                <EditText
+                    android:id="@+id/edtMinHora"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@drawable/bg_input_verde"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp"
+                    android:gravity="center_vertical"
+                    android:textColor="#FFFFFF"
+                    android:inputType="numberDecimal"
+                    android:layout_marginTop="4dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_card_dark"
+                android:padding="16dp"
+                android:layout_marginBottom="12dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Custos fixos mensais"
+                    android:textColor="#FFFFFF"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="10dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="10dp">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginEnd="6dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="FINANCIAMENTO"
+                            android:textColor="#1FE7A0"
+                            android:textSize="10.5sp"
+                            android:textStyle="bold"
+                            android:paddingBottom="4dp" />
+
+                        <EditText
+                            android:id="@+id/edtFinanciamento"
+                            android:layout_width="match_parent"
+                            android:layout_height="44dp"
+                            android:background="@drawable/bg_input_verde"
+                            android:gravity="center"
+                            android:textColor="#FFFFFF"
+                            android:hint="0"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:inputType="numberDecimal" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="SEGURO"
+                            android:textColor="#1FE7A0"
+                            android:textSize="10.5sp"
+                            android:textStyle="bold"
+                            android:paddingBottom="4dp" />
+
+                        <EditText
+                            android:id="@+id/edtSeguro"
+                            android:layout_width="match_parent"
+                            android:layout_height="44dp"
+                            android:background="@drawable/bg_input_verde"
+                            android:gravity="center"
+                            android:textColor="#FFFFFF"
+                            android:hint="0"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:inputType="numberDecimal" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="10dp">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginEnd="6dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="IPVA (ANO)"
+                            android:textColor="#1FE7A0"
+                            android:textSize="10.5sp"
+                            android:textStyle="bold"
+                            android:paddingBottom="4dp" />
+
+                        <EditText
+                            android:id="@+id/edtIpva"
+                            android:layout_width="match_parent"
+                            android:layout_height="44dp"
+                            android:background="@drawable/bg_input_verde"
+                            android:gravity="center"
+                            android:textColor="#FFFFFF"
+                            android:hint="0"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:inputType="numberDecimal" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="LICENCIAMENTO"
+                            android:textColor="#1FE7A0"
+                            android:textSize="10.5sp"
+                            android:textStyle="bold"
+                            android:paddingBottom="4dp" />
+
+                        <EditText
+                            android:id="@+id/edtLicenciamento"
+                            android:layout_width="match_parent"
+                            android:layout_height="44dp"
+                            android:background="@drawable/bg_input_verde"
+                            android:gravity="center"
+                            android:textColor="#FFFFFF"
+                            android:hint="0"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:inputType="numberDecimal" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="10dp">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginEnd="6dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="MANUTENÇÃO"
+                            android:textColor="#1FE7A0"
+                            android:textSize="10.5sp"
+                            android:textStyle="bold"
+                            android:paddingBottom="4dp" />
+
+                        <EditText
+                            android:id="@+id/edtManutencao"
+                            android:layout_width="match_parent"
+                            android:layout_height="44dp"
+                            android:background="@drawable/bg_input_verde"
+                            android:gravity="center"
+                            android:textColor="#FFFFFF"
+                            android:hint="0"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:inputType="numberDecimal" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="CONTAS PESSOAIS"
+                            android:textColor="#1FE7A0"
+                            android:textSize="10.5sp"
+                            android:textStyle="bold"
+                            android:paddingBottom="4dp" />
+
+                        <EditText
+                            android:id="@+id/edtContasPessoais"
+                            android:layout_width="match_parent"
+                            android:layout_height="44dp"
+                            android:background="@drawable/bg_input_verde"
+                            android:gravity="center"
+                            android:textColor="#FFFFFF"
+                            android:hint="0"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:inputType="numberDecimal" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="KM RODADOS POR MÊS (MÉDIA)"
+                    android:textColor="#1FE7A0"
+                    android:textSize="10.5sp"
+                    android:textStyle="bold"
+                    android:paddingBottom="4dp" />
+                <EditText
+                    android:id="@+id/edtKmMes"
+                    android:layout_width="match_parent"
+                    android:layout_height="44dp"
+                    android:background="@drawable/bg_input_verde"
+                    android:gravity="center"
+                    android:textColor="#FFFFFF"
+                    android:hint="0"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:inputType="numberDecimal" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_card_dark"
+                android:padding="16dp"
+                android:layout_marginBottom="12dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Segurança"
+                    android:textColor="#FFFFFF"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="8dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Avisar pausa a cada quantas horas dirigindo"
+                    android:textColor="#8B96AC" />
+                <EditText
+                    android:id="@+id/edtLimitePausa"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@drawable/bg_input_verde"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp"
+                    android:gravity="center_vertical"
+                    android:textColor="#FFFFFF"
+                    android:inputType="numberDecimal"
+                    android:layout_marginTop="6dp" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/btnSalvar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_cta_start"
+                android:padding="14dp"
+                android:gravity="center"
+                android:text="Salvar configurações"
+                android:textColor="#052018"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:clickable="true"
+                android:focusable="true" />
+
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>
