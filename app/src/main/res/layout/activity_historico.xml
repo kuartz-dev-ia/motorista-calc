@@ -17,41 +17,20 @@
             android:padding="16dp"
             android:paddingBottom="18dp">
 
-            <LinearLayout
-                android:layout_width="match_parent"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
+                android:text="🕐 Histórico"
+                android:textColor="#FFFFFF"
+                android:textSize="17sp"
+                android:textStyle="bold" />
 
-                <ImageView
-                    android:layout_width="34dp"
-                    android:layout_height="34dp"
-                    android:src="@drawable/logo_motorista"
-                    android:layout_marginEnd="10dp"
-                    android:contentDescription="Logo do app" />
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="🕐 Histórico"
-                        android:textColor="#FFFFFF"
-                        android:textSize="17sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Suas jornadas concluídas"
-                        android:textColor="#8B96AC"
-                        android:textSize="10sp" />
-                </LinearLayout>
-            </LinearLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Relatório financeiro completo"
+                android:textColor="#8B96AC"
+                android:textSize="10sp" />
         </LinearLayout>
 
         <LinearLayout
@@ -60,46 +39,86 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Resumo Geral"
-                android:textColor="#FFFFFF"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="10dp" />
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="8dp">
+                android:orientation="vertical"
+                android:background="@drawable/bg_card_dark"
+                android:padding="14dp"
+                android:layout_marginBottom="12dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Período"
+                    android:textColor="#FFFFFF"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="8dp" />
 
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:background="@drawable/bg_tint_green"
-                    android:padding="12dp"
-                    android:layout_marginEnd="6dp">
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="10dp">
 
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="💲" android:textSize="14sp" />
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Total Ganho" android:textColor="#8B96AC" android:textSize="9sp" />
-                    <TextView android:id="@+id/txtResumoGanho" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="R$ 0,00" android:textColor="#1FE7A0" android:textSize="15sp" android:textStyle="bold" />
+                    <TextView
+                        android:id="@+id/btnDataInicio"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="6dp"
+                        android:background="@drawable/bg_input_verde"
+                        android:gravity="center"
+                        android:padding="10dp"
+                        android:text="📅 --/--/----"
+                        android:textColor="#FFFFFF"
+                        android:textSize="12sp"
+                        android:clickable="true"
+                        android:focusable="true" />
+
+                    <TextView
+                        android:id="@+id/btnDataFim"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_input_verde"
+                        android:gravity="center"
+                        android:padding="10dp"
+                        android:text="📅 --/--/----"
+                        android:textColor="#FFFFFF"
+                        android:textSize="12sp"
+                        android:clickable="true"
+                        android:focusable="true" />
                 </LinearLayout>
 
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:background="@drawable/bg_tint_blue"
-                    android:padding="12dp">
+                    android:orientation="horizontal">
 
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="🕐" android:textSize="14sp" />
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Horas" android:textColor="#8B96AC" android:textSize="9sp" />
-                    <TextView android:id="@+id/txtResumoHoras" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="00:00" android:textColor="#3DB8F5" android:textSize="15sp" android:textStyle="bold" />
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="6dp"
+                        android:background="@drawable/bg_chip_unselected"
+                        android:gravity="center"
+                        android:padding="10dp"
+                        android:text="👤 Motorista Principal"
+                        android:textColor="#8B96AC"
+                        android:textSize="11sp" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_chip_unselected"
+                        android:gravity="center"
+                        android:padding="10dp"
+                        android:text="🚗 Veículo Principal"
+                        android:textColor="#8B96AC"
+                        android:textSize="11sp" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -109,48 +128,288 @@
                 android:orientation="horizontal"
                 android:layout_marginBottom="16dp">
 
-                <LinearLayout
+                <TextView
+                    android:id="@+id/tabGeral"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:background="@drawable/bg_tint_purple"
-                    android:padding="12dp"
-                    android:layout_marginEnd="6dp">
+                    android:layout_marginEnd="4dp"
+                    android:background="@drawable/bg_chip_selected"
+                    android:gravity="center"
+                    android:padding="9dp"
+                    android:text="Geral"
+                    android:textColor="#08131A"
+                    android:textSize="10.5sp"
+                    android:textStyle="bold"
+                    android:clickable="true"
+                    android:focusable="true" />
 
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="📈" android:textSize="14sp" />
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Média/h" android:textColor="#8B96AC" android:textSize="9sp" />
-                    <TextView android:id="@+id/txtResumoMedia" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="R$ 0,00" android:textColor="#9B6BF5" android:textSize="15sp" android:textStyle="bold" />
+                <TextView
+                    android:id="@+id/tabMetas"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="4dp"
+                    android:background="@drawable/bg_chip_unselected"
+                    android:gravity="center"
+                    android:padding="9dp"
+                    android:text="Metas"
+                    android:textColor="#8B96AC"
+                    android:textSize="10.5sp"
+                    android:clickable="true"
+                    android:focusable="true" />
+
+                <TextView
+                    android:id="@+id/tabMedias"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="4dp"
+                    android:background="@drawable/bg_chip_unselected"
+                    android:gravity="center"
+                    android:padding="9dp"
+                    android:text="Médias/dia"
+                    android:textColor="#8B96AC"
+                    android:textSize="10.5sp"
+                    android:clickable="true"
+                    android:focusable="true" />
+
+                <TextView
+                    android:id="@+id/tabPorViagem"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_chip_unselected"
+                    android:gravity="center"
+                    android:padding="9dp"
+                    android:text="Por viagem"
+                    android:textColor="#8B96AC"
+                    android:textSize="10.5sp"
+                    android:clickable="true"
+                    android:focusable="true" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/grupoGeral"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:background="@drawable/bg_tint_green"
+                    android:padding="14dp"
+                    android:layout_marginBottom="8dp">
+
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="💲 Faturamento Bruto" android:textColor="#8B96AC" android:textSize="10sp" />
+                    <TextView android:id="@+id/txtFaturamentoBruto" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="R$ 0,00" android:textColor="#1FE7A0" android:textSize="20sp" android:textStyle="bold" />
                 </LinearLayout>
 
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:background="@drawable/bg_tint_red"
-                    android:padding="12dp">
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="8dp">
 
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="📋" android:textSize="14sp" />
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Jornadas" android:textColor="#8B96AC" android:textSize="9sp" />
-                    <TextView android:id="@+id/txtResumoJornadas" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textColor="#F5576B" android:textSize="15sp" android:textStyle="bold" />
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:background="@drawable/bg_tint_green" android:padding="12dp" android:layout_marginEnd="6dp">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="💧 Lucro Líquido" android:textColor="#8B96AC" android:textSize="9sp" />
+                        <TextView android:id="@+id/txtLucroLiquido" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="R$ 0,00" android:textColor="#1FE7A0" android:textSize="15sp" android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:background="@drawable/bg_tint_red" android:padding="12dp">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="⛽ Gastos" android:textColor="#8B96AC" android:textSize="9sp" />
+                        <TextView android:id="@+id/txtGastos" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="R$ 0,00" android:textColor="#F5576B" android:textSize="15sp" android:textStyle="bold" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="8dp">
+
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:background="@drawable/bg_tint_blue" android:padding="12dp" android:layout_marginEnd="6dp">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="📅 Dias Trabalhados" android:textColor="#8B96AC" android:textSize="9sp" />
+                        <TextView android:id="@+id/txtDiasTrabalhados" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textColor="#3DB8F5" android:textSize="15sp" android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:background="@drawable/bg_tint_purple" android:padding="12dp">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="📍 Km Rodados" android:textColor="#8B96AC" android:textSize="9sp" />
+                        <TextView android:id="@+id/txtKmRodadosGeral" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textColor="#9B6BF5" android:textSize="15sp" android:textStyle="bold" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="8dp">
+
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:background="@drawable/bg_tint_blue" android:padding="12dp" android:layout_marginEnd="6dp">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="🕐 Horas Trabalhadas" android:textColor="#8B96AC" android:textSize="9sp" />
+                        <TextView android:id="@+id/txtHorasTrabalhadasGeral" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="00:00" android:textColor="#3DB8F5" android:textSize="15sp" android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:background="@drawable/bg_tint_blue" android:padding="12dp">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="🚀 Velocidade Média" android:textColor="#8B96AC" android:textSize="9sp" />
+                        <TextView android:id="@+id/txtVelocidadeMedia" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 km/h" android:textColor="#3DB8F5" android:textSize="15sp" android:textStyle="bold" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="8dp">
+
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:background="@drawable/bg_tint_blue" android:padding="12dp" android:layout_marginEnd="6dp">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="📋 Total de Viagens" android:textColor="#8B96AC" android:textSize="9sp" />
+                        <TextView android:id="@+id/txtTotalViagens" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textColor="#3DB8F5" android:textSize="15sp" android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:background="@drawable/bg_tint_purple" android:padding="12dp">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="📍 Ganho por Km" android:textColor="#8B96AC" android:textSize="9sp" />
+                        <TextView android:id="@+id/txtGanhoPorKm" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="R$ 0,00" android:textColor="#9B6BF5" android:textSize="15sp" android:textStyle="bold" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:background="@drawable/bg_tint_green"
+                    android:padding="14dp"
+                    android:layout_marginBottom="16dp">
+
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="⏱️ Ganho por Hora" android:textColor="#8B96AC" android:textSize="10sp" />
+                    <TextView android:id="@+id/txtGanhoPorHora" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="R$ 0,00" android:textColor="#1FE7A0" android:textSize="20sp" android:textStyle="bold" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:background="@drawable/bg_card_dark"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Gastos x Lucro Líquido"
+                        android:textColor="#FFFFFF"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="10dp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="14dp"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="10dp">
+
+                        <View
+                            android:id="@+id/barraLucro"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:background="#1FE7A0" />
+
+                        <View
+                            android:id="@+id/barraGastos"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:background="#F5576B" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="horizontal" android:gravity="center_vertical">
+                            <View android:layout_width="10dp" android:layout_height="10dp" android:background="#1FE7A0" android:layout_marginEnd="6dp" />
+                            <TextView android:id="@+id/txtLegendaLucro" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Lucro 0%" android:textColor="#8B96AC" android:textSize="11sp" />
+                        </LinearLayout>
+
+                        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="horizontal" android:gravity="center_vertical">
+                            <View android:layout_width="10dp" android:layout_height="10dp" android:background="#F5576B" android:layout_marginEnd="6dp" />
+                            <TextView android:id="@+id/txtLegendaGastos" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Gastos 0%" android:textColor="#8B96AC" android:textSize="11sp" />
+                        </LinearLayout>
+                    </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Histórico de Jornadas"
-                android:textColor="#FFFFFF"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="10dp" />
-
             <LinearLayout
-                android:id="@+id/containerJornadas"
+                android:id="@+id/grupoMetas"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical" />
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:id="@+id/containerJornadas"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/grupoMedias"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="8dp">
+
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:background="@drawable/bg_tint_green" android:padding="12dp" android:layout_marginEnd="6dp">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="💲 Ganho médio/dia" android:textColor="#8B96AC" android:textSize="9sp" />
+                        <TextView android:id="@+id/txtMediaGanhoDia" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="R$ 0,00" android:textColor="#1FE7A0" android:textSize="15sp" android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:background="@drawable/bg_tint_purple" android:padding="12dp">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="📍 Km médio/dia" android:textColor="#8B96AC" android:textSize="9sp" />
+                        <TextView android:id="@+id/txtMediaKmDia" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textColor="#9B6BF5" android:textSize="15sp" android:textStyle="bold" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:background="@drawable/bg_tint_blue" android:padding="12dp" android:layout_marginEnd="6dp">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="🕐 Horas médias/dia" android:textColor="#8B96AC" android:textSize="9sp" />
+                        <TextView android:id="@+id/txtMediaHorasDia" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0,0" android:textColor="#3DB8F5" android:textSize="15sp" android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:background="@drawable/bg_tint_blue" android:padding="12dp">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="📈 R$/hora médio" android:textColor="#8B96AC" android:textSize="9sp" />
+                        <TextView android:id="@+id/txtMediaRPorHora" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="R$ 0,00" android:textColor="#3DB8F5" android:textSize="15sp" android:textStyle="bold" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/grupoPorViagem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:id="@+id/containerPorViagem"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+            </LinearLayout>
 
         </LinearLayout>
     </LinearLayout>
