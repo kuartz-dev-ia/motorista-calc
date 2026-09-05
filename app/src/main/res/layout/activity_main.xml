@@ -741,128 +741,32 @@
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/btnAbrirMaisOpcoes"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
                     android:background="@drawable/bg_card_dark"
-                    android:padding="14dp"
-                    android:layout_marginBottom="14dp">
+                    android:padding="16dp"
+                    android:layout_marginBottom="14dp"
+                    android:clickable="true"
+                    android:focusable="true">
 
-                    <LinearLayout
-                        android:id="@+id/headerMaisOpcoes"
-                        android:layout_width="match_parent"
+                    <TextView
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:clickable="true"
-                        android:focusable="true">
+                        android:layout_weight="1"
+                        android:text="⚙️ Mais opções"
+                        android:textColor="#FFFFFF"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
 
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Mais opções"
-                            android:textColor="#FFFFFF"
-                            android:textSize="13sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:id="@+id/setaMaisOpcoes"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="▼"
-                            android:textColor="#8B96AC"
-                            android:textSize="12sp" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/containerMaisOpcoes"
-                        android:layout_width="match_parent"
+                    <TextView
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:visibility="gone"
-                        android:layout_marginTop="10dp">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:layout_marginBottom="8dp">
-
-                            <TextView
-                                android:id="@+id/btnManutencoes"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:layout_marginEnd="4dp"
-                                android:background="@drawable/bg_input_verde"
-                                android:padding="10dp"
-                                android:text="🔧 Manutenções"
-                                android:textColor="#FFFFFF"
-                                android:textSize="12sp"
-                                android:clickable="true"
-                                android:focusable="true" />
-
-                            <TextView
-                                android:id="@+id/btnAbastecimentos"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:background="@drawable/bg_input_verde"
-                                android:padding="10dp"
-                                android:text="⛽ Abastecimentos"
-                                android:textColor="#FFFFFF"
-                                android:textSize="12sp"
-                                android:clickable="true"
-                                android:focusable="true" />
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:layout_marginBottom="8dp">
-
-                            <TextView
-                                android:id="@+id/btnDocumentos"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:layout_marginEnd="4dp"
-                                android:background="@drawable/bg_input_verde"
-                                android:padding="10dp"
-                                android:text="📄 Documentos"
-                                android:textColor="#FFFFFF"
-                                android:textSize="12sp"
-                                android:clickable="true"
-                                android:focusable="true" />
-
-                            <TextView
-                                android:id="@+id/btnPrints"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:background="@drawable/bg_input_verde"
-                                android:padding="10dp"
-                                android:text="🖼️ Prints"
-                                android:textColor="#FFFFFF"
-                                android:textSize="12sp"
-                                android:clickable="true"
-                                android:focusable="true" />
-                        </LinearLayout>
-
-                        <TextView
-                            android:id="@+id/btnGravacoes"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:background="@drawable/bg_input_verde"
-                            android:padding="10dp"
-                            android:text="🎬 Gravações salvas"
-                            android:textColor="#FFFFFF"
-                            android:textSize="12sp"
-                            android:clickable="true"
-                            android:focusable="true" />
-                    </LinearLayout>
+                        android:text="›"
+                        android:textColor="#8B96AC"
+                        android:textSize="18sp" />
                 </LinearLayout>
 
                 <LinearLayout
