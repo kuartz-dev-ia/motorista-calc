@@ -2,621 +2,200 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0A0E17">
+    android:background="#070C14">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="20dp">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Config"
-            android:textColor="#FFFFFF"
-            android:textSize="22sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="16dp" />
+        android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:background="@drawable/bg_card_dark"
+            android:orientation="vertical"
+            android:background="#0F1B2D"
             android:padding="16dp"
-            android:layout_marginBottom="12dp">
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Modo Escuro"
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Otimizado para condução noturna"
-                    android:textColor="#8B96AC"
-                    android:textSize="11sp" />
-            </LinearLayout>
+            android:paddingBottom="18dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/bg_chip_selected"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
-                android:paddingTop="4dp"
-                android:paddingBottom="4dp"
-                android:text="Ativo"
-                android:textColor="#08131A"
-                android:textSize="11sp"
+                android:text="⚙️ Config"
+                android:textColor="#FFFFFF"
+                android:textSize="17sp"
                 android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ajustes do app e do veículo"
+                android:textColor="#8B96AC"
+                android:textSize="10sp" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="@drawable/bg_card_dark"
-            android:padding="16dp"
-            android:layout_marginBottom="12dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Configuração de Combustível"
-                android:textColor="#FFFFFF"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="10dp" />
+            android:padding="16dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="@drawable/bg_card_dark"
+                android:padding="16dp"
                 android:layout_marginBottom="12dp">
 
-                <TextView
-                    android:id="@+id/chipGasolina"
+                <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:layout_marginEnd="4dp"
-                    android:background="@drawable/bg_chip_unselected"
-                    android:gravity="center"
-                    android:padding="10dp"
-                    android:text="⛽ Gasolina"
-                    android:textColor="#8B96AC"
-                    android:textSize="11sp"
-                    android:clickable="true"
-                    android:focusable="true" />
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Modo Escuro"
+                        android:textColor="#FFFFFF"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Otimizado para condução noturna"
+                        android:textColor="#8B96AC"
+                        android:textSize="11sp" />
+                </LinearLayout>
 
                 <TextView
-                    android:id="@+id/chipEtanol"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="4dp"
-                    android:background="@drawable/bg_chip_selected"
-                    android:gravity="center"
-                    android:padding="10dp"
-                    android:text="🌿 Etanol"
-                    android:textColor="#08131A"
-                    android:textSize="11sp"
-                    android:textStyle="bold"
-                    android:clickable="true"
-                    android:focusable="true" />
-
-                <TextView
-                    android:id="@+id/chipGnv"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:background="@drawable/bg_chip_unselected"
-                    android:gravity="center"
-                    android:padding="10dp"
-                    android:text="⚡ GNV"
-                    android:textColor="#8B96AC"
-                    android:textSize="11sp"
-                    android:clickable="true"
-                    android:focusable="true" />
-            </LinearLayout>
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Preço por litro"
-                android:textColor="#8B96AC"
-                android:textSize="11sp"
-                android:paddingBottom="4dp" />
-            <EditText
-                android:id="@+id/edtPrecoCombustivel"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:background="@drawable/bg_input_verde"
-                android:paddingStart="14dp"
-                android:paddingEnd="14dp"
-                android:gravity="center_vertical"
-                android:textColor="#FFFFFF"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:inputType="numberDecimal"
-                android:layout_marginBottom="10dp" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Consumo do veículo (km/l)"
-                android:textColor="#8B96AC"
-                android:textSize="11sp"
-                android:paddingBottom="4dp" />
-            <EditText
-                android:id="@+id/edtConsumo"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:background="@drawable/bg_input_verde"
-                android:paddingStart="14dp"
-                android:paddingEnd="14dp"
-                android:gravity="center_vertical"
-                android:textColor="#FFFFFF"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:inputType="numberDecimal"
-                android:layout_marginBottom="12dp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:background="@drawable/bg_card_accent"
-                android:padding="14dp"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="12dp">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="ℹ️ Custo por Km (Prévia)"
-                    android:textColor="#8B96AC"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:id="@+id/txtCustoPorKmPreview"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="R$ 0,00/km"
-                    android:textColor="#1FE7A0"
-                    android:textSize="17sp"
+                    android:background="@drawable/bg_chip_selected"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:paddingTop="4dp"
+                    android:paddingBottom="4dp"
+                    android:text="Ativo"
+                    android:textColor="#08131A"
+                    android:textSize="11sp"
                     android:textStyle="bold" />
             </LinearLayout>
-
-            <TextView
-                android:id="@+id/btnSalvarCombustivel"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/bg_hero_green"
-                android:padding="13dp"
-                android:gravity="center"
-                android:text="💾 Salvar Configurações"
-                android:textColor="#08131A"
-                android:textSize="13sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="12dp"
-                android:clickable="true"
-                android:focusable="true" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Resumo dos Combustíveis"
-                android:textColor="#FFFFFF"
-                android:textSize="13sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="6dp" />
-
-            <TextView
-                android:id="@+id/txtResumoCombustiveis"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="#8B96AC"
-                android:textSize="12sp"
-                android:layout_marginBottom="10dp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:background="#26F5A623"
-                android:padding="12dp">
+                android:background="@drawable/bg_card_dark"
+                android:padding="16dp"
+                android:layout_marginBottom="12dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="💡 Dica"
-                    android:textColor="#F5A623"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
+                    android:text="Configuração de Combustível"
+                    android:textColor="#FFFFFF"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="10dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="12dp">
+
+                    <TextView
+                        android:id="@+id/chipGasolina"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="4dp"
+                        android:background="@drawable/bg_chip_unselected"
+                        android:gravity="center"
+                        android:padding="10dp"
+                        android:text="⛽ Gasolina"
+                        android:textColor="#8B96AC"
+                        android:textSize="11sp"
+                        android:clickable="true"
+                        android:focusable="true" />
+
+                    <TextView
+                        android:id="@+id/chipEtanol"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="4dp"
+                        android:background="@drawable/bg_chip_selected"
+                        android:gravity="center"
+                        android:padding="10dp"
+                        android:text="🌿 Etanol"
+                        android:textColor="#08131A"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        android:clickable="true"
+                        android:focusable="true" />
+
+                    <TextView
+                        android:id="@+id/chipGnv"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_chip_unselected"
+                        android:gravity="center"
+                        android:padding="10dp"
+                        android:text="⚡ GNV"
+                        android:textColor="#8B96AC"
+                        android:textSize="11sp"
+                        android:clickable="true"
+                        android:focusable="true" />
+                </LinearLayout>
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="O custo por km é calculado dividindo o preço do combustível pelo consumo do veículo. Mantenha esses valores atualizados para um cálculo de lucro líquido preciso."
-                    android:textColor="#F5A623"
+                    android:text="Preço por litro"
+                    android:textColor="#8B96AC"
                     android:textSize="11sp"
-                    android:layout_marginTop="4dp" />
-            </LinearLayout>
-        </LinearLayout>
+                    android:paddingBottom="4dp" />
+                <EditText
+                    android:id="@+id/edtPrecoCombustivel"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@drawable/bg_input_verde"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp"
+                    android:gravity="center_vertical"
+                    android:textColor="#FFFFFF"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:inputType="numberDecimal"
+                    android:layout_marginBottom="10dp" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@drawable/bg_card_dark"
-            android:padding="16dp"
-            android:layout_marginBottom="12dp">
-
-            <TextView
-                android:id="@+id/txtStatus"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="#E4E7EC"
-                android:layout_marginBottom="12dp" />
-
-            <Button
-                android:id="@+id/btnAtivarAcessibilidade"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="1. Ativar serviço de acessibilidade" />
-
-            <Button
-                android:id="@+id/btnPermitirOverlay"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="2. Permitir exibir sobre outros apps" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@drawable/bg_card_dark"
-            android:padding="16dp"
-            android:layout_marginBottom="12dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="R$/km mínimo aceitável"
-                android:textColor="#8B96AC"
-                android:textSize="11sp" />
-            <EditText
-                android:id="@+id/edtMinKm"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:background="@drawable/bg_input_verde"
-                android:paddingStart="14dp"
-                android:paddingEnd="14dp"
-                android:gravity="center_vertical"
-                android:textColor="#FFFFFF"
-                android:inputType="numberDecimal"
-                android:layout_marginTop="4dp"
-                android:layout_marginBottom="12dp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="R$/hora mínimo aceitável"
-                android:textColor="#8B96AC"
-                android:textSize="11sp" />
-            <EditText
-                android:id="@+id/edtMinHora"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:background="@drawable/bg_input_verde"
-                android:paddingStart="14dp"
-                android:paddingEnd="14dp"
-                android:gravity="center_vertical"
-                android:textColor="#FFFFFF"
-                android:inputType="numberDecimal"
-                android:layout_marginTop="4dp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@drawable/bg_card_dark"
-            android:padding="16dp"
-            android:layout_marginBottom="12dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Custos fixos mensais"
-                android:textColor="#FFFFFF"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="10dp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="10dp">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Consumo do veículo (km/l)"
+                    android:textColor="#8B96AC"
+                    android:textSize="11sp"
+                    android:paddingBottom="4dp" />
+                <EditText
+                    android:id="@+id/edtConsumo"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@drawable/bg_input_verde"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp"
+                    android:gravity="center_vertical"
+                    android:textColor="#FFFFFF"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:inputType="numberDecimal"
+                    android:layout_marginBottom="12dp" />
 
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:layout_marginEnd="6dp">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:text="FINANCIAMENTO"
-                        android:textColor="#1FE7A0"
-                        android:textSize="10.5sp"
-                        android:textStyle="bold"
-                        android:paddingBottom="4dp" />
-
-                    <EditText
-                        android:id="@+id/edtFinanciamento"
-                        android:layout_width="match_parent"
-                        android:layout_height="44dp"
-                        android:background="@drawable/bg_input_verde"
-                        android:gravity="center"
-                        android:textColor="#FFFFFF"
-                        android:hint="0"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:inputType="numberDecimal" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:layout_marginStart="6dp">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:text="SEGURO"
-                        android:textColor="#1FE7A0"
-                        android:textSize="10.5sp"
-                        android:textStyle="bold"
-                        android:paddingBottom="4dp" />
-
-                    <EditText
-                        android:id="@+id/edtSeguro"
-                        android:layout_width="match_parent"
-                        android:layout_height="44dp"
-                        android:background="@drawable/bg_input_verde"
-                        android:gravity="center"
-                        android:textColor="#FFFFFF"
-                        android:hint="0"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:inputType="numberDecimal" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="10dp">
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:layout_marginEnd="6dp">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:text="IPVA (ANO)"
-                        android:textColor="#1FE7A0"
-                        android:textSize="10.5sp"
-                        android:textStyle="bold"
-                        android:paddingBottom="4dp" />
-
-                    <EditText
-                        android:id="@+id/edtIpva"
-                        android:layout_width="match_parent"
-                        android:layout_height="44dp"
-                        android:background="@drawable/bg_input_verde"
-                        android:gravity="center"
-                        android:textColor="#FFFFFF"
-                        android:hint="0"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:inputType="numberDecimal" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:layout_marginStart="6dp">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:text="LICENCIAMENTO"
-                        android:textColor="#1FE7A0"
-                        android:textSize="10.5sp"
-                        android:textStyle="bold"
-                        android:paddingBottom="4dp" />
-
-                    <EditText
-                        android:id="@+id/edtLicenciamento"
-                        android:layout_width="match_parent"
-                        android:layout_height="44dp"
-                        android:background="@drawable/bg_input_verde"
-                        android:gravity="center"
-                        android:textColor="#FFFFFF"
-                        android:hint="0"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:inputType="numberDecimal" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="10dp">
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:layout_marginEnd="6dp">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:text="MANUTENÇÃO"
-                        android:textColor="#1FE7A0"
-                        android:textSize="10.5sp"
-                        android:textStyle="bold"
-                        android:paddingBottom="4dp" />
-
-                    <EditText
-                        android:id="@+id/edtManutencao"
-                        android:layout_width="match_parent"
-                        android:layout_height="44dp"
-                        android:background="@drawable/bg_input_verde"
-                        android:gravity="center"
-                        android:textColor="#FFFFFF"
-                        android:hint="0"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:inputType="numberDecimal" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:layout_marginStart="6dp">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:text="CONTAS PESSOAIS"
-                        android:textColor="#1FE7A0"
-                        android:textSize="10.5sp"
-                        android:textStyle="bold"
-                        android:paddingBottom="4dp" />
-
-                    <EditText
-                        android:id="@+id/edtContasPessoais"
-                        android:layout_width="match_parent"
-                        android:layout_height="44dp"
-                        android:background="@drawable/bg_input_verde"
-                        android:gravity="center"
-                        android:textColor="#FFFFFF"
-                        android:hint="0"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:inputType="numberDecimal" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="KM RODADOS POR MÊS (MÉDIA)"
-                android:textColor="#1FE7A0"
-                android:textSize="10.5sp"
-                android:textStyle="bold"
-                android:paddingBottom="4dp" />
-            <EditText
-                android:id="@+id/edtKmMes"
-                android:layout_width="match_parent"
-                android:layout_height="44dp"
-                android:background="@drawable/bg_input_verde"
-                android:gravity="center"
-                android:textColor="#FFFFFF"
-                android:hint="0"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:inputType="numberDecimal" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@drawable/bg_card_dark"
-            android:padding="16dp"
-            android:layout_marginBottom="12dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Segurança"
-                android:textColor="#FFFFFF"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="8dp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Avisar pausa a cada quantas horas dirigindo"
-                android:textColor="#8B96AC" />
-            <EditText
-                android:id="@+id/edtLimitePausa"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="#FFFFFF"
-                android:inputType="numberDecimal" />
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/btnSalvar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/bg_hero_green"
-            android:padding="14dp"
-            android:gravity="center"
-            android:text="Salvar configurações"
-            android:textColor="#08131A"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:clickable="true"
-            android:focusable="true" />
-
-    </LinearLayout>
-</ScrollView>
+                    android:orientation=
