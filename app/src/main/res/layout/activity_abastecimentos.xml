@@ -2,200 +2,220 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0A0E17">
+    android:background="#070C14">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="20dp">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="⛽ Abastecimentos"
-            android:textColor="#FFFFFF"
-            android:textSize="22sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="16dp" />
+        android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="@drawable/bg_card_dark"
+            android:background="#0F1B2D"
             android:padding="16dp"
-            android:layout_marginBottom="12dp">
+            android:paddingBottom="18dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Novo abastecimento"
+                android:text="⛽ Abastecimentos"
                 android:textColor="#FFFFFF"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="10dp" />
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Consumo real do seu veículo"
+                android:textColor="#8B96AC"
+                android:textSize="10sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="10dp">
+                android:orientation="vertical"
+                android:background="@drawable/bg_card_dark"
+                android:padding="16dp"
+                android:layout_marginBottom="12dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Novo abastecimento"
+                    android:textColor="#FFFFFF"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="10dp" />
 
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:layout_marginEnd="6dp">
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="10dp">
 
-                    <TextView
-                        android:layout_width="match_parent"
+                    <LinearLayout
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:text="LITROS"
-                        android:textColor="#1FE7A0"
-                        android:textSize="10.5sp"
-                        android:textStyle="bold"
-                        android:paddingBottom="4dp" />
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginEnd="6dp">
 
-                    <EditText
-                        android:id="@+id/edtLitros"
-                        android:layout_width="match_parent"
-                        android:layout_height="44dp"
-                        android:background="@drawable/bg_input_verde"
-                        android:gravity="center"
-                        android:textColor="#FFFFFF"
-                        android:textColorHint="#8B96AC"
-                        android:hint="0"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:inputType="numberDecimal" />
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="LITROS"
+                            android:textColor="#1FE7A0"
+                            android:textSize="10.5sp"
+                            android:textStyle="bold"
+                            android:paddingBottom="4dp" />
+
+                        <EditText
+                            android:id="@+id/edtLitros"
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:background="@drawable/bg_input_verde"
+                            android:gravity="center"
+                            android:textColor="#FFFFFF"
+                            android:textColorHint="#8B96AC"
+                            android:hint="0"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:inputType="numberDecimal" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="VALOR TOTAL (R$)"
+                            android:textColor="#1FE7A0"
+                            android:textSize="10.5sp"
+                            android:textStyle="bold"
+                            android:paddingBottom="4dp" />
+
+                        <EditText
+                            android:id="@+id/edtValorAbastecimento"
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:background="@drawable/bg_input_verde"
+                            android:gravity="center"
+                            android:textColor="#FFFFFF"
+                            android:textColorHint="#8B96AC"
+                            android:hint="0"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:inputType="numberDecimal" />
+                    </LinearLayout>
                 </LinearLayout>
 
-                <LinearLayout
-                    android:layout_width="0dp"
+                <TextView
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:layout_marginStart="6dp">
+                    android:gravity="center"
+                    android:text="KM ATUAL DO PAINEL"
+                    android:textColor="#1FE7A0"
+                    android:textSize="10.5sp"
+                    android:textStyle="bold"
+                    android:paddingBottom="4dp" />
+                <EditText
+                    android:id="@+id/edtKmAtual"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@drawable/bg_input_verde"
+                    android:gravity="center"
+                    android:textColor="#FFFFFF"
+                    android:textColorHint="#8B96AC"
+                    android:hint="0"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:inputType="numberDecimal"
+                    android:layout_marginBottom="12dp" />
 
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:text="VALOR TOTAL (R$)"
-                        android:textColor="#1FE7A0"
-                        android:textSize="10.5sp"
-                        android:textStyle="bold"
-                        android:paddingBottom="4dp" />
-
-                    <EditText
-                        android:id="@+id/edtValorAbastecimento"
-                        android:layout_width="match_parent"
-                        android:layout_height="44dp"
-                        android:background="@drawable/bg_input_verde"
-                        android:gravity="center"
-                        android:textColor="#FFFFFF"
-                        android:textColorHint="#8B96AC"
-                        android:hint="0"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:inputType="numberDecimal" />
-                </LinearLayout>
+                <TextView
+                    android:id="@+id/btnSalvarAbastecimento"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_cta_start"
+                    android:padding="13dp"
+                    android:gravity="center"
+                    android:text="Salvar abastecimento"
+                    android:textColor="#052018"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:clickable="true"
+                    android:focusable="true" />
             </LinearLayout>
 
-            <TextView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="KM ATUAL DO PAINEL"
-                android:textColor="#1FE7A0"
-                android:textSize="10.5sp"
-                android:textStyle="bold"
-                android:paddingBottom="4dp" />
-            <EditText
-                android:id="@+id/edtKmAtual"
-                android:layout_width="match_parent"
-                android:layout_height="44dp"
-                android:background="@drawable/bg_input_verde"
-                android:gravity="center"
-                android:textColor="#FFFFFF"
-                android:textColorHint="#8B96AC"
-                android:hint="0"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:inputType="numberDecimal"
-                android:layout_marginBottom="12dp" />
+                android:orientation="vertical"
+                android:background="@drawable/bg_tint_red"
+                android:padding="14dp"
+                android:layout_marginBottom="12dp">
 
-            <TextView
-                android:id="@+id/btnSalvarAbastecimento"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/bg_hero_green"
-                android:padding="12dp"
-                android:gravity="center"
-                android:text="Salvar abastecimento"
-                android:textColor="#08131A"
-                android:textSize="13sp"
-                android:textStyle="bold"
-                android:clickable="true"
-                android:focusable="true" />
-        </LinearLayout>
+                <TextView
+                    android:id="@+id/txtConsumoMedio"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="#8B96AC"
+                    android:textSize="12sp"
+                    android:layout_marginBottom="10dp" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@drawable/bg_card_dark"
-            android:padding="14dp"
-            android:layout_marginBottom="12dp">
-
-            <TextView
-                android:id="@+id/txtConsumoMedio"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="#8B96AC"
-                android:textSize="12sp"
-                android:layout_marginBottom="10dp" />
-
-            <TextView
-                android:id="@+id/btnUsarConsumoReal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/bg_input_verde"
-                android:padding="10dp"
-                android:gravity="center"
-                android:text="✓ Usar este consumo nos cálculos de corrida"
-                android:textColor="#1FE7A0"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                android:clickable="true"
-                android:focusable="true" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@drawable/bg_card_dark"
-            android:padding="14dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Histórico"
-                android:textColor="#FFFFFF"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="6dp" />
+                <TextView
+                    android:id="@+id/btnUsarConsumoReal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_input_verde"
+                    android:padding="10dp"
+                    android:gravity="center"
+                    android:text="✓ Usar este consumo nos cálculos de corrida"
+                    android:textColor="#F5576B"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:clickable="true"
+                    android:focusable="true" />
+            </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/containerAbastecimentos"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical" />
-        </LinearLayout>
+                android:orientation="vertical"
+                android:background="@drawable/bg_card_dark"
+                android:padding="14dp">
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Histórico"
+                    android:textColor="#FFFFFF"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="6dp" />
+
+                <LinearLayout
+                    android:id="@+id/containerAbastecimentos"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+            </LinearLayout>
+
+        </LinearLayout>
     </LinearLayout>
-</ScrollView>                            
+</ScrollView>
