@@ -5,8 +5,6 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Intent
 import android.graphics.Bitmap
-import android.media.AudioAttributes
-import android.media.RingtoneManager
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
@@ -43,6 +41,9 @@ class RideAccessibilityService : AccessibilityService() {
                 val monitoramentoAtivo = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
                     .getBoolean(PREF_MONITORAMENTO_ATIVO, true)
                 val testeExpirado = TrialManager.expirou(this@RideAccessibilityService)
+
+                atualizarNotificacaoJornada()
+
                 if (monitoramentoAtivo && !testeExpirado) {
                     verificarLembretePausa()
                     verificarLembreteMeta()
@@ -64,6 +65,7 @@ class RideAccessibilityService : AccessibilityService() {
         Log.d(TAG, "Serviço de acessibilidade conectado (modo print + OCR)")
         criarCanalPausa()
         criarCanalMeta()
+        criarCanalJornada()
         try {
             handler.post(pollRunnable)
         } catch (e: Exception) {
@@ -88,14 +90,57 @@ class RideAccessibilityService : AccessibilityService() {
             val canal = NotificationChannel(CANAL_META_ID, "Lembrete de meta", NotificationManager.IMPORTANCE_HIGH).apply {
                 enableVibration(true)
                 vibrationPattern = longArrayOf(0, 300, 200, 300, 200, 300)
-                val somUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-                val atributos = AudioAttributes.Builder()
-                    .setUsage(AudioAttributes.USAGE_ALARM)
-                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                val somUri = android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_NOTIFICATION)
+                val atributos = android.media.AudioAttributes.Builder()
+                    .setUsage(android.media.AudioAttributes.USAGE_ALARM)
+                    .setContentType(android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION)
                     .build()
                 setSound(somUri, atributos)
             }
             (getSystemService(NOTIFICATION_SERVICE) as NotificationManager).createNotificationChannel(canal)
+        }
+    }
+
+    private fun criarCanalJornada() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val canal = NotificationChannel(CANAL_JORNADA_ID, "Jornada ao vivo", NotificationManager.IMPORTANCE_LOW).apply {
+                setSound(null, null)
+                enableVibration(false)
+            }
+            (getSystemService(NOTIFICATION_SERVICE) as NotificationManager).createNotificationChannel(canal)
+        }
+    }
+
+    private fun atualizarNotificacaoJornada() {
+        val gerenciador = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        val jornada = JornadaStorage.jornadaAtiva(this)
+
+        if (jornada == null) {
+            gerenciador.cancel(NOTIFICACAO_JORNADA_ID)
+            return
+        }
+
+        val prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+        val ultimaAtualizacao = prefs.getLong(PREF_ULTIMA_NOTIFICACAO_JORNADA, 0L)
+        if (System.currentTimeMillis() - ultimaAtualizacao < 20_000L) return
+
+        val stats = JornadaStorage.calcularStats(this, jornada)
+        val horas = stats.tempoTrabalhadoMin / 60
+        val minutos = stats.tempoTrabalhadoMin % 60
+
+        try {
+            val notificacao = NotificationCompat.Builder(this, CANAL_JORNADA_ID)
+                .setContentTitle("🚗 Jornada em andamento — %02d:%02d".format(horas, minutos))
+                .setContentText("Ganho: R$ %.2f  •  R$/h: R$ %.2f  •  %.0f%% da meta".format(stats.ganhoBruto, stats.valorPorHora, stats.percentualMeta))
+                .setSmallIcon(android.R.drawable.ic_menu_directions)
+                .setOngoing(true)
+                .setOnlyAlertOnce(true)
+                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .build()
+            gerenciador.notify(NOTIFICACAO_JORNADA_ID, notificacao)
+            prefs.edit().putLong(PREF_ULTIMA_NOTIFICACAO_JORNADA, System.currentTimeMillis()).apply()
+        } catch (e: Exception) {
+            Log.e(TAG, "Erro ao notificar jornada: ${e.message}")
         }
     }
 
@@ -441,6 +486,7 @@ class RideAccessibilityService : AccessibilityService() {
     override fun onDestroy() {
         super.onDestroy()
         handler.removeCallbacks(pollRunnable)
+        (getSystemService(NOTIFICATION_SERVICE) as NotificationManager).cancel(NOTIFICACAO_JORNADA_ID)
     }
 
     companion object {
@@ -471,11 +517,16 @@ class RideAccessibilityService : AccessibilityService() {
         const val PREF_PRECO_GNV = "preco_gnv"
         const val PREF_CONSUMO_GNV = "consumo_gnv"
         const val PREF_ULTIMO_LEMBRETE_META = "ultimo_lembrete_meta_millis"
+        const val PREF_META_SEMANAL = "meta_semanal"
+        const val PREF_META_MENSAL = "meta_mensal"
+        const val PREF_ULTIMA_NOTIFICACAO_JORNADA = "ultima_notificacao_jornada_millis"
         private const val VALOR_MAXIMO_PLAUSIVEL = 300.0
         private const val CANAL_PAUSA_ID = "lembrete_pausa"
         private const val NOTIFICACAO_PAUSA_ID = 772
         private const val CANAL_META_ID = "lembrete_meta"
         private const val NOTIFICACAO_META_ID = 773
+        private const val CANAL_JORNADA_ID = "jornada_ao_vivo"
+        private const val NOTIFICACAO_JORNADA_ID = 774
         private const val INTERVALO_LEMBRETE_META_MS = 30L * 60 * 1000
     }
 }
