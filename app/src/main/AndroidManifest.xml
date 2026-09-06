@@ -88,6 +88,11 @@
             android:label="Mais opções" />
 
         <activity
+            android:name=".BackupActivity"
+            android:exported="false"
+            android:label="Backup" />
+
+        <activity
             android:name=".ParametrosActivity"
             android:exported="false"
             android:label="Config" />
