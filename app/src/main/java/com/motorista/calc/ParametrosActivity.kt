@@ -52,6 +52,8 @@ class ParametrosActivity : AppCompatActivity() {
         val edtContasPessoais = findViewById<EditText>(R.id.edtContasPessoais)
         val edtKmMes = findViewById<EditText>(R.id.edtKmMes)
         val edtLimitePausa = findViewById<EditText>(R.id.edtLimitePausa)
+        val edtMetaSemanal = findViewById<EditText>(R.id.edtMetaSemanal)
+        val edtMetaMensal = findViewById<EditText>(R.id.edtMetaMensal)
         val btnSalvar = findViewById<TextView>(R.id.btnSalvar)
         val btnSalvarCombustivel = findViewById<TextView>(R.id.btnSalvarCombustivel)
         val txtStatus = findViewById<TextView>(R.id.txtStatus)
@@ -69,6 +71,8 @@ class ParametrosActivity : AppCompatActivity() {
         preencherSeExistir(edtContasPessoais, RideAccessibilityService.PREF_CONTAS_PESSOAIS)
         preencherSeExistir(edtKmMes, RideAccessibilityService.PREF_KM_MES)
         preencherSeExistir(edtLimitePausa, RideAccessibilityService.PREF_LIMITE_PAUSA_HORAS)
+        preencherSeExistir(edtMetaSemanal, RideAccessibilityService.PREF_META_SEMANAL)
+        preencherSeExistir(edtMetaMensal, RideAccessibilityService.PREF_META_MENSAL)
 
         val watcherPreview = object : android.text.TextWatcher {
             override fun afterTextChanged(s: android.text.Editable?) { atualizarPreviewCustoPorKm() }
@@ -88,6 +92,10 @@ class ParametrosActivity : AppCompatActivity() {
 
         btnPermitirOverlay.setOnClickListener {
             startActivity(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName")))
+        }
+
+        findViewById<android.view.View>(R.id.btnAbrirBackup).setOnClickListener {
+            startActivity(Intent(this, BackupActivity::class.java))
         }
 
         val acaoSalvarCombustivel = {
@@ -111,6 +119,8 @@ class ParametrosActivity : AppCompatActivity() {
                 putFloat(RideAccessibilityService.PREF_CONTAS_PESSOAIS, edtContasPessoais.text.toString().toFloatOrNull() ?: 0f)
                 putFloat(RideAccessibilityService.PREF_KM_MES, edtKmMes.text.toString().toFloatOrNull() ?: 3000f)
                 putFloat(RideAccessibilityService.PREF_LIMITE_PAUSA_HORAS, edtLimitePausa.text.toString().toFloatOrNull() ?: 3.0f)
+                putFloat(RideAccessibilityService.PREF_META_SEMANAL, edtMetaSemanal.text.toString().toFloatOrNull() ?: 0f)
+                putFloat(RideAccessibilityService.PREF_META_MENSAL, edtMetaMensal.text.toString().toFloatOrNull() ?: 0f)
                 apply()
             }
             android.widget.Toast.makeText(this, "Configurações salvas", android.widget.Toast.LENGTH_SHORT).show()
