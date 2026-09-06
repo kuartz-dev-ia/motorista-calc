@@ -24,6 +24,13 @@
                 android:textColor="#FFFFFF"
                 android:textSize="17sp"
                 android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Edite ou adicione corridas da jornada atual"
+                android:textColor="#8B96AC"
+                android:textSize="10sp" />
         </LinearLayout>
 
         <LinearLayout
