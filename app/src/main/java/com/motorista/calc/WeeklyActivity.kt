@@ -139,7 +139,58 @@ class WeeklyActivity : AppCompatActivity() {
         barraMeta.setBackgroundColor(Color.parseColor(if (taxaMedia >= 100) "#1FE7A0" else "#F5A623"))
         barraMeta.requestLayout()
 
+        montarComparativoEMeta(totalGanho)
         montarGraficoUltimosDias()
+    }
+
+    private fun montarComparativoEMeta(ganhoAtual: Double) {
+        val containerComparativo = findViewById<android.view.View>(R.id.containerComparativo)
+        val containerMetaPeriodo = findViewById<android.view.View>(R.id.containerMetaPeriodo)
+        val prefs = getSharedPreferences(RideAccessibilityService.PREFS_NAME, MODE_PRIVATE)
+
+        if (periodoAtual == Periodo.SEMANA) {
+            val fimSemanaAnterior = System.currentTimeMillis() - 7L * 24 * 60 * 60 * 1000
+            val inicioSemanaAnterior = fimSemanaAnterior - 7L * 24 * 60 * 60 * 1000
+            val jornadasAnteriores = JornadaStorage.listarTodas(this).filter { it.dataInicioMillis in inicioSemanaAnterior until fimSemanaAnterior }
+            val ganhoAnterior = jornadasAnteriores.sumOf { JornadaStorage.calcularStats(this, it).ganhoBruto }
+
+            val txtComparativo = findViewById<TextView>(R.id.txtComparativo)
+            if (ganhoAnterior > 0) {
+                val variacao = ((ganhoAtual - ganhoAnterior) / ganhoAnterior) * 100
+                if (variacao >= 0) {
+                    txtComparativo.text = "📈 %.0f%% a mais que a semana passada (R$ %.2f)".format(variacao, ganhoAnterior)
+                    txtComparativo.setTextColor(Color.parseColor("#1FE7A0"))
+                } else {
+                    txtComparativo.text = "📉 %.0f%% a menos que a semana passada (R$ %.2f)".format(-variacao, ganhoAnterior)
+                    txtComparativo.setTextColor(Color.parseColor("#F5576B"))
+                }
+                containerComparativo.visibility = android.view.View.VISIBLE
+            } else {
+                containerComparativo.visibility = android.view.View.GONE
+            }
+
+            val metaSemanal = prefs.getFloat(RideAccessibilityService.PREF_META_SEMANAL, 0f)
+            if (metaSemanal > 0) {
+                val percMeta = (ganhoAtual / metaSemanal) * 100
+                findViewById<TextView>(R.id.txtMetaPeriodo).text = "🎯 Meta semanal: R$ %.0f (%.0f%% atingida)".format(metaSemanal, percMeta)
+                containerMetaPeriodo.visibility = android.view.View.VISIBLE
+            } else {
+                containerMetaPeriodo.visibility = android.view.View.GONE
+            }
+        } else if (periodoAtual == Periodo.MES) {
+            containerComparativo.visibility = android.view.View.GONE
+            val metaMensal = prefs.getFloat(RideAccessibilityService.PREF_META_MENSAL, 0f)
+            if (metaMensal > 0) {
+                val percMeta = (ganhoAtual / metaMensal) * 100
+                findViewById<TextView>(R.id.txtMetaPeriodo).text = "🎯 Meta mensal: R$ %.0f (%.0f%% atingida)".format(metaMensal, percMeta)
+                containerMetaPeriodo.visibility = android.view.View.VISIBLE
+            } else {
+                containerMetaPeriodo.visibility = android.view.View.GONE
+            }
+        } else {
+            containerComparativo.visibility = android.view.View.GONE
+            containerMetaPeriodo.visibility = android.view.View.GONE
+        }
     }
 
     private fun montarLista() {
@@ -290,4 +341,4 @@ class WeeklyActivity : AppCompatActivity() {
             android.widget.Toast.makeText(this, "Erro ao exportar: ${e.message}", android.widget.Toast.LENGTH_LONG).show()
         }
     }
-}           
+}
