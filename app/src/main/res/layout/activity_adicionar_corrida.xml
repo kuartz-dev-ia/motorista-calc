@@ -30,7 +30,7 @@
                 android:layout_height="wrap_content"
                 android:text="Registre uma corrida manualmente"
                 android:textColor="#8B96AC"
-                android:textSize="11sp" />
+                android:textSize="10sp" />
         </LinearLayout>
 
         <LinearLayout
@@ -174,7 +174,7 @@
                 android:padding="12dp"
                 android:gravity="center"
                 android:text="Cancelar"
-                android:textColor="#8B96AC"
+                android:textColor="#FFFFFF"
                 android:textSize="13sp"
                 android:clickable="true"
                 android:focusable="true" />
