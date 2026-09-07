@@ -1064,7 +1064,7 @@ class RideAccessibilityService : AccessibilityService() {
             )
 
         /*
-         * NOVA CAMADA DE ANÁLISE
+         * CAMADA CENTRAL DE ANÁLISE
          */
         val plataforma =
             detectarPlataforma()
@@ -1181,6 +1181,9 @@ class RideAccessibilityService : AccessibilityService() {
             return
         }
 
+        /*
+         * PAUSA O POLLING ENQUANTO O CARD ESTÁ VISÍVEL
+         */
         handler.removeCallbacks(
             pollRunnable
         )
@@ -1191,25 +1194,34 @@ class RideAccessibilityService : AccessibilityService() {
             )
         }
 
-        val percentualLucro =
-            analise.percentualLucro
-
+        /*
+         * ENVIA TODOS OS DADOS DA ANÁLISE PARA O OVERLAY
+         */
         val intent =
             Intent(
                 this,
                 OverlayService::class.java
             ).apply {
 
+                /*
+                 * ID DO REGISTRO
+                 */
                 putExtra(
                     OverlayService.EXTRA_REGISTRO_ID,
                     registroId
                 )
 
+                /*
+                 * NÍVEL LEGADO
+                 */
                 putExtra(
                     OverlayService.EXTRA_NIVEL,
                     resultado.nivel.ordinal
                 )
 
+                /*
+                 * R$/KM
+                 */
                 resultado.valorPorKmCalculado?.let { valorKm ->
                     putExtra(
                         OverlayService.EXTRA_VALOR_KM_CALC,
@@ -1217,6 +1229,9 @@ class RideAccessibilityService : AccessibilityService() {
                     )
                 }
 
+                /*
+                 * R$/HORA
+                 */
                 resultado.valorPorHoraEfetivo?.let { valorHora ->
                     putExtra(
                         OverlayService.EXTRA_VALOR_HORA_EFETIVO,
@@ -1224,6 +1239,9 @@ class RideAccessibilityService : AccessibilityService() {
                     )
                 }
 
+                /*
+                 * R$/MINUTO
+                 */
                 resultado.valorPorMinutoEfetivo?.let { valorMinuto ->
                     putExtra(
                         OverlayService.EXTRA_VALOR_MINUTO_EFETIVO,
@@ -1231,6 +1249,9 @@ class RideAccessibilityService : AccessibilityService() {
                     )
                 }
 
+                /*
+                 * LUCRO LÍQUIDO
+                 */
                 resultado.lucroLiquidoEstimado?.let { lucro ->
                     putExtra(
                         OverlayService.EXTRA_LUCRO,
@@ -1238,12 +1259,69 @@ class RideAccessibilityService : AccessibilityService() {
                     )
                 }
 
-                percentualLucro?.let { percentual ->
+                /*
+                 * PERCENTUAL DE LUCRO
+                 */
+                analise.percentualLucro?.let { percentual ->
                     putExtra(
                         OverlayService.EXTRA_PERCENTUAL_LUCRO,
                         percentual
                     )
                 }
+
+                /*
+                 * NOVA DECISÃO
+                 *
+                 * ACEITAR
+                 * AVALIAR
+                 * RECUSAR
+                 */
+                putExtra(
+                    OverlayService.EXTRA_DECISAO,
+                    analise.decisao.name
+                )
+
+                /*
+                 * CONFIANÇA DA ANÁLISE
+                 */
+                putExtra(
+                    OverlayService.EXTRA_CONFIANCA,
+                    analise.confiancaDados
+                )
+
+                /*
+                 * CUSTO TOTAL ESTIMADO
+                 */
+                analise.custoTotalEstimado?.let { custo ->
+                    putExtra(
+                        OverlayService.EXTRA_CUSTO_ESTIMADO,
+                        custo
+                    )
+                }
+
+                /*
+                 * MOTIVO DA DECISÃO
+                 */
+                putExtra(
+                    OverlayService.EXTRA_MOTIVO,
+                    analise.motivo
+                )
+
+                /*
+                 * DISTÂNCIA TOTAL
+                 */
+                putExtra(
+                    OverlayService.EXTRA_DISTANCIA_TOTAL,
+                    analise.distanciaTotalKm
+                )
+
+                /*
+                 * TEMPO TOTAL
+                 */
+                putExtra(
+                    OverlayService.EXTRA_TEMPO_TOTAL,
+                    analise.tempoTotalMin
+                )
             }
 
         startService(intent)
