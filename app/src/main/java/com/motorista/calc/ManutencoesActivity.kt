@@ -1,21 +1,15 @@
 package com.motorista.calc
 
 import android.content.Intent
-import android.graphics.Color
-import android.graphics.Typeface
 import android.os.Bundle
-import android.view.Gravity
-import android.widget.LinearLayout
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 
-class MaisOpcoesActivity : AppCompatActivity() {
+class ManutencoesActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setContentView(R.layout.activity_mais_opcoes)
+        setContentView(R.layout.activity_manutencoes)
 
         findViewById<android.view.View>(
             R.id.btnManutencoes
@@ -71,90 +65,5 @@ class MaisOpcoesActivity : AppCompatActivity() {
                 )
             )
         }
-
-        adicionarBotaoDashboard()
-    }
-
-    private fun adicionarBotaoDashboard() {
-
-        val raiz =
-            findViewById<LinearLayout>(
-                android.R.id.content
-            ).getChildAt(0) as? LinearLayout
-                ?: return
-
-        val botao =
-            TextView(this).apply {
-
-                text = "📊  Dashboard"
-
-                setTextColor(
-                    Color.WHITE
-                )
-
-                textSize = 14f
-
-                setTypeface(
-                    typeface,
-                    Typeface.BOLD
-                )
-
-                gravity =
-                    Gravity.CENTER_VERTICAL
-
-                background =
-                    ContextCompat.getDrawable(
-                        this@MaisOpcoesActivity,
-                        R.drawable.bg_card_dark
-                    )
-
-                setPadding(
-                    dp(18),
-                    dp(16),
-                    dp(18),
-                    dp(16)
-                )
-
-                isClickable = true
-                isFocusable = true
-
-                setOnClickListener {
-
-                    startActivity(
-                        Intent(
-                            this@MaisOpcoesActivity,
-                            DashboardActivity::class.java
-                        )
-                    )
-                }
-            }
-
-        val parametros =
-            LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            ).apply {
-
-                setMargins(
-                    dp(16),
-                    dp(8),
-                    dp(16),
-                    dp(8)
-                )
-            }
-
-        raiz.addView(
-            botao,
-            0,
-            parametros
-        )
-    }
-
-    private fun dp(valor: Int): Int {
-
-        return (
-            valor *
-                resources.displayMetrics.density
-            ).toInt()
     }
 }
