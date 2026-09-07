@@ -38,64 +38,118 @@ class OverlayService : Service() {
 
     override fun onBind(intent: Intent?): IBinder? = null
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+    override fun onStartCommand(
+        intent: Intent?,
+        flags: Int,
+        startId: Int
+    ): Int {
+
         intent ?: return START_NOT_STICKY
 
         val registroId =
             if (intent.hasExtra(EXTRA_REGISTRO_ID)) {
-                intent.getLongExtra(EXTRA_REGISTRO_ID, -1L)
+                intent.getLongExtra(
+                    EXTRA_REGISTRO_ID,
+                    -1L
+                )
             } else {
                 null
             }
 
-        val valorKmCalc = intent.getDoubleOrNull(EXTRA_VALOR_KM_CALC)
-        val valorHoraEfetivo = intent.getDoubleOrNull(EXTRA_VALOR_HORA_EFETIVO)
-        val valorMinutoEfetivo = intent.getDoubleOrNull(EXTRA_VALOR_MINUTO_EFETIVO)
-        val lucro = intent.getDoubleOrNull(EXTRA_LUCRO)
-        val percentualLucro = intent.getDoubleOrNull(EXTRA_PERCENTUAL_LUCRO)
+        val valorKmCalc =
+            intent.getDoubleOrNull(
+                EXTRA_VALOR_KM_CALC
+            )
 
-        val nivel = NivelCorrida.values().getOrElse(
-            intent.getIntExtra(EXTRA_NIVEL, 0)
-        ) {
-            NivelCorrida.RUIM
-        }
+        val valorHoraEfetivo =
+            intent.getDoubleOrNull(
+                EXTRA_VALOR_HORA_EFETIVO
+            )
 
-        val decisao = when {
-            intent.hasExtra(EXTRA_DECISAO) -> {
-                try {
-                    DecisaoCorrida.valueOf(
-                        intent.getStringExtra(EXTRA_DECISAO)
-                            ?: DecisaoCorrida.RECUSAR.name
-                    )
-                } catch (e: Exception) {
+        val valorMinutoEfetivo =
+            intent.getDoubleOrNull(
+                EXTRA_VALOR_MINUTO_EFETIVO
+            )
+
+        val lucro =
+            intent.getDoubleOrNull(
+                EXTRA_LUCRO
+            )
+
+        val percentualLucro =
+            intent.getDoubleOrNull(
+                EXTRA_PERCENTUAL_LUCRO
+            )
+
+        val nivel =
+            NivelCorrida.values().getOrElse(
+                intent.getIntExtra(
+                    EXTRA_NIVEL,
+                    0
+                )
+            ) {
+                NivelCorrida.RUIM
+            }
+
+        val decisao =
+            when {
+
+                intent.hasExtra(EXTRA_DECISAO) -> {
+
+                    try {
+
+                        DecisaoCorrida.valueOf(
+                            intent.getStringExtra(
+                                EXTRA_DECISAO
+                            )
+                                ?: DecisaoCorrida.RECUSAR.name
+                        )
+
+                    } catch (_: Exception) {
+
+                        decisaoPeloNivel(nivel)
+                    }
+                }
+
+                else -> {
                     decisaoPeloNivel(nivel)
                 }
             }
 
-            else -> decisaoPeloNivel(nivel)
-        }
+        val confianca =
+            intent.getIntExtra(
+                EXTRA_CONFIANCA,
+                0
+            ).coerceIn(0, 100)
 
-        val confianca = intent.getIntExtra(
-            EXTRA_CONFIANCA,
-            0
-        ).coerceIn(0, 100)
+        val custoEstimado =
+            intent.getDoubleOrNull(
+                EXTRA_CUSTO_ESTIMADO
+            )
 
-        val custoEstimado = intent.getDoubleOrNull(
-            EXTRA_CUSTO_ESTIMADO
-        )
+        /*
+         * O MOTIVO CONTINUA SENDO RECEBIDO
+         * PARA PRESERVAR A COMPATIBILIDADE
+         * COM O FLUXO ATUAL.
+         *
+         * Porém, ele NÃO será mais exibido
+         * no Overlay.
+         */
+        val motivo =
+            intent.getStringExtra(
+                EXTRA_MOTIVO
+            ).orEmpty()
 
-        val motivo = intent.getStringExtra(
-            EXTRA_MOTIVO
-        ).orEmpty()
+        val distanciaTotalKm =
+            intent.getDoubleOrNull(
+                EXTRA_DISTANCIA_TOTAL
+            )
 
-        val distanciaTotalKm = intent.getDoubleOrNull(
-            EXTRA_DISTANCIA_TOTAL
-        )
-
-        val tempoTotalMin = intent.getIntExtra(
-            EXTRA_TEMPO_TOTAL,
-            0
-        )
+        val tempoTotalMin =
+            intent.getIntExtra(
+                EXTRA_TEMPO_TOTAL,
+                0
+            )
 
         mostrarOverlay(
             registroId = registroId,
@@ -116,47 +170,81 @@ class OverlayService : Service() {
         return START_NOT_STICKY
     }
 
-    private fun Intent.getDoubleOrNull(key: String): Double? =
+    private fun Intent.getDoubleOrNull(
+        key: String
+    ): Double? =
         if (hasExtra(key)) {
-            getDoubleExtra(key, Double.NaN)
-                .takeIf { !it.isNaN() }
+
+            getDoubleExtra(
+                key,
+                Double.NaN
+            ).takeIf {
+                !it.isNaN()
+            }
+
         } else {
             null
         }
 
     private fun dp(valor: Int): Int =
-        (valor * resources.displayMetrics.density).toInt()
+        (
+            valor *
+                resources.displayMetrics.density
+            ).toInt()
 
-    private fun decisaoPeloNivel(nivel: NivelCorrida): DecisaoCorrida {
+    private fun decisaoPeloNivel(
+        nivel: NivelCorrida
+    ): DecisaoCorrida {
+
         return when (nivel) {
-            NivelCorrida.BOM -> DecisaoCorrida.ACEITAR
-            NivelCorrida.MEDIO -> DecisaoCorrida.AVALIAR
-            NivelCorrida.RUIM -> DecisaoCorrida.RECUSAR
+
+            NivelCorrida.BOM ->
+                DecisaoCorrida.ACEITAR
+
+            NivelCorrida.MEDIO ->
+                DecisaoCorrida.AVALIAR
+
+            NivelCorrida.RUIM ->
+                DecisaoCorrida.RECUSAR
         }
     }
 
-    private fun alertarComSomEVibracao(nivel: NivelCorrida) {
+    private fun alertarComSomEVibracao(
+        nivel: NivelCorrida
+    ) {
+
         try {
+
             val vibrator: Vibrator? =
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                    (getSystemService(
-                        Context.VIBRATOR_MANAGER_SERVICE
-                    ) as? VibratorManager)?.defaultVibrator
+                if (
+                    Build.VERSION.SDK_INT >=
+                    Build.VERSION_CODES.S
+                ) {
+
+                    (
+                        getSystemService(
+                            Context.VIBRATOR_MANAGER_SERVICE
+                        ) as? VibratorManager
+                        )?.defaultVibrator
+
                 } else {
+
                     @Suppress("DEPRECATION")
                     getSystemService(
                         Context.VIBRATOR_SERVICE
                     ) as? Vibrator
                 }
 
-            val tone = ToneGenerator(
-                AudioManager.STREAM_NOTIFICATION,
-                90
-            )
+            val tone =
+                ToneGenerator(
+                    AudioManager.STREAM_NOTIFICATION,
+                    90
+                )
 
             when (nivel) {
 
                 NivelCorrida.RUIM -> {
+
                     tone.startTone(
                         ToneGenerator.TONE_CDMA_LOW_L,
                         250
@@ -174,6 +262,7 @@ class OverlayService : Service() {
                 }
 
                 NivelCorrida.MEDIO -> {
+
                     tone.startTone(
                         ToneGenerator.TONE_PROP_BEEP,
                         150
@@ -189,6 +278,7 @@ class OverlayService : Service() {
                 }
 
                 NivelCorrida.BOM -> {
+
                     tone.startTone(
                         ToneGenerator.TONE_CDMA_HIGH_L,
                         200
@@ -225,16 +315,23 @@ class OverlayService : Service() {
         vibrator: Vibrator?,
         padrao: LongArray
     ) {
+
         vibrator ?: return
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (
+            Build.VERSION.SDK_INT >=
+            Build.VERSION_CODES.O
+        ) {
+
             vibrator.vibrate(
                 VibrationEffect.createWaveform(
                     padrao,
                     -1
                 )
             )
+
         } else {
+
             @Suppress("DEPRECATION")
             vibrator.vibrate(
                 padrao,
@@ -264,7 +361,9 @@ class OverlayService : Service() {
         registroIdAtual = registroId
 
         windowManager =
-            getSystemService(WINDOW_SERVICE) as WindowManager
+            getSystemService(
+                WINDOW_SERVICE
+            ) as WindowManager
 
         data class Paleta(
             val fundoTopo: Int,
@@ -277,99 +376,133 @@ class OverlayService : Service() {
             val texto: String
         )
 
-        val paleta = when (decisao) {
+        val paleta =
+            when (decisao) {
 
-            DecisaoCorrida.RECUSAR -> Paleta(
-                Color.parseColor("#4A1414"),
-                Color.parseColor("#2A0A0A"),
-                Color.parseColor("#C24A4A"),
-                Color.parseColor("#F7C1C1"),
-                Color.parseColor("#D98787"),
-                Color.parseColor("#FCEBEB"),
-                Color.parseColor("#5A1E1E"),
-                "NÃO COMPENSA"
-            )
+                DecisaoCorrida.RECUSAR ->
+                    Paleta(
+                        Color.parseColor("#4A1414"),
+                        Color.parseColor("#2A0A0A"),
+                        Color.parseColor("#C24A4A"),
+                        Color.parseColor("#F7C1C1"),
+                        Color.parseColor("#D98787"),
+                        Color.parseColor("#FCEBEB"),
+                        Color.parseColor("#5A1E1E"),
+                        "NÃO COMPENSA"
+                    )
 
-            DecisaoCorrida.AVALIAR -> Paleta(
-                Color.parseColor("#4A340A"),
-                Color.parseColor("#2A1D03"),
-                Color.parseColor("#D69A3F"),
-                Color.parseColor("#FAC775"),
-                Color.parseColor("#C99A55"),
-                Color.parseColor("#FAEEDA"),
-                Color.parseColor("#5A3E12"),
-                "VOCÊ DECIDE"
-            )
+                DecisaoCorrida.AVALIAR ->
+                    Paleta(
+                        Color.parseColor("#4A340A"),
+                        Color.parseColor("#2A1D03"),
+                        Color.parseColor("#D69A3F"),
+                        Color.parseColor("#FAC775"),
+                        Color.parseColor("#C99A55"),
+                        Color.parseColor("#FAEEDA"),
+                        Color.parseColor("#5A3E12"),
+                        "VOCÊ DECIDE"
+                    )
 
-            DecisaoCorrida.ACEITAR -> Paleta(
-                Color.parseColor("#1E4A0A"),
-                Color.parseColor("#0F2A03"),
-                Color.parseColor("#6FAF3D"),
-                Color.parseColor("#C0DD97"),
-                Color.parseColor("#8FB868"),
-                Color.parseColor("#EAF3DE"),
-                Color.parseColor("#2E5A16"),
-                "VALE A PENA"
-            )
-        }
+                DecisaoCorrida.ACEITAR ->
+                    Paleta(
+                        Color.parseColor("#1E4A0A"),
+                        Color.parseColor("#0F2A03"),
+                        Color.parseColor("#6FAF3D"),
+                        Color.parseColor("#C0DD97"),
+                        Color.parseColor("#8FB868"),
+                        Color.parseColor("#EAF3DE"),
+                        Color.parseColor("#2E5A16"),
+                        "VALE A PENA"
+                    )
+            }
 
-        val fundoCard = GradientDrawable(
-            GradientDrawable.Orientation.TL_BR,
-            intArrayOf(
-                paleta.fundoTopo,
-                paleta.fundoBase
-            )
-        ).apply {
-            cornerRadius = dp(20).toFloat()
-            setStroke(
-                dp(2),
-                paleta.borda
-            )
-        }
+        val fundoCard =
+            GradientDrawable(
+                GradientDrawable.Orientation.TL_BR,
+                intArrayOf(
+                    paleta.fundoTopo,
+                    paleta.fundoBase
+                )
+            ).apply {
 
-        val container = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            gravity = Gravity.CENTER_HORIZONTAL
-            background = fundoCard
+                cornerRadius =
+                    dp(20).toFloat()
 
-            setPadding(
-                dp(20),
-                dp(10),
-                dp(20),
-                dp(10)
-            )
-        }
+                setStroke(
+                    dp(2),
+                    paleta.borda
+                )
+            }
 
-        val linhaTopo = TextView(this).apply {
-            text = paleta.texto
-            setTextColor(paleta.titulo)
-            textSize = 16f
+        val container =
+            LinearLayout(this).apply {
 
-            setTypeface(
-                typeface,
-                Typeface.BOLD
-            )
+                orientation =
+                    LinearLayout.VERTICAL
 
-            gravity = Gravity.CENTER_HORIZONTAL
+                gravity =
+                    Gravity.CENTER_HORIZONTAL
 
-            setPadding(
-                0,
-                0,
-                0,
-                dp(6)
-            )
-        }
+                background =
+                    fundoCard
 
-        container.addView(linhaTopo)
+                setPadding(
+                    dp(20),
+                    dp(10),
+                    dp(20),
+                    dp(10)
+                )
+            }
+
+        /*
+         * DECISÃO PRINCIPAL
+         */
+
+        val linhaTopo =
+            TextView(this).apply {
+
+                text =
+                    paleta.texto
+
+                setTextColor(
+                    paleta.titulo
+                )
+
+                textSize = 16f
+
+                setTypeface(
+                    typeface,
+                    Typeface.BOLD
+                )
+
+                gravity =
+                    Gravity.CENTER_HORIZONTAL
+
+                setPadding(
+                    0,
+                    0,
+                    0,
+                    dp(6)
+                )
+            }
+
+        container.addView(
+            linhaTopo
+        )
 
         /*
          * INDICADORES PRINCIPAIS
          */
 
-        val linhaMetricas = LinearLayout(this).apply {
-            orientation = LinearLayout.HORIZONTAL
-            gravity = Gravity.CENTER_HORIZONTAL
-        }
+        val linhaMetricas =
+            LinearLayout(this).apply {
+
+                orientation =
+                    LinearLayout.HORIZONTAL
+
+                gravity =
+                    Gravity.CENTER_HORIZONTAL
+            }
 
         linhaMetricas.addView(
             criarColuna(
@@ -404,7 +537,9 @@ class OverlayService : Service() {
             )
         )
 
-        container.addView(linhaMetricas)
+        container.addView(
+            linhaMetricas
+        )
 
         /*
          * DISTÂNCIA E TEMPO
@@ -415,30 +550,41 @@ class OverlayService : Service() {
             tempoTotalMin > 0
         ) {
 
-            val linhaDetalhes = LinearLayout(this).apply {
-                orientation = LinearLayout.HORIZONTAL
-                gravity = Gravity.CENTER
-                setPadding(
-                    0,
-                    dp(6),
-                    0,
-                    0
-                )
-            }
+            val linhaDetalhes =
+                LinearLayout(this).apply {
 
-            if (distanciaTotalKm != null) {
+                    orientation =
+                        LinearLayout.HORIZONTAL
 
-                val txtDistancia = TextView(this).apply {
-                    text = "↔ %.1f km".format(
-                        distanciaTotalKm
+                    gravity =
+                        Gravity.CENTER
+
+                    setPadding(
+                        0,
+                        dp(6),
+                        0,
+                        0
                     )
-
-                    setTextColor(
-                        paleta.rotulo
-                    )
-
-                    textSize = 11f
                 }
+
+            if (
+                distanciaTotalKm != null
+            ) {
+
+                val txtDistancia =
+                    TextView(this).apply {
+
+                        text =
+                            "↔ %.1f km".format(
+                                distanciaTotalKm
+                            )
+
+                        setTextColor(
+                            paleta.rotulo
+                        )
+
+                        textSize = 11f
+                    }
 
                 linhaDetalhes.addView(
                     txtDistancia
@@ -450,32 +596,43 @@ class OverlayService : Service() {
                 tempoTotalMin > 0
             ) {
 
-                val separador = TextView(this).apply {
-                    text = "  •  "
-                    setTextColor(
-                        Color.parseColor("#80FFFFFF")
-                    )
-                    textSize = 11f
-                }
+                val separador =
+                    TextView(this).apply {
+
+                        text = "  •  "
+
+                        setTextColor(
+                            Color.parseColor(
+                                "#80FFFFFF"
+                            )
+                        )
+
+                        textSize = 11f
+                    }
 
                 linhaDetalhes.addView(
                     separador
                 )
             }
 
-            if (tempoTotalMin > 0) {
+            if (
+                tempoTotalMin > 0
+            ) {
 
-                val txtTempo = TextView(this).apply {
-                    text = "⏱ %d min".format(
-                        tempoTotalMin
-                    )
+                val txtTempo =
+                    TextView(this).apply {
 
-                    setTextColor(
-                        paleta.rotulo
-                    )
+                        text =
+                            "⏱ %d min".format(
+                                tempoTotalMin
+                            )
 
-                    textSize = 11f
-                }
+                        setTextColor(
+                            paleta.rotulo
+                        )
+
+                        textSize = 11f
+                    }
 
                 linhaDetalhes.addView(
                     txtTempo
@@ -505,8 +662,12 @@ class OverlayService : Service() {
                         LinearLayout.LayoutParams.MATCH_PARENT,
                         dp(1)
                     ).apply {
-                        topMargin = dp(8)
-                        bottomMargin = dp(8)
+
+                        topMargin =
+                            dp(8)
+
+                        bottomMargin =
+                            dp(8)
                     }
             }
 
@@ -518,36 +679,47 @@ class OverlayService : Service() {
          * LUCRO
          */
 
-        val linhaLucro = LinearLayout(this).apply {
-            orientation = LinearLayout.HORIZONTAL
-            gravity = Gravity.CENTER
-        }
+        val linhaLucro =
+            LinearLayout(this).apply {
 
-        val txtLucro = TextView(this).apply {
-            text = lucro?.let {
-                "R$ %.2f".format(it)
-            } ?: "--"
+                orientation =
+                    LinearLayout.HORIZONTAL
 
-            setTextColor(
-                paleta.valor
-            )
+                gravity =
+                    Gravity.CENTER
+            }
 
-            textSize = 16f
+        val txtLucro =
+            TextView(this).apply {
 
-            setTypeface(
-                typeface,
-                Typeface.BOLD
-            )
-        }
+                text =
+                    lucro?.let {
+                        "R$ %.2f".format(it)
+                    } ?: "--"
+
+                setTextColor(
+                    paleta.valor
+                )
+
+                textSize = 16f
+
+                setTypeface(
+                    typeface,
+                    Typeface.BOLD
+                )
+            }
 
         linhaLucro.addView(
             txtLucro
         )
 
-        if (percentualLucro != null) {
+        if (
+            percentualLucro != null
+        ) {
 
             val espacoPill =
                 android.view.View(this).apply {
+
                     layoutParams =
                         LinearLayout.LayoutParams(
                             dp(8),
@@ -569,9 +741,10 @@ class OverlayService : Service() {
             val txtPercentual =
                 TextView(this).apply {
 
-                    text = "%.0f%% lucro".format(
-                        percentualLucro
-                    )
+                    text =
+                        "%.0f%% lucro".format(
+                            percentualLucro
+                        )
 
                     setTextColor(
                         paleta.titulo
@@ -584,7 +757,8 @@ class OverlayService : Service() {
                         Typeface.BOLD
                     )
 
-                    background = pillFundo
+                    background =
+                        pillFundo
 
                     setPadding(
                         dp(8),
@@ -611,97 +785,26 @@ class OverlayService : Service() {
          * CUSTO ESTIMADO
          */
 
-        if (custoEstimado != null) {
+        if (
+            custoEstimado != null
+        ) {
 
-            val txtCusto = TextView(this).apply {
-
-                text = "Custo estimado: R$ %.2f".format(
-                    custoEstimado
-                )
-
-                setTextColor(
-                    paleta.rotulo
-                )
-
-                textSize = 11f
-
-                gravity =
-                    Gravity.CENTER_HORIZONTAL
-
-                setPadding(
-                    0,
-                    dp(4),
-                    0,
-                    0
-                )
-            }
-
-            container.addView(
-                txtCusto
-            )
-        }
-
-        /*
-         * CONFIANÇA
-         */
-
-        if (confianca > 0) {
-
-            val txtConfianca =
+            val txtCusto =
                 TextView(this).apply {
 
                     text =
-                        "Análise: %d%% de confiança".format(
-                            confianca
+                        "Custo estimado: R$ %.2f".format(
+                            custoEstimado
                         )
 
                     setTextColor(
-                        Color.parseColor(
-                            "#B0FFFFFF"
-                        )
-                    )
-
-                    textSize = 10f
-
-                    gravity =
-                        Gravity.CENTER_HORIZONTAL
-
-                    setPadding(
-                        0,
-                        dp(2),
-                        0,
-                        0
-                    )
-                }
-
-            container.addView(
-                txtConfianca
-            )
-        }
-
-        /*
-         * MOTIVO
-         */
-
-        if (motivo.isNotBlank()) {
-
-            val txtMotivo =
-                TextView(this).apply {
-
-                    text = motivo
-
-                    setTextColor(
-                        Color.parseColor(
-                            "#D0FFFFFF"
-                        )
+                        paleta.rotulo
                     )
 
                     textSize = 11f
 
                     gravity =
                         Gravity.CENTER_HORIZONTAL
-
-                    maxLines = 2
 
                     setPadding(
                         0,
@@ -712,23 +815,53 @@ class OverlayService : Service() {
                 }
 
             container.addView(
-                txtMotivo
+                txtCusto
             )
         }
+
+        /*
+         * IMPORTANTE:
+         *
+         * A informação de confiança da análise
+         * NÃO É MAIS EXIBIDA.
+         *
+         * O valor continua sendo calculado e
+         * enviado pelo fluxo interno para futuras
+         * funcionalidades.
+         */
+
+        /*
+         * IMPORTANTE:
+         *
+         * O MOTIVO DA DECISÃO TAMBÉM NÃO É MAIS
+         * EXIBIDO.
+         *
+         * Exemplos que deixarão de aparecer:
+         * "Km abaixo do mínimo"
+         * "Hora abaixo do mínimo"
+         * etc.
+         *
+         * A lógica de decisão continua intacta.
+         */
 
         /*
          * TIPO DA JANELA
          */
 
         val layoutType =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            if (
+                Build.VERSION.SDK_INT >=
+                Build.VERSION_CODES.O
+            ) {
 
-                WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
+                WindowManager.LayoutParams
+                    .TYPE_APPLICATION_OVERLAY
 
             } else {
 
                 @Suppress("DEPRECATION")
-                WindowManager.LayoutParams.TYPE_SYSTEM_ALERT
+                WindowManager.LayoutParams
+                    .TYPE_SYSTEM_ALERT
             }
 
         /*
@@ -753,14 +886,18 @@ class OverlayService : Service() {
                 y = dp(60)
             }
 
-        overlayView = container
+        overlayView =
+            container
 
         try {
+
             windowManager?.addView(
                 overlayView,
                 paramsCard
             )
+
         } catch (_: Exception) {
+
             return
         }
 
@@ -772,54 +909,59 @@ class OverlayService : Service() {
          * BARRA DE AÇÕES
          */
 
-        val barra = LinearLayout(this).apply {
-            orientation =
-                LinearLayout.HORIZONTAL
-        }
+        val barra =
+            LinearLayout(this).apply {
 
-        val btnAceitei = TextView(this).apply {
-
-            text = "✔ Aceitei"
-
-            setTextColor(
-                Color.WHITE
-            )
-
-            textSize = 12f
-
-            background =
-                GradientDrawable().apply {
-
-                    cornerRadius =
-                        dp(8).toFloat()
-
-                    setColor(
-                        Color.parseColor(
-                            "#CC1B5E20"
-                        )
-                    )
-                }
-
-            setPadding(
-                dp(12),
-                dp(6),
-                dp(12),
-                dp(6)
-            )
-
-            setOnClickListener {
-
-                registroIdAtual?.let { id ->
-
-                    HistoricoStorage.marcarAceita(
-                        this@OverlayService,
-                        id
-                    )
-                }
-
-                fecharCard()
+                orientation =
+                    LinearLayout.HORIZONTAL
             }
-        }
+
+        val btnAceitei =
+            TextView(this).apply {
+
+                text =
+                    "✔ Aceitei"
+
+                setTextColor(
+                    Color.WHITE
+                )
+
+                textSize = 12f
+
+                background =
+                    GradientDrawable().apply {
+
+                        cornerRadius =
+                            dp(8).toFloat()
+
+                        setColor(
+                            Color.parseColor(
+                                "#CC1B5E20"
+                            )
+                        )
+                    }
+
+                setPadding(
+                    dp(12),
+                    dp(6),
+                    dp(12),
+                    dp(6)
+                )
+
+                setOnClickListener {
+
+                    registroIdAtual?.let { id ->
+
+                        HistoricoStorage
+                            .marcarAceita(
+                                this@OverlayService,
+                                id
+                            )
+                    }
+
+                    fecharCard()
+                }
+            }
 
         val espaco =
             android.view.View(this).apply {
@@ -831,43 +973,45 @@ class OverlayService : Service() {
                     )
             }
 
-        val btnFechar = TextView(this).apply {
+        val btnFechar =
+            TextView(this).apply {
 
-            text = "✕"
+                text =
+                    "✕"
 
-            setTextColor(
-                Color.WHITE
-            )
+                setTextColor(
+                    Color.WHITE
+                )
 
-            textSize = 14f
+                textSize = 14f
 
-            gravity =
-                Gravity.CENTER
+                gravity =
+                    Gravity.CENTER
 
-            background =
-                GradientDrawable().apply {
+                background =
+                    GradientDrawable().apply {
 
-                    cornerRadius =
-                        dp(8).toFloat()
+                        cornerRadius =
+                            dp(8).toFloat()
 
-                    setColor(
-                        Color.parseColor(
-                            "#CC000000"
+                        setColor(
+                            Color.parseColor(
+                                "#CC000000"
+                            )
                         )
-                    )
+                    }
+
+                setPadding(
+                    dp(12),
+                    dp(6),
+                    dp(12),
+                    dp(6)
+                )
+
+                setOnClickListener {
+                    fecharCard()
                 }
-
-            setPadding(
-                dp(12),
-                dp(6),
-                dp(12),
-                dp(6)
-            )
-
-            setOnClickListener {
-                fecharCard()
             }
-        }
 
         barra.addView(
             btnAceitei
@@ -891,20 +1035,25 @@ class OverlayService : Service() {
             ).apply {
 
                 gravity =
-                    Gravity.TOP or Gravity.END
+                    Gravity.TOP or
+                        Gravity.END
 
                 x = dp(8)
                 y = dp(50)
             }
 
-        barraAcoes = barra
+        barraAcoes =
+            barra
 
         try {
+
             windowManager?.addView(
                 barraAcoes,
                 paramsBarra
             )
+
         } catch (_: Exception) {
+
             barraAcoes = null
         }
 
@@ -950,7 +1099,8 @@ class OverlayService : Service() {
         val txtValor =
             TextView(this).apply {
 
-                text = valorTexto
+                text =
+                    valorTexto
 
                 setTextColor(
                     corValor
@@ -970,7 +1120,8 @@ class OverlayService : Service() {
         val txtRotulo =
             TextView(this).apply {
 
-                text = rotulo
+                text =
+                    rotulo
 
                 setTextColor(
                     corRotulo
@@ -1006,7 +1157,11 @@ class OverlayService : Service() {
         overlayView?.let {
 
             try {
-                windowManager?.removeView(it)
+
+                windowManager?.removeView(
+                    it
+                )
+
             } catch (_: Exception) {
             }
         }
@@ -1016,7 +1171,11 @@ class OverlayService : Service() {
         barraAcoes?.let {
 
             try {
-                windowManager?.removeView(it)
+
+                windowManager?.removeView(
+                    it
+                )
+
             } catch (_: Exception) {
             }
         }
@@ -1070,7 +1229,7 @@ class OverlayService : Service() {
             "extra_nivel"
 
         /*
-         * NOVOS DADOS DA RIDE ANALYSIS
+         * DADOS DA RIDE ANALYSIS
          */
 
         const val EXTRA_DECISAO =
@@ -1095,12 +1254,12 @@ class OverlayService : Service() {
             10000L
 
         @Volatile
-        private var instanciaAtual: OverlayService? =
-            null
+        private var instanciaAtual:
+            OverlayService? = null
 
         @Volatile
-        var aoFechar: (() -> Unit)? =
-            null
+        var aoFechar:
+            (() -> Unit)? = null
 
         fun ocultarTemporariamente() {
 
