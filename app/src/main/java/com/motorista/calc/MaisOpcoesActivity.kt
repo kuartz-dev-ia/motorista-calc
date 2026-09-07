@@ -6,6 +6,7 @@ import android.graphics.Typeface
 import android.os.Bundle
 import android.view.Gravity
 import android.widget.LinearLayout
+import android.widget.ScrollView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -75,12 +76,23 @@ class MaisOpcoesActivity : AppCompatActivity() {
         adicionarBotaoDashboard()
     }
 
+    /**
+     * Adiciona o botão Dashboard no início
+     * da lista de opções.
+     *
+     * O layout possui um ScrollView como raiz,
+     * portanto precisamos acessar o LinearLayout
+     * que está dentro dele.
+     */
     private fun adicionarBotaoDashboard() {
 
-        val raiz =
-            findViewById<LinearLayout>(
+        val scrollView =
+            findViewById<ScrollView>(
                 android.R.id.content
-            ).getChildAt(0) as? LinearLayout
+            )
+
+        val raiz =
+            scrollView.getChildAt(0) as? LinearLayout
                 ?: return
 
         val botao =
@@ -150,7 +162,9 @@ class MaisOpcoesActivity : AppCompatActivity() {
         )
     }
 
-    private fun dp(valor: Int): Int {
+    private fun dp(
+        valor: Int
+    ): Int {
 
         return (
             valor *
