@@ -25,7 +25,6 @@ class OverlayService : Service() {
 
     private var windowManager: WindowManager? = null
     private var overlayView: android.view.View? = null
-    private var barraAcoes: android.view.View? = null
     private var registroIdAtual: Long? = null
 
     private val handler = Handler(Looper.getMainLooper())
@@ -127,19 +126,6 @@ class OverlayService : Service() {
                 EXTRA_CUSTO_ESTIMADO
             )
 
-        /*
-         * O MOTIVO CONTINUA SENDO RECEBIDO
-         * PARA PRESERVAR A COMPATIBILIDADE
-         * COM O FLUXO ATUAL.
-         *
-         * Porém, ele NÃO será mais exibido
-         * no Overlay.
-         */
-        val motivo =
-            intent.getStringExtra(
-                EXTRA_MOTIVO
-            ).orEmpty()
-
         val distanciaTotalKm =
             intent.getDoubleOrNull(
                 EXTRA_DISTANCIA_TOTAL
@@ -162,7 +148,6 @@ class OverlayService : Service() {
             decisao = decisao,
             confianca = confianca,
             custoEstimado = custoEstimado,
-            motivo = motivo,
             distanciaTotalKm = distanciaTotalKm,
             tempoTotalMin = tempoTotalMin
         )
@@ -351,7 +336,6 @@ class OverlayService : Service() {
         decisao: DecisaoCorrida,
         confianca: Int,
         custoEstimado: Double?,
-        motivo: String,
         distanciaTotalKm: Double?,
         tempoTotalMin: Int
     ) {
@@ -426,7 +410,7 @@ class OverlayService : Service() {
             ).apply {
 
                 cornerRadius =
-                    dp(20).toFloat()
+                    dp(18).toFloat()
 
                 setStroke(
                     dp(2),
@@ -447,16 +431,32 @@ class OverlayService : Service() {
                     fundoCard
 
                 setPadding(
-                    dp(20),
-                    dp(10),
-                    dp(20),
+                    dp(16),
+                    dp(8),
+                    dp(16),
                     dp(10)
                 )
             }
 
         /*
-         * DECISÃO PRINCIPAL
+         * CABEÇALHO
          */
+
+        val cabecalho =
+            LinearLayout(this).apply {
+
+                orientation =
+                    LinearLayout.HORIZONTAL
+
+                gravity =
+                    Gravity.CENTER_VERTICAL
+
+                layoutParams =
+                    LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                    )
+            }
 
         val linhaTopo =
             TextView(this).apply {
@@ -476,22 +476,80 @@ class OverlayService : Service() {
                 )
 
                 gravity =
-                    Gravity.CENTER_HORIZONTAL
+                    Gravity.CENTER
+
+                layoutParams =
+                    LinearLayout.LayoutParams(
+                        0,
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        1f
+                    )
 
                 setPadding(
+                    dp(4),
                     0,
-                    0,
-                    0,
-                    dp(6)
+                    dp(4),
+                    dp(4)
                 )
             }
 
-        container.addView(
+        cabecalho.addView(
             linhaTopo
+        )
+
+        val btnFechar =
+            TextView(this).apply {
+
+                text =
+                    "✕"
+
+                setTextColor(
+                    Color.WHITE
+                )
+
+                textSize = 17f
+
+                gravity =
+                    Gravity.CENTER
+
+                background =
+                    GradientDrawable().apply {
+
+                        cornerRadius =
+                            dp(8).toFloat()
+
+                        setColor(
+                            Color.parseColor(
+                                "#55000000"
+                            )
+                        )
+                    }
+
+                setPadding(
+                    dp(8),
+                    dp(3),
+                    dp(8),
+                    dp(3)
+                )
+
+                setOnClickListener {
+                    fecharCard()
+                }
+            }
+
+        cabecalho.addView(
+            btnFechar
+        )
+
+        container.addView(
+            cabecalho
         )
 
         /*
          * INDICADORES PRINCIPAIS
+         *
+         * Cada coluna recebe o mesmo peso.
+         * Isso impede que R$/MIN quebre em duas linhas.
          */
 
         val linhaMetricas =
@@ -501,7 +559,20 @@ class OverlayService : Service() {
                     LinearLayout.HORIZONTAL
 
                 gravity =
-                    Gravity.CENTER_HORIZONTAL
+                    Gravity.CENTER
+
+                layoutParams =
+                    LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                    )
+
+                setPadding(
+                    0,
+                    dp(2),
+                    0,
+                    0
+                )
             }
 
         linhaMetricas.addView(
@@ -559,9 +630,15 @@ class OverlayService : Service() {
                     gravity =
                         Gravity.CENTER
 
+                    layoutParams =
+                        LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.MATCH_PARENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT
+                        )
+
                     setPadding(
                         0,
-                        dp(6),
+                        dp(4),
                         0,
                         0
                     )
@@ -584,6 +661,8 @@ class OverlayService : Service() {
                         )
 
                         textSize = 11f
+
+                        includeFontPadding = false
                     }
 
                 linhaDetalhes.addView(
@@ -599,7 +678,8 @@ class OverlayService : Service() {
                 val separador =
                     TextView(this).apply {
 
-                        text = "  •  "
+                        text =
+                            "  •  "
 
                         setTextColor(
                             Color.parseColor(
@@ -608,6 +688,8 @@ class OverlayService : Service() {
                         )
 
                         textSize = 11f
+
+                        includeFontPadding = false
                     }
 
                 linhaDetalhes.addView(
@@ -632,6 +714,8 @@ class OverlayService : Service() {
                         )
 
                         textSize = 11f
+
+                        includeFontPadding = false
                     }
 
                 linhaDetalhes.addView(
@@ -664,10 +748,10 @@ class OverlayService : Service() {
                     ).apply {
 
                         topMargin =
-                            dp(8)
+                            dp(6)
 
                         bottomMargin =
-                            dp(8)
+                            dp(6)
                     }
             }
 
@@ -687,6 +771,12 @@ class OverlayService : Service() {
 
                 gravity =
                     Gravity.CENTER
+
+                layoutParams =
+                    LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                    )
             }
 
         val txtLucro =
@@ -701,12 +791,14 @@ class OverlayService : Service() {
                     paleta.valor
                 )
 
-                textSize = 16f
+                textSize = 17f
 
                 setTypeface(
                     typeface,
                     Typeface.BOLD
                 )
+
+                includeFontPadding = false
             }
 
         linhaLucro.addView(
@@ -766,6 +858,8 @@ class OverlayService : Service() {
                         dp(8),
                         dp(2)
                     )
+
+                    includeFontPadding = false
                 }
 
             linhaLucro.addView(
@@ -801,17 +895,19 @@ class OverlayService : Service() {
                         paleta.rotulo
                     )
 
-                    textSize = 11f
+                    textSize = 10f
 
                     gravity =
                         Gravity.CENTER_HORIZONTAL
 
                     setPadding(
                         0,
-                        dp(4),
+                        dp(3),
                         0,
-                        0
+                        dp(3)
                     )
+
+                    includeFontPadding = false
                 }
 
             container.addView(
@@ -820,29 +916,90 @@ class OverlayService : Service() {
         }
 
         /*
-         * IMPORTANTE:
+         * CONFIANÇA E MOTIVO
          *
-         * A informação de confiança da análise
-         * NÃO É MAIS EXIBIDA.
+         * NÃO SÃO EXIBIDOS.
          *
-         * O valor continua sendo calculado e
-         * enviado pelo fluxo interno para futuras
-         * funcionalidades.
+         * Continuam existindo no fluxo interno.
          */
 
         /*
-         * IMPORTANTE:
+         * BOTÃO ACEITEI
          *
-         * O MOTIVO DA DECISÃO TAMBÉM NÃO É MAIS
-         * EXIBIDO.
-         *
-         * Exemplos que deixarão de aparecer:
-         * "Km abaixo do mínimo"
-         * "Hora abaixo do mínimo"
-         * etc.
-         *
-         * A lógica de decisão continua intacta.
+         * Agora fica dentro do próprio card.
          */
+
+        val btnAceitei =
+            TextView(this).apply {
+
+                text =
+                    "✔  Aceitei"
+
+                setTextColor(
+                    Color.WHITE
+                )
+
+                textSize = 12f
+
+                gravity =
+                    Gravity.CENTER
+
+                setTypeface(
+                    typeface,
+                    Typeface.BOLD
+                )
+
+                background =
+                    GradientDrawable().apply {
+
+                        cornerRadius =
+                            dp(9).toFloat()
+
+                        setColor(
+                            Color.parseColor(
+                                "#CC1B5E20"
+                            )
+                        )
+                    }
+
+                setPadding(
+                    dp(18),
+                    dp(6),
+                    dp(18),
+                    dp(6)
+                )
+
+                setOnClickListener {
+
+                    registroIdAtual?.let { id ->
+
+                        HistoricoStorage
+                            .marcarAceita(
+                                this@OverlayService,
+                                id
+                            )
+                    }
+
+                    fecharCard()
+                }
+            }
+
+        val larguraBotao =
+            LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+
+                topMargin =
+                    dp(4)
+            }
+
+        btnAceitei.layoutParams =
+            larguraBotao
+
+        container.addView(
+            btnAceitei
+        )
 
         /*
          * TIPO DA JANELA
@@ -866,6 +1023,9 @@ class OverlayService : Service() {
 
         /*
          * CARD PRINCIPAL
+         *
+         * Removido FLAG_NOT_TOUCHABLE para que
+         * os botões internos funcionem.
          */
 
         val paramsCard =
@@ -874,8 +1034,7 @@ class OverlayService : Service() {
                 WindowManager.LayoutParams.WRAP_CONTENT,
                 layoutType,
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
-                    WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
-                    WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                    WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
                 PixelFormat.TRANSLUCENT
             ).apply {
 
@@ -883,7 +1042,8 @@ class OverlayService : Service() {
                     Gravity.TOP or
                         Gravity.CENTER_HORIZONTAL
 
-                y = dp(60)
+                y =
+                    dp(50)
             }
 
         overlayView =
@@ -904,158 +1064,6 @@ class OverlayService : Service() {
         alertarComSomEVibracao(
             nivel
         )
-
-        /*
-         * BARRA DE AÇÕES
-         */
-
-        val barra =
-            LinearLayout(this).apply {
-
-                orientation =
-                    LinearLayout.HORIZONTAL
-            }
-
-        val btnAceitei =
-            TextView(this).apply {
-
-                text =
-                    "✔ Aceitei"
-
-                setTextColor(
-                    Color.WHITE
-                )
-
-                textSize = 12f
-
-                background =
-                    GradientDrawable().apply {
-
-                        cornerRadius =
-                            dp(8).toFloat()
-
-                        setColor(
-                            Color.parseColor(
-                                "#CC1B5E20"
-                            )
-                        )
-                    }
-
-                setPadding(
-                    dp(12),
-                    dp(6),
-                    dp(12),
-                    dp(6)
-                )
-
-                setOnClickListener {
-
-                    registroIdAtual?.let { id ->
-
-                        HistoricoStorage
-                            .marcarAceita(
-                                this@OverlayService,
-                                id
-                            )
-                    }
-
-                    fecharCard()
-                }
-            }
-
-        val espaco =
-            android.view.View(this).apply {
-
-                layoutParams =
-                    LinearLayout.LayoutParams(
-                        dp(6),
-                        1
-                    )
-            }
-
-        val btnFechar =
-            TextView(this).apply {
-
-                text =
-                    "✕"
-
-                setTextColor(
-                    Color.WHITE
-                )
-
-                textSize = 14f
-
-                gravity =
-                    Gravity.CENTER
-
-                background =
-                    GradientDrawable().apply {
-
-                        cornerRadius =
-                            dp(8).toFloat()
-
-                        setColor(
-                            Color.parseColor(
-                                "#CC000000"
-                            )
-                        )
-                    }
-
-                setPadding(
-                    dp(12),
-                    dp(6),
-                    dp(12),
-                    dp(6)
-                )
-
-                setOnClickListener {
-                    fecharCard()
-                }
-            }
-
-        barra.addView(
-            btnAceitei
-        )
-
-        barra.addView(
-            espaco
-        )
-
-        barra.addView(
-            btnFechar
-        )
-
-        val paramsBarra =
-            WindowManager.LayoutParams(
-                WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.WRAP_CONTENT,
-                layoutType,
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
-                PixelFormat.TRANSLUCENT
-            ).apply {
-
-                gravity =
-                    Gravity.TOP or
-                        Gravity.END
-
-                x = dp(8)
-                y = dp(50)
-            }
-
-        barraAcoes =
-            barra
-
-        try {
-
-            windowManager?.addView(
-                barraAcoes,
-                paramsBarra
-            )
-
-        } catch (_: Exception) {
-
-            barraAcoes = null
-        }
 
         /*
          * FECHAMENTO AUTOMÁTICO
@@ -1086,35 +1094,21 @@ class OverlayService : Service() {
                     LinearLayout.VERTICAL
 
                 gravity =
-                    Gravity.CENTER_HORIZONTAL
+                    Gravity.CENTER
+
+                layoutParams =
+                    LinearLayout.LayoutParams(
+                        0,
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        1f
+                    )
 
                 setPadding(
-                    dp(12),
+                    dp(2),
                     0,
-                    dp(12),
+                    dp(2),
                     0
                 )
-            }
-
-        val txtValor =
-            TextView(this).apply {
-
-                text =
-                    valorTexto
-
-                setTextColor(
-                    corValor
-                )
-
-                textSize = 21f
-
-                setTypeface(
-                    typeface,
-                    Typeface.BOLD
-                )
-
-                gravity =
-                    Gravity.CENTER_HORIZONTAL
             }
 
         val txtRotulo =
@@ -1127,12 +1121,46 @@ class OverlayService : Service() {
                     corRotulo
                 )
 
-                textSize = 11f
+                textSize = 10f
 
                 gravity =
-                    Gravity.CENTER_HORIZONTAL
+                    Gravity.CENTER
 
                 maxLines = 1
+
+                includeFontPadding = false
+            }
+
+        val txtValor =
+            TextView(this).apply {
+
+                text =
+                    valorTexto
+
+                setTextColor(
+                    corValor
+                )
+
+                textSize = 19f
+
+                setTypeface(
+                    typeface,
+                    Typeface.BOLD
+                )
+
+                gravity =
+                    Gravity.CENTER
+
+                maxLines = 1
+
+                includeFontPadding = false
+
+                /*
+                 * Garante que o valor permaneça
+                 * em uma única linha.
+                 */
+                ellipsize =
+                    android.text.TextUtils.TruncateAt.END
             }
 
         coluna.addView(
@@ -1167,20 +1195,6 @@ class OverlayService : Service() {
         }
 
         overlayView = null
-
-        barraAcoes?.let {
-
-            try {
-
-                windowManager?.removeView(
-                    it
-                )
-
-            } catch (_: Exception) {
-            }
-        }
-
-        barraAcoes = null
     }
 
     private fun fecharCard() {
@@ -1228,10 +1242,6 @@ class OverlayService : Service() {
         const val EXTRA_NIVEL =
             "extra_nivel"
 
-        /*
-         * DADOS DA RIDE ANALYSIS
-         */
-
         const val EXTRA_DECISAO =
             "extra_decisao"
 
@@ -1270,11 +1280,6 @@ class OverlayService : Service() {
                     ?.visibility =
                     android.view.View.INVISIBLE
 
-                instanciaAtual
-                    ?.barraAcoes
-                    ?.visibility =
-                    android.view.View.INVISIBLE
-
             } catch (_: Exception) {
             }
         }
@@ -1285,11 +1290,6 @@ class OverlayService : Service() {
 
                 instanciaAtual
                     ?.overlayView
-                    ?.visibility =
-                    android.view.View.VISIBLE
-
-                instanciaAtual
-                    ?.barraAcoes
                     ?.visibility =
                     android.view.View.VISIBLE
 
