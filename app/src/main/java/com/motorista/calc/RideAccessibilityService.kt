@@ -23,7 +23,9 @@ class RideAccessibilityService : AccessibilityService() {
 
     private val recognizer by lazy {
         try {
-            TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
+            TextRecognition.getClient(
+                TextRecognizerOptions.DEFAULT_OPTIONS
+            )
         } catch (e: Exception) {
             Log.e(TAG, "Falha ao criar cliente de OCR: ${e.message}")
             null
@@ -34,25 +36,33 @@ class RideAccessibilityService : AccessibilityService() {
     private var capturandoNoMomento = false
 
     private val handler = Handler(Looper.getMainLooper())
+
     private val pollingIntervalMs = 1500L
 
     private val pollRunnable = object : Runnable {
+
         override fun run() {
+
             try {
-                val monitoramentoAtivo = getSharedPreferences(
-                    PREFS_NAME,
-                    MODE_PRIVATE
-                ).getBoolean(
-                    PREF_MONITORAMENTO_ATIVO,
-                    true
-                )
+
+                val monitoramentoAtivo =
+                    getSharedPreferences(
+                        PREFS_NAME,
+                        MODE_PRIVATE
+                    ).getBoolean(
+                        PREF_MONITORAMENTO_ATIVO,
+                        true
+                    )
 
                 val testeExpirado =
-                    TrialManager.expirou(this@RideAccessibilityService)
+                    TrialManager.expirou(
+                        this@RideAccessibilityService
+                    )
 
                 atualizarNotificacaoJornada()
 
                 if (monitoramentoAtivo && !testeExpirado) {
+
                     verificarLembretePausa()
                     verificarLembreteMeta()
 
@@ -62,6 +72,7 @@ class RideAccessibilityService : AccessibilityService() {
                 }
 
             } catch (e: Exception) {
+
                 Log.e(
                     TAG,
                     "Erro no ciclo de captura: ${e.message}"
@@ -70,6 +81,7 @@ class RideAccessibilityService : AccessibilityService() {
                 capturandoNoMomento = false
 
             } finally {
+
                 handler.postDelayed(
                     this,
                     pollingIntervalMs
@@ -79,6 +91,7 @@ class RideAccessibilityService : AccessibilityService() {
     }
 
     override fun onServiceConnected() {
+
         super.onServiceConnected()
 
         Log.d(
@@ -100,12 +113,14 @@ class RideAccessibilityService : AccessibilityService() {
         }
     }
 
-    override fun onAccessibilityEvent(event: AccessibilityEvent?) {
+    override fun onAccessibilityEvent(
+        event: AccessibilityEvent?
+    ) {
         // O reconhecimento roda via print + OCR em polling.
-        // Este método é mantido porque faz parte do AccessibilityService.
     }
 
     private fun criarCanalPausa() {
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 
             val canal = NotificationChannel(
@@ -123,6 +138,7 @@ class RideAccessibilityService : AccessibilityService() {
     }
 
     private fun criarCanalMeta() {
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 
             val canal = NotificationChannel(
@@ -133,14 +149,15 @@ class RideAccessibilityService : AccessibilityService() {
 
                 enableVibration(true)
 
-                vibrationPattern = longArrayOf(
-                    0,
-                    300,
-                    200,
-                    300,
-                    200,
-                    300
-                )
+                vibrationPattern =
+                    longArrayOf(
+                        0,
+                        300,
+                        200,
+                        300,
+                        200,
+                        300
+                    )
 
                 val somUri =
                     android.media.RingtoneManager.getDefaultUri(
@@ -172,6 +189,7 @@ class RideAccessibilityService : AccessibilityService() {
     }
 
     private fun criarCanalJornada() {
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 
             val canal = NotificationChannel(
@@ -511,6 +529,948 @@ class RideAccessibilityService : AccessibilityService() {
                     .setAutoCancel(true)
                     .build()
 
-            (
+            val gerenciador =
                 getSystemService(
-                    NOT
+                    NOTIFICATION_SERVICE
+                ) as NotificationManager
+
+            gerenciador.notify(
+                NOTIFICACAO_META_ID,
+                notificacao
+            )
+
+        } catch (e: Exception) {
+
+            Log.e(
+                TAG,
+                "Erro ao notificar meta: ${e.message}"
+            )
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.R)
+    private fun tentarCapturarEOcr() {
+
+        if (capturandoNoMomento) {
+            return
+        }
+
+        val ocr =
+            recognizer
+
+        if (ocr == null) {
+
+            registrarStatus(
+                "Cliente de OCR não inicializou (recognizer null)"
+            )
+
+            return
+        }
+
+        capturandoNoMomento = true
+
+        OverlayService.ocultarTemporariamente()
+
+        handler.postDelayed({
+
+            try {
+
+                takeScreenshot(
+                    android.view.Display.DEFAULT_DISPLAY,
+                    executor,
+                    object : TakeScreenshotCallback {
+
+                        override fun onSuccess(
+                            result: ScreenshotResult
+                        ) {
+
+                            OverlayService.restaurarVisibilidade()
+
+                            try {
+
+                                val bitmapHardware =
+                                    Bitmap.wrapHardwareBuffer(
+                                        result.hardwareBuffer,
+                                        result.colorSpace
+                                    )
+
+                                val bitmap =
+                                    bitmapHardware?.copy(
+                                        Bitmap.Config.ARGB_8888,
+                                        false
+                                    )
+
+                                result.hardwareBuffer.close()
+
+                                if (bitmap == null) {
+
+                                    registrarStatus(
+                                        "Print capturado, mas bitmap veio nulo"
+                                    )
+
+                                    capturandoNoMomento = false
+
+                                    return
+                                }
+
+                                val inputImage =
+                                    InputImage.fromBitmap(
+                                        bitmap,
+                                        0
+                                    )
+
+                                ocr.process(inputImage)
+                                    .addOnSuccessListener { visionText ->
+
+                                        try {
+
+                                            val textoOcr =
+                                                visionText.text
+
+                                            registrarStatus(
+                                                "OCR OK (${textoOcr.length} caracteres lidos)"
+                                            )
+
+                                            processarTextoOcr(
+                                                textoOcr
+                                            )
+
+                                        } catch (e: Exception) {
+
+                                            registrarStatus(
+                                                "Erro processando texto do OCR: ${e.message}"
+                                            )
+
+                                        } finally {
+
+                                            capturandoNoMomento = false
+                                        }
+                                    }
+                                    .addOnFailureListener { erro ->
+
+                                        registrarStatus(
+                                            "Falha no OCR: ${erro.message}"
+                                        )
+
+                                        capturandoNoMomento = false
+                                    }
+
+                            } catch (e: Exception) {
+
+                                registrarStatus(
+                                    "Erro processando print: ${e.message}"
+                                )
+
+                                capturandoNoMomento = false
+                            }
+                        }
+
+                        override fun onFailure(
+                            errorCode: Int
+                        ) {
+
+                            OverlayService.restaurarVisibilidade()
+
+                            registrarStatus(
+                                "Falha ao tirar print (código $errorCode)"
+                            )
+
+                            capturandoNoMomento = false
+                        }
+                    }
+                )
+
+            } catch (e: Exception) {
+
+                OverlayService.restaurarVisibilidade()
+
+                registrarStatus(
+                    "Erro ao pedir print: ${e.message}"
+                )
+
+                capturandoNoMomento = false
+            }
+
+        }, 200L)
+    }
+
+    private fun registrarStatus(
+        mensagem: String
+    ) {
+
+        try {
+
+            val prefsDebug =
+                getSharedPreferences(
+                    PREFS_NAME,
+                    MODE_PRIVATE
+                )
+
+            val hora =
+                java.text.SimpleDateFormat(
+                    "HH:mm:ss",
+                    java.util.Locale.getDefault()
+                ).format(
+                    java.util.Date()
+                )
+
+            prefsDebug.edit()
+                .putString(
+                    PREF_STATUS_OCR,
+                    "[$hora] $mensagem"
+                )
+                .apply()
+
+        } catch (e: Exception) {
+            // Ignora erros de debug.
+        }
+    }
+
+    private fun processarTextoOcr(
+        textoBruto: String
+    ) {
+
+        if (
+            textoBruto.isBlank() ||
+            textoBruto == ultimoTextoProcessado
+        ) {
+            return
+        }
+
+        ultimoTextoProcessado =
+            textoBruto
+
+        val texto =
+            TriggerPatterns.limparTextoContaminado(
+                textoBruto
+            )
+
+        registrarDebug(texto)
+
+        if (
+            !TriggerPatterns.pareceTelaDeCorrida(
+                texto
+            )
+        ) {
+            return
+        }
+
+        Log.d(
+            TAG,
+            "Tela de corrida detectada via OCR. Processando..."
+        )
+
+        processarTelaDeCorrida(texto)
+    }
+
+    private fun registrarDebug(
+        texto: String
+    ) {
+
+        try {
+
+            val prefsDebug =
+                getSharedPreferences(
+                    PREFS_NAME,
+                    MODE_PRIVATE
+                )
+
+            val hora =
+                java.text.SimpleDateFormat(
+                    "HH:mm:ss",
+                    java.util.Locale.getDefault()
+                ).format(
+                    java.util.Date()
+                )
+
+            val entradaNova =
+                "=== $hora (OCR) ===\n$texto\n\n"
+
+            val logAntigo =
+                prefsDebug.getString(
+                    PREF_ULTIMO_TEXTO,
+                    ""
+                ) ?: ""
+
+            val novoLog =
+                (
+                    entradaNova +
+                    logAntigo
+                ).take(8000)
+
+            prefsDebug.edit()
+                .putString(
+                    PREF_ULTIMO_TEXTO,
+                    novoLog
+                )
+                .apply()
+
+        } catch (e: Exception) {
+
+            Log.e(
+                TAG,
+                "Erro salvando debug: ${e.message}"
+            )
+        }
+    }
+
+    private fun detectarPlataforma(): String {
+
+        return try {
+
+            val pacote =
+                rootInActiveWindow
+                    ?.packageName
+                    ?.toString()
+                    ?: ""
+
+            when {
+
+                pacote.contains("ubercab") ->
+                    "Uber"
+
+                pacote.contains("app99") ->
+                    "99"
+
+                else ->
+                    "Outro"
+            }
+
+        } catch (e: Exception) {
+
+            "Outro"
+        }
+    }
+
+    private fun obterPrecoEConsumoAtivos(
+        prefs: android.content.SharedPreferences
+    ): Pair<Double, Double> {
+
+        return when (
+            prefs.getString(
+                PREF_COMBUSTIVEL_ATIVO,
+                "etanol"
+            )
+        ) {
+
+            "gasolina" -> Pair(
+                prefs.getFloat(
+                    PREF_PRECO_GASOLINA,
+                    6.10f
+                ).toDouble(),
+                prefs.getFloat(
+                    PREF_CONSUMO_GASOLINA,
+                    10.0f
+                ).toDouble()
+            )
+
+            "gnv" -> Pair(
+                prefs.getFloat(
+                    PREF_PRECO_GNV,
+                    4.50f
+                ).toDouble(),
+                prefs.getFloat(
+                    PREF_CONSUMO_GNV,
+                    12.0f
+                ).toDouble()
+            )
+
+            else -> Pair(
+                prefs.getFloat(
+                    PREF_PRECO_ETANOL,
+                    4.20f
+                ).toDouble(),
+                prefs.getFloat(
+                    PREF_CONSUMO_ETANOL,
+                    7.0f
+                ).toDouble()
+            )
+        }
+    }
+
+    private fun processarTelaDeCorrida(
+        texto: String
+    ) {
+
+        val pernas =
+            TriggerPatterns.extrairPernas(texto)
+
+        val pernaPickup =
+            pernas.firstOrNull()
+
+        val pernaCorrida =
+            pernas.lastOrNull()
+
+        val ride =
+            RideInfo(
+                valorTotal =
+                    TriggerPatterns.extrairValorTotal(texto),
+
+                valorPorKmExibido =
+                    TriggerPatterns.extrairValorPorKmExibido(texto),
+
+                surgeMultiplicador =
+                    TriggerPatterns.extrairSurge(texto),
+
+                avaliacaoPassageiro =
+                    TriggerPatterns.extrairAvaliacao(texto),
+
+                viagemLonga =
+                    TriggerPatterns.ehViagemLonga(texto),
+
+                verificado =
+                    TriggerPatterns.ehVerificado(texto),
+
+                tempoPickupMin =
+                    pernaPickup?.tempoMin,
+
+                distanciaPickupKm =
+                    pernaPickup?.distanciaKm,
+
+                tempoCorridaMin =
+                    if (pernas.size >= 2) {
+                        pernaCorrida?.tempoMin
+                    } else {
+                        pernas.firstOrNull()?.tempoMin
+                    },
+
+                distanciaCorridaKm =
+                    if (pernas.size >= 2) {
+                        pernaCorrida?.distanciaKm
+                    } else {
+                        pernas.firstOrNull()?.distanciaKm
+                    }
+            )
+
+        if (ride.valorTotal == null) {
+
+            Log.d(
+                TAG,
+                "Tela parecia corrida mas não achei valor em R$. Texto: $texto"
+            )
+
+            return
+        }
+
+        if (
+            ride.valorTotal > VALOR_MAXIMO_PLAUSIVEL
+        ) {
+
+            Log.d(
+                TAG,
+                "Valor implausível (R$ ${ride.valorTotal}), provável erro de OCR. Ignorando."
+            )
+
+            registrarStatus(
+                "Valor implausível ignorado: R$ ${ride.valorTotal}"
+            )
+
+            return
+        }
+
+        val prefs =
+            getSharedPreferences(
+                PREFS_NAME,
+                MODE_PRIVATE
+            )
+
+        val financiamento =
+            prefs.getFloat(
+                PREF_FINANCIAMENTO,
+                0f
+            ).toDouble()
+
+        val seguro =
+            prefs.getFloat(
+                PREF_SEGURO,
+                0f
+            ).toDouble()
+
+        val ipvaAnual =
+            prefs.getFloat(
+                PREF_IPVA,
+                0f
+            ).toDouble()
+
+        val licenciamentoAnual =
+            prefs.getFloat(
+                PREF_LICENCIAMENTO,
+                0f
+            ).toDouble()
+
+        val manutencao =
+            prefs.getFloat(
+                PREF_MANUTENCAO,
+                0f
+            ).toDouble()
+
+        val contasPessoais =
+            prefs.getFloat(
+                PREF_CONTAS_PESSOAIS,
+                0f
+            ).toDouble()
+
+        val kmMes =
+            prefs.getFloat(
+                PREF_KM_MES,
+                3000f
+            ).toDouble()
+
+        val custoFixoMensal =
+            financiamento +
+            seguro +
+            (ipvaAnual / 12.0) +
+            (licenciamentoAnual / 12.0) +
+            manutencao +
+            contasPessoais
+
+        val custoFixoPorKm =
+            if (kmMes > 0) {
+                custoFixoMensal / kmMes
+            } else {
+                0.0
+            }
+
+        val (
+            precoAtivo,
+            consumoAtivo
+        ) =
+            obterPrecoEConsumoAtivos(
+                prefs
+            )
+
+        val engine =
+            CalculationEngine(
+                precoCombustivelPorLitro =
+                    precoAtivo,
+
+                consumoKmPorLitro =
+                    consumoAtivo,
+
+                minimoValorPorKm =
+                    prefs.getFloat(
+                        PREF_MIN_KM,
+                        1.50f
+                    ).toDouble(),
+
+                minimoValorPorHora =
+                    prefs.getFloat(
+                        PREF_MIN_HORA,
+                        25.0f
+                    ).toDouble(),
+
+                custoFixoPorKm =
+                    custoFixoPorKm
+            )
+
+        /*
+         * NOVA CAMADA DE ANÁLISE
+         */
+        val plataforma =
+            detectarPlataforma()
+
+        val analise =
+            RideAnalysis.criar(
+                ride = ride,
+                engine = engine,
+                plataforma = plataforma
+            )
+
+        val resultado =
+            analise.result
+
+        Log.d(
+            TAG,
+            "================ ANÁLISE DA CORRIDA ================"
+        )
+
+        Log.d(
+            TAG,
+            "Ride: ${analise.ride}"
+        )
+
+        Log.d(
+            TAG,
+            "Plataforma: ${analise.plataforma}"
+        )
+
+        Log.d(
+            TAG,
+            "Distância total: ${analise.distanciaTotalKm} km"
+        )
+
+        Log.d(
+            TAG,
+            "Tempo total: ${analise.tempoTotalMin} min"
+        )
+
+        Log.d(
+            TAG,
+            "R$/km: ${analise.valorPorKm}"
+        )
+
+        Log.d(
+            TAG,
+            "R$/hora: ${analise.valorPorHora}"
+        )
+
+        Log.d(
+            TAG,
+            "Lucro líquido: ${analise.lucroLiquido}"
+        )
+
+        Log.d(
+            TAG,
+            "Lucro %: ${analise.percentualLucro}"
+        )
+
+        Log.d(
+            TAG,
+            "Custo total estimado: ${analise.custoTotalEstimado}"
+        )
+
+        Log.d(
+            TAG,
+            "Decisão: ${analise.decisao}"
+        )
+
+        Log.d(
+            TAG,
+            "Confiança dos dados: ${analise.confiancaDados}%"
+        )
+
+        Log.d(
+            TAG,
+            "Motivo: ${analise.motivo}"
+        )
+
+        Log.d(
+            TAG,
+            "======================================================"
+        )
+
+        val distanciaTotalKm =
+            analise.distanciaTotalKm
+
+        val tempoTotalMin =
+            analise.tempoTotalMin
+
+        val (
+            registroId,
+            registroNovo
+        ) =
+            HistoricoStorage.adicionarRegistro(
+                context = this,
+                valorTotal = ride.valorTotal,
+                distanciaTotalKm = distanciaTotalKm,
+                tempoTotalMin = tempoTotalMin,
+                valorPorKm = resultado.valorPorKmCalculado,
+                valorPorHora = resultado.valorPorHoraEfetivo,
+                lucroLiquido = resultado.lucroLiquidoEstimado,
+                valeAPena = resultado.valeAPena,
+                plataforma = plataforma
+            )
+
+        if (!registroNovo) {
+
+            Log.d(
+                TAG,
+                "Oferta repetida detectada, ignorando reexibição do card."
+            )
+
+            return
+        }
+
+        handler.removeCallbacks(
+            pollRunnable
+        )
+
+        OverlayService.aoFechar = {
+            handler.post(
+                pollRunnable
+            )
+        }
+
+        val percentualLucro =
+            analise.percentualLucro
+
+        val intent =
+            Intent(
+                this,
+                OverlayService::class.java
+            ).apply {
+
+                putExtra(
+                    OverlayService.EXTRA_REGISTRO_ID,
+                    registroId
+                )
+
+                putExtra(
+                    OverlayService.EXTRA_NIVEL,
+                    resultado.nivel.ordinal
+                )
+
+                resultado.valorPorKmCalculado?.let { valorKm ->
+                    putExtra(
+                        OverlayService.EXTRA_VALOR_KM_CALC,
+                        valorKm
+                    )
+                }
+
+                resultado.valorPorHoraEfetivo?.let { valorHora ->
+                    putExtra(
+                        OverlayService.EXTRA_VALOR_HORA_EFETIVO,
+                        valorHora
+                    )
+                }
+
+                resultado.valorPorMinutoEfetivo?.let { valorMinuto ->
+                    putExtra(
+                        OverlayService.EXTRA_VALOR_MINUTO_EFETIVO,
+                        valorMinuto
+                    )
+                }
+
+                resultado.lucroLiquidoEstimado?.let { lucro ->
+                    putExtra(
+                        OverlayService.EXTRA_LUCRO,
+                        lucro
+                    )
+                }
+
+                percentualLucro?.let { percentual ->
+                    putExtra(
+                        OverlayService.EXTRA_PERCENTUAL_LUCRO,
+                        percentual
+                    )
+                }
+            }
+
+        startService(intent)
+
+        if (
+            Build.VERSION.SDK_INT >=
+            Build.VERSION_CODES.R
+        ) {
+
+            handler.postDelayed(
+                {
+                    salvarPrintDoMomento()
+                },
+                500L
+            )
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.R)
+    private fun salvarPrintDoMomento() {
+
+        try {
+
+            takeScreenshot(
+                android.view.Display.DEFAULT_DISPLAY,
+                executor,
+                object : TakeScreenshotCallback {
+
+                    override fun onSuccess(
+                        result: ScreenshotResult
+                    ) {
+
+                        try {
+
+                            val bitmapHardware =
+                                Bitmap.wrapHardwareBuffer(
+                                    result.hardwareBuffer,
+                                    result.colorSpace
+                                )
+
+                            val bitmap =
+                                bitmapHardware?.copy(
+                                    Bitmap.Config.ARGB_8888,
+                                    false
+                                )
+
+                            result.hardwareBuffer.close()
+
+                            if (bitmap != null) {
+
+                                PrintsStorage.salvar(
+                                    this@RideAccessibilityService,
+                                    bitmap
+                                )
+                            }
+
+                        } catch (e: Exception) {
+
+                            Log.e(
+                                TAG,
+                                "Erro salvando print do momento: ${e.message}"
+                            )
+                        }
+                    }
+
+                    override fun onFailure(
+                        errorCode: Int
+                    ) {
+
+                        Log.e(
+                            TAG,
+                            "Falha ao tirar print pra salvar (código $errorCode)"
+                        )
+                    }
+                }
+            )
+
+        } catch (e: Exception) {
+
+            Log.e(
+                TAG,
+                "Erro ao pedir print: ${e.message}"
+            )
+        }
+    }
+
+    override fun onInterrupt() {
+
+        Log.w(
+            TAG,
+            "Serviço de acessibilidade interrompido"
+        )
+    }
+
+    override fun onDestroy() {
+
+        super.onDestroy()
+
+        handler.removeCallbacks(
+            pollRunnable
+        )
+
+        executor.shutdown()
+
+        (
+            getSystemService(
+                NOTIFICATION_SERVICE
+            ) as NotificationManager
+        ).cancel(
+            NOTIFICACAO_JORNADA_ID
+        )
+    }
+
+    companion object {
+
+        private const val TAG =
+            "RideAccessibility"
+
+        const val PREFS_NAME =
+            "motorista_calc_prefs"
+
+        const val PREF_PRECO_COMBUSTIVEL =
+            "preco_combustivel"
+
+        const val PREF_CONSUMO =
+            "consumo_km_litro"
+
+        const val PREF_MIN_KM =
+            "minimo_valor_km"
+
+        const val PREF_MIN_HORA =
+            "minimo_valor_hora"
+
+        const val PREF_SALVAR_PRINT =
+            "salvar_print"
+
+        const val PREF_ULTIMO_TEXTO =
+            "ultimo_texto_capturado"
+
+        const val PREF_STATUS_OCR =
+            "status_ocr"
+
+        const val PREF_MONITORAMENTO_ATIVO =
+            "monitoramento_ativo"
+
+        const val PREF_FINANCIAMENTO =
+            "financiamento_mensal"
+
+        const val PREF_SEGURO =
+            "seguro_mensal"
+
+        const val PREF_IPVA =
+            "ipva_anual"
+
+        const val PREF_LICENCIAMENTO =
+            "licenciamento_anual"
+
+        const val PREF_MANUTENCAO =
+            "manutencao_mensal"
+
+        const val PREF_CONTAS_PESSOAIS =
+            "contas_pessoais_mensal"
+
+        const val PREF_KM_MES =
+            "km_rodados_mes"
+
+        const val PREF_INICIO_SESSAO =
+            "inicio_sessao_millis"
+
+        const val PREF_LIMITE_PAUSA_HORAS =
+            "limite_pausa_horas"
+
+        const val PREF_COMBUSTIVEL_ATIVO =
+            "combustivel_ativo"
+
+        const val PREF_PRECO_GASOLINA =
+            "preco_gasolina"
+
+        const val PREF_CONSUMO_GASOLINA =
+            "consumo_gasolina"
+
+        const val PREF_PRECO_ETANOL =
+            "preco_etanol"
+
+        const val PREF_CONSUMO_ETANOL =
+            "consumo_etanol"
+
+        const val PREF_PRECO_GNV =
+            "preco_gnv"
+
+        const val PREF_CONSUMO_GNV =
+            "consumo_gnv"
+
+        const val PREF_ULTIMO_LEMBRETE_META =
+            "ultimo_lembrete_meta_millis"
+
+        const val PREF_META_SEMANAL =
+            "meta_semanal"
+
+        const val PREF_META_MENSAL =
+            "meta_mensal"
+
+        const val PREF_ULTIMA_NOTIFICACAO_JORNADA =
+            "ultima_notificacao_jornada_millis"
+
+        private const val VALOR_MAXIMO_PLAUSIVEL =
+            300.0
+
+        private const val CANAL_PAUSA_ID =
+            "lembrete_pausa"
+
+        private const val NOTIFICACAO_PAUSA_ID =
+            772
+
+        private const val CANAL_META_ID =
+            "lembrete_meta"
+
+        private const val NOTIFICACAO_META_ID =
+            773
+
+        private const val CANAL_JORNADA_ID =
+            "jornada_ao_vivo"
+
+        private const val NOTIFICACAO_JORNADA_ID =
+            774
+
+        private const val INTERVALO_LEMBRETE_META_MS =
+            30L * 60 * 1000
+    }
+}
