@@ -162,9 +162,13 @@ class MainActivity : AppCompatActivity() {
             .putLong(RideAccessibilityService.PREF_ULTIMO_LEMBRETE_META, System.currentTimeMillis())
             .apply()
 
+        if (android.provider.Settings.canDrawOverlays(this)) {
+            ContextCompat.startForegroundService(this, Intent(this, ChatHeadService::class.java))
+        }
+
         atualizarTelaJornada()
     }
-
+    
     private fun atualizarTelaJornada() {
         val grupoNovaJornada = findViewById<android.view.View>(R.id.grupoNovaJornada)
         val grupoAndamento = findViewById<android.view.View>(R.id.grupoJornadaAndamento)
