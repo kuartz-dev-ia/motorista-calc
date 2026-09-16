@@ -39,8 +39,7 @@ class EncerrarJornadaActivity : AppCompatActivity() {
         val n99 = edtValor99.text.toString().toDoubleOrNull() ?: 0.0
         txtTotalPreview.text = "R$ %.2f".format(uber + n99)
     }
-
-    private fun confirmarEncerramento() {
+private fun confirmarEncerramento() {
         val jornada = JornadaStorage.jornadaAtiva(this)
         if (jornada == null) {
             Toast.makeText(this, "Nenhuma jornada em andamento.", Toast.LENGTH_LONG).show()
@@ -65,6 +64,8 @@ class EncerrarJornadaActivity : AppCompatActivity() {
             .putLong(RideAccessibilityService.PREF_INICIO_SESSAO, 0L)
             .apply()
 
+        stopService(Intent(this, ChatHeadService::class.java))
+
         val jornadaAtualizada = JornadaStorage.listarTodas(this).first { it.id == jornada.id }
         val stats = JornadaStorage.calcularStats(this, jornadaAtualizada)
 
@@ -76,4 +77,5 @@ class EncerrarJornadaActivity : AppCompatActivity() {
 
         finish()
     }
+    
 }
