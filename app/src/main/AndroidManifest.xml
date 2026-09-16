@@ -132,7 +132,12 @@
             android:name=".RideRecorderService"
             android:exported="false"
             android:foregroundServiceType="camera|microphone" />
-
+        
+        <service
+            android:name=".ChatHeadService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse" />
+        
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
