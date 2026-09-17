@@ -137,6 +137,10 @@
             android:name=".ChatHeadService"
             android:exported="false"
             android:foregroundServiceType="specialUse" />
+
+        <service
+            android:name=".ResumoOverlayService"
+            android:exported="false" />
         
         <provider
             android:name="androidx.core.content.FileProvider"
