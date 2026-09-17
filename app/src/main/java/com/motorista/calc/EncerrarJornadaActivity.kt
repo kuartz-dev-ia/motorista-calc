@@ -1,5 +1,6 @@
 package com.motorista.calc
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.EditText
 import android.widget.TextView
@@ -39,7 +40,8 @@ class EncerrarJornadaActivity : AppCompatActivity() {
         val n99 = edtValor99.text.toString().toDoubleOrNull() ?: 0.0
         txtTotalPreview.text = "R$ %.2f".format(uber + n99)
     }
-private fun confirmarEncerramento() {
+
+    private fun confirmarEncerramento() {
         val jornada = JornadaStorage.jornadaAtiva(this)
         if (jornada == null) {
             Toast.makeText(this, "Nenhuma jornada em andamento.", Toast.LENGTH_LONG).show()
@@ -77,5 +79,4 @@ private fun confirmarEncerramento() {
 
         finish()
     }
-    
 }
