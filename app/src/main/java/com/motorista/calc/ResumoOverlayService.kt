@@ -25,16 +25,17 @@ class ResumoOverlayService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val valor = intent?.getDoubleExtra(EXTRA_VALOR, -1.0)?.takeIf { it > 0 } ?: return START_NOT_STICKY
-        val viagens = intent.getIntExtra(EXTRA_VIAGENS, 0)
         val plataforma = intent.getStringExtra(EXTRA_PLATAFORMA) ?: "Outro"
+        val categoria = intent.getStringExtra(EXTRA_CATEGORIA)
+        val horario = intent.getStringExtra(EXTRA_HORARIO)
 
-        mostrarCard(valor, viagens, plataforma)
+        mostrarCard(valor, plataforma, categoria, horario)
         return START_NOT_STICKY
     }
 
     private fun dp(v: Int) = (v * resources.displayMetrics.density).toInt()
 
-    private fun mostrarCard(valor: Double, viagens: Int, plataforma: String) {
+    private fun mostrarCard(valor: Double, plataforma: String, categoria: String?, horario: String?) {
         limpar()
         windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
 
@@ -53,7 +54,7 @@ class ResumoOverlayService : Service() {
         val emoji = when (plataforma) { "Uber" -> "⬛"; "99" -> "🟡"; else -> "🚗" }
 
         container.addView(TextView(this).apply {
-            text = "$emoji $plataforma · FATURAMENTO DETECTADO"
+            text = "$emoji $plataforma · ÚLTIMA VIAGEM DETECTADA"
             setTextColor(Color.parseColor("#8B96AC"))
             textSize = 10.5f
             setTypeface(typeface, Typeface.BOLD)
@@ -67,19 +68,24 @@ class ResumoOverlayService : Service() {
             setPadding(0, dp(4), 0, dp(2))
         })
 
-        if (viagens > 0) {
+        val detalhes = listOfNotNull(categoria, horario).joinToString("  •  ")
+        if (detalhes.isNotBlank()) {
             container.addView(TextView(this).apply {
-                text = "$viagens corrida(s) hoje"
+                text = detalhes
                 setTextColor(Color.parseColor("#8B96AC"))
                 textSize = 11f
                 setPadding(0, 0, 0, dp(10))
+            })
+        } else {
+            container.addView(android.view.View(this).apply {
+                layoutParams = LinearLayout.LayoutParams(0, dp(10))
             })
         }
 
         val linhaBotoes = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
 
         val btnSalvar = TextView(this).apply {
-            text = "✔ Salvar"
+            text = "✔ Salvar corrida"
             setTextColor(Color.parseColor("#052018"))
             textSize = 12.5f
             setTypeface(typeface, Typeface.BOLD)
@@ -141,7 +147,7 @@ class ResumoOverlayService : Service() {
                 plataforma = plataforma
             )
             if (novo) HistoricoStorage.marcarAceita(this, id)
-            Toast.makeText(this, "Faturamento salvo no histórico de hoje", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Corrida salva no histórico de hoje", Toast.LENGTH_SHORT).show()
         } catch (e: Exception) {
             Toast.makeText(this, "Erro ao salvar: ${e.message}", Toast.LENGTH_LONG).show()
         }
@@ -162,7 +168,8 @@ class ResumoOverlayService : Service() {
 
     companion object {
         const val EXTRA_VALOR = "extra_valor_resumo"
-        const val EXTRA_VIAGENS = "extra_viagens_resumo"
         const val EXTRA_PLATAFORMA = "extra_plataforma_resumo"
+        const val EXTRA_CATEGORIA = "extra_categoria_resumo"
+        const val EXTRA_HORARIO = "extra_horario_resumo"
     }
 }
