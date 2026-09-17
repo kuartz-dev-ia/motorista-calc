@@ -305,10 +305,11 @@ class RideAccessibilityService : AccessibilityService() {
             return
         }
 
-        if (ResumoDetector.pareceTelaDeResumoGanhos(texto)) {
-            Log.d(TAG, "Tela de resumo de ganhos detectada via OCR. Processando...")
-            processarTelaDeResumo(texto)
+        if (ResumoDetector.pareceUltimaViagem(texto)) {
+            Log.d(TAG, "Tela de 'última viagem' detectada via OCR. Processando...")
+            processarUltimaViagem(texto)
         }
+
     }
 
     private fun registrarDebug(texto: String) {
@@ -337,21 +338,7 @@ class RideAccessibilityService : AccessibilityService() {
         }
     }
 
-    private fun processarTelaDeResumo(texto: String) {
-        val valor = ResumoDetector.extrairValorTotal(texto) ?: return
-        if (valor <= 0 || valor > VALOR_MAXIMO_PLAUSIVEL_RESUMO) return
-
-        val viagens = ResumoDetector.extrairQtdViagens(texto) ?: 0
-        val plataforma = detectarPlataforma()
-
-        val intent = Intent(this, ResumoOverlayService::class.java).apply {
-            putExtra(ResumoOverlayService.EXTRA_VALOR, valor)
-            putExtra(ResumoOverlayService.EXTRA_VIAGENS, viagens)
-            putExtra(ResumoOverlayService.EXTRA_PLATAFORMA, plataforma)
-        }
-        startService(intent)
-    }
-
+    
     private fun obterPrecoEConsumoAtivos(prefs: android.content.SharedPreferences): Pair<Double, Double> {
         return when (prefs.getString(PREF_COMBUSTIVEL_ATIVO, "etanol")) {
             "gasolina" -> Pair(
@@ -367,6 +354,23 @@ class RideAccessibilityService : AccessibilityService() {
                 prefs.getFloat(PREF_CONSUMO_ETANOL, 7.0f).toDouble()
             )
         }
+    }
+    
+    private fun processarUltimaViagem(texto: String) {
+        val valor = ResumoDetector.extrairValorUltimaViagem(texto) ?: return
+        if (valor <= 0 || valor > VALOR_MAXIMO_PLAUSIVEL_RESUMO) return
+
+        val categoria = ResumoDetector.extrairCategoria(texto)
+        val horario = ResumoDetector.extrairHorario(texto)
+        val plataforma = detectarPlataforma()
+
+        val intent = Intent(this, ResumoOverlayService::class.java).apply {
+            putExtra(ResumoOverlayService.EXTRA_VALOR, valor)
+            putExtra(ResumoOverlayService.EXTRA_PLATAFORMA, plataforma)
+            categoria?.let { putExtra(ResumoOverlayService.EXTRA_CATEGORIA, it) }
+            horario?.let { putExtra(ResumoOverlayService.EXTRA_HORARIO, it) }
+        }
+        startService(intent)
     }
 
     private fun processarTelaDeCorrida(texto: String) {
