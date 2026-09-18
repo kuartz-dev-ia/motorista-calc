@@ -118,6 +118,12 @@
             android:exported="false"
             android:label="Saúde do Veículo" />
 
+        <activity
+            android:name=".EventosActivity"
+            android:exported="false"
+            android:label="Radar de Eventos" />
+        
+
         <service
             android:name=".RideAccessibilityService"
             android:exported="true"
