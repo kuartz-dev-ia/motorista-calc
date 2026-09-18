@@ -466,6 +466,9 @@ class RideAccessibilityService : AccessibilityService() {
             resultado.valorPorMinutoEfetivo?.let { putExtra(OverlayService.EXTRA_VALOR_MINUTO_EFETIVO, it) }
             resultado.lucroLiquidoEstimado?.let { putExtra(OverlayService.EXTRA_LUCRO, it) }
             percentualLucro?.let { putExtra(OverlayService.EXTRA_PERCENTUAL_LUCRO, it) }
+            putExtra(OverlayService.EXTRA_DISTANCIA_KM, distanciaTotalKm)
+            putExtra(OverlayService.EXTRA_TEMPO_MIN, tempoTotalMin)
+            resultado.custoCombustivelEstimado?.let { putExtra(OverlayService.EXTRA_CUSTO_COMBUSTIVEL, it) }
         }
         startService(intent)
 
