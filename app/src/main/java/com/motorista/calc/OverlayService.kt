@@ -41,9 +41,12 @@ class OverlayService : Service() {
         val valorMinutoEfetivo = intent.getDoubleOrNull(EXTRA_VALOR_MINUTO_EFETIVO)
         val lucro = intent.getDoubleOrNull(EXTRA_LUCRO)
         val percentualLucro = intent.getDoubleOrNull(EXTRA_PERCENTUAL_LUCRO)
+        val distanciaKm = intent.getDoubleOrNull(EXTRA_DISTANCIA_KM)
+        val tempoMin = if (intent.hasExtra(EXTRA_TEMPO_MIN)) intent.getIntExtra(EXTRA_TEMPO_MIN, -1).takeIf { it >= 0 } else null
+        val custoCombustivel = intent.getDoubleOrNull(EXTRA_CUSTO_COMBUSTIVEL)
         val nivel = NivelCorrida.values().getOrElse(intent.getIntExtra(EXTRA_NIVEL, 0)) { NivelCorrida.RUIM }
 
-        mostrarOverlay(registroId, valorKmCalc, valorHoraEfetivo, valorMinutoEfetivo, lucro, percentualLucro, nivel)
+        mostrarOverlay(registroId, valorKmCalc, valorHoraEfetivo, valorMinutoEfetivo, lucro, percentualLucro, distanciaKm, tempoMin, custoCombustivel, nivel)
         return START_NOT_STICKY
     }
 
@@ -59,6 +62,9 @@ class OverlayService : Service() {
         valorMinutoEfetivo: Double?,
         lucro: Double?,
         percentualLucro: Double?,
+        distanciaKm: Double?,
+        tempoMin: Int?,
+        custoCombustivel: Double?,
         nivel: NivelCorrida
     ) {
         limparViewsSemCallback()
@@ -148,6 +154,22 @@ class OverlayService : Service() {
             linhaLucro.addView(txtPercentual)
         }
         container.addView(linhaLucro)
+
+        val detalhes = mutableListOf<String>()
+        distanciaKm?.let { detalhes.add("%.1f km".format(it)) }
+        tempoMin?.let { detalhes.add("$it min") }
+        custoCombustivel?.let { detalhes.add("⛽ R$ %.2f".format(it)) }
+
+        if (detalhes.isNotEmpty()) {
+            val txtDetalhes = TextView(this).apply {
+                text = detalhes.joinToString("  •  ")
+                setTextColor(paleta.rotulo)
+                textSize = 11f
+                gravity = Gravity.CENTER_HORIZONTAL
+                setPadding(0, dp(4), 0, 0)
+            }
+            container.addView(txtDetalhes)
+        }
 
         val layoutType = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
@@ -292,6 +314,9 @@ class OverlayService : Service() {
         const val EXTRA_VALOR_MINUTO_EFETIVO = "extra_valor_minuto_efetivo"
         const val EXTRA_LUCRO = "extra_lucro"
         const val EXTRA_PERCENTUAL_LUCRO = "extra_percentual_lucro"
+        const val EXTRA_DISTANCIA_KM = "extra_distancia_km"
+        const val EXTRA_TEMPO_MIN = "extra_tempo_min"
+        const val EXTRA_CUSTO_COMBUSTIVEL = "extra_custo_combustivel"
         const val EXTRA_NIVEL = "extra_nivel"
 
         private const val DURACAO_EXIBICAO_MS = 10000L
