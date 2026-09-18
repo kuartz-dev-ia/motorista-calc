@@ -84,20 +84,50 @@ object ManutencaoStorage {
         return AbastecimentoStorage.listarTodos(context).maxByOrNull { it.dataHora }?.kmAtual
     }
 
+    /** Pra cada tipo de manutenção, pega o registro mais recente. */
+    fun itensAtuais(context: Context): List<Manutencao> {
+        return listarTodos(context).groupBy { it.tipo }.mapNotNull { (_, registros) -> registros.maxByOrNull { it.dataHora } }
+    }
+
     /** Pra cada tipo de manutenção, pega o registro mais recente e verifica se
      * já passou do km ou da data prevista pra próxima. */
     fun pendencias(context: Context): List<Manutencao> {
-        val lista = listarTodos(context)
-        val maisRecentePorTipo = lista.groupBy { it.tipo }.mapValues { it.value.maxByOrNull { m -> it.value.indexOf(m) }!! }
         val kmAtual = kmAtualEstimada(context)
         val agora = System.currentTimeMillis()
 
-        return lista.groupBy { it.tipo }
-            .mapNotNull { (_, registros) -> registros.maxByOrNull { it.dataHora } }
-            .filter { registro ->
-                val venceuPorKm = registro.proximaKm != null && kmAtual != null && kmAtual >= registro.proximaKm
-                val venceuPorData = registro.proximaDataMillis != null && agora >= registro.proximaDataMillis
-                venceuPorKm || venceuPorData
-            }
+        return itensAtuais(context).filter { registro ->
+            val venceuPorKm = registro.proximaKm != null && kmAtual != null && kmAtual >= registro.proximaKm
+            val venceuPorData = registro.proximaDataMillis != null && agora >= registro.proximaDataMillis
+            venceuPorKm || venceuPorData
+        }
+    }
+
+    /** Percentual de "saúde" de um item (0 a 100), com base no km restante até
+     * a próxima manutenção. Retorna null se o item não tiver lembrete por km
+     * configurado. */
+    fun percentualSaude(item: Manutencao, kmAtual: Double?): Double? {
+        val proximaKm = item.proximaKm ?: return null
+        val intervalo = proximaKm - item.kmRegistrado
+        if (intervalo <= 0) return null
+        val km = kmAtual ?: item.kmRegistrado
+        val restante = proximaKm - km
+        return (restante / intervalo * 100).coerceIn(0.0, 100.0)
+    }
+
+    /** Saúde geral do veículo: média dos percentuais de todos os itens que
+     * têm lembrete por km configurado. Null se nenhum item tiver isso. */
+    fun saudeGeral(context: Context): Double? {
+        val kmAtual = kmAtualEstimada(context)
+        val percentuais = itensAtuais(context).mapNotNull { percentualSaude(it, kmAtual) }
+        return if (percentuais.isNotEmpty()) percentuais.average() else null
+    }
+
+    /** "Registra o serviço": cria um novo registro do mesmo tipo, com o km/data
+     * atuais, mantendo o mesmo intervalo de lembrete configurado antes. */
+    fun registrarServico(context: Context, item: Manutencao) {
+        val kmAtual = kmAtualEstimada(context) ?: item.kmRegistrado
+        val intervaloKm = item.proximaKm?.let { it - item.kmRegistrado }
+        val intervaloDias = item.proximaDataMillis?.let { ((it - item.dataHora) / (24L * 60 * 60 * 1000)).toInt() }
+        adicionar(context, item.tipo, kmAtual, item.custo, intervaloKm, intervaloDias)
     }
 }
