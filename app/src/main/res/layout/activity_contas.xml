@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#070C14">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="#0F1B2D"
+            android:padding="16dp"
+            android:paddingBottom="18dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="💰 Minhas Contas"
+                android:textColor="#FFFFFF"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Contas fixas e recorrentes"
+                android:textColor="#8B96AC"
+                android:textSize="10sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_tint_green"
+                android:padding="14dp"
+                android:layout_marginBottom="12dp">
+
+                <TextView
+                    android:id="@+id/txtTotalContas"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Total mensal: R$ 0,00"
+                    android:textColor="#1FE7A0"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_card_dark"
+                android:padding="16dp"
+                android:layout_marginBottom="12dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Nova conta"
+                    android:textColor="#FFFFFF"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="10dp" />
+
+                <EditText
+                    android:id="@+id/edtNomeConta"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@drawable/bg_input_verde"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp"
+                    android:gravity="center_vertical"
+                    android:textColor="#FFFFFF"
+                    android:textColorHint="#8B96AC"
+                    android:hint="Nome (ex: Financiamento do carro)"
+                    android:textSize="13sp"
+                    android:layout_marginBottom="10dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="10dp">
+
+                    <EditText
+                        android:id="@+id/edtValorConta"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="6dp"
+                        android:background="@drawable/bg_input_verde"
+                        android:gravity="center"
+                        android:textColor="#FFFFFF"
+                        android:textColorHint="#8B96AC"
+                        android:hint="Valor (R$)"
+                        android:textSize="14sp"
+                        android:inputType="numberDecimal" />
+
+                    <EditText
+                        android:id="@+id/edtDiaVencimento"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_input_verde"
+                        android:gravity="center"
+                        android:textColor="#FFFFFF"
+                        android:textColorHint="#8B96AC"
+                        android:hint="Dia venc. (opcional)"
+                        android:textSize="12sp"
+                        android:inputType="number" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Categoria"
+                    android:textColor="#8B96AC"
+                    android:textSize="11sp"
+                    android:layout_marginBottom="6dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="12dp">
+
+                    <TextView
+                        android:id="@+id/chipCasa"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="4dp"
+                        android:background="@drawable/bg_chip_selected"
+                        android:gravity="center"
+                        android:padding="10dp"
+                        android:text="🏠"
+                        android:textColor="#08131A"
+                        android:textSize="14sp"
+                        android:clickable="true"
+                        android:focusable="true" />
+
+                    <TextView
+                        android:id="@+id/chipCarro"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="4dp"
+                        android:background="@drawable/bg_chip_unselected"
+                        android:gravity="center"
+                        android:padding="10dp"
+                        android:text="🚗"
+                        android:textColor="#8B96AC"
+                        android:textSize="14sp"
+                        android:clickable="true"
+                        android:focusable="true" />
+
+                    <TextView
+                        android:id="@+id/chipMoto"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="4dp"
+                        android:background="@drawable/bg_chip_unselected"
+                        android:gravity="center"
+                        android:padding="10dp"
+                        android:text="🏍️"
+                        android:textColor="#8B96AC"
+                        android:textSize="14sp"
+                        android:clickable="true"
+                        android:focusable="true" />
+
+                    <TextView
+                        android:id="@+id/chipCartao"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="4dp"
+                        android:background="@drawable/bg_chip_unselected"
+                        android:gravity="center"
+                        android:padding="10dp"
+                        android:text="💳"
+                        android:textColor="#8B96AC"
+                        android:textSize="14sp"
+                        android:clickable="true"
+                        android:focusable="true" />
+
+                    <TextView
+                        android:id="@+id/chipOutro"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_chip_unselected"
+                        android:gravity="center"
+                        android:padding="10dp"
+                        android:text="📦"
+                        android:textColor="#8B96AC"
+                        android:textSize="14sp"
+                        android:clickable="true"
+                        android:focusable="true" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/btnSalvarConta"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_cta_start"
+                    android:padding="13dp"
+                    android:gravity="center"
+                    android:text="Salvar conta"
+                    android:textColor="#052018"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:clickable="true"
+                    android:focusable="true" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Suas contas (toque no status pra marcar como paga/pendente)"
+                android:textColor="#8B96AC"
+                android:textSize="10.5sp"
+                android:layout_marginBottom="8dp" />
+
+            <LinearLayout
+                android:id="@+id/containerContas"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>
