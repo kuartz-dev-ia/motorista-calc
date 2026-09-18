@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#070C14">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="#0F1B2D"
+            android:padding="16dp"
+            android:paddingBottom="18dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="📡 Radar de Eventos"
+                android:textColor="#FFFFFF"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Shows, jogos e eventos de alta demanda"
+                android:textColor="#8B96AC"
+                android:textSize="10sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_card_dark"
+                android:padding="16dp"
+                android:layout_marginBottom="12dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Novo evento"
+                    android:textColor="#FFFFFF"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="10dp" />
+
+                <TextView
+                    android:id="@+id/btnExtrairImagem"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_input_verde"
+                    android:padding="12dp"
+                    android:gravity="center"
+                    android:text="📷 Extrair texto de uma imagem (print/panfleto)"
+                    android:textColor="#3DB8F5"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="10dp"
+                    android:clickable="true"
+                    android:focusable="true" />
+
+                <TextView
+                    android:id="@+id/txtTextoExtraido"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_tint_blue"
+                    android:padding="10dp"
+                    android:textColor="#E4E7EC"
+                    android:textSize="11sp"
+                    android:textIsSelectable="true"
+                    android:layout_marginBottom="10dp"
+                    android:visibility="gone" />
+
+                <EditText
+                    android:id="@+id/edtNomeEvento"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@drawable/bg_input_verde"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp"
+                    android:gravity="center_vertical"
+                    android:textColor="#FFFFFF"
+                    android:textColorHint="#8B96AC"
+                    android:hint="Nome do evento"
+                    android:textSize="13sp"
+                    android:layout_marginBottom="10dp" />
+
+                <EditText
+                    android:id="@+id/edtEnderecoEvento"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@drawable/bg_input_verde"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp"
+                    android:gravity="center_vertical"
+                    android:textColor="#FFFFFF"
+                    android:textColorHint="#8B96AC"
+                    android:hint="Endereço / local / cidade-UF"
+                    android:textSize="13sp"
+                    android:layout_marginBottom="10dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="10dp">
+
+                    <TextView
+                        android:id="@+id/chipShow"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="4dp"
+                        android:background="@drawable/bg_chip_selected"
+                        android:gravity="center"
+                        android:padding="9dp"
+                        android:text="🎤 Show"
+                        android:textColor="#08131A"
+                        android:textSize="11sp"
+                        android:clickable="true"
+                        android:focusable="true" />
+
+                    <TextView
+                        android:id="@+id/chipJogo"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="4dp"
+                        android:background="@drawable/bg_chip_unselected"
+                        android:gravity="center"
+                        android:padding="9dp"
+                        android:text="⚽ Jogo"
+                        android:textColor="#8B96AC"
+                        android:textSize="11sp"
+                        android:clickable="true"
+                        android:focusable="true" />
+
+                    <TextView
+                        android:id="@+id/chipOutroEvento"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_chip_unselected"
+                        android:gravity="center"
+                        android:padding="9dp"
+                        android:text="📍 Outro"
+                        android:textColor="#8B96AC"
+                        android:textSize="11sp"
+                        android:clickable="true"
+                        android:focusable="true" />
+                </LinearLayout>
+
+                <EditText
+                    android:id="@+id/edtDataEvento"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@drawable/bg_input_verde"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp"
+                    android:gravity="center_vertical"
+                    android:textColor="#FFFFFF"
+                    android:textColorHint="#8B96AC"
+                    android:hint="Data (ex: 15/10/2026)"
+                    android:textSize="13sp"
+                    android:layout_marginBottom="10dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="12dp">
+
+                    <EditText
+                        android:id="@+id/edtHorarioInicioEvento"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="6dp"
+                        android:background="@drawable/bg_input_verde"
+                        android:gravity="center"
+                        android:textColor="#FFFFFF"
+                        android:textColorHint="#8B96AC"
+                        android:hint="Início (ex: 20:00)"
+                        android:textSize="12sp" />
+
+                    <EditText
+                        android:id="@+id/edtHorarioFimEvento"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_input_verde"
+                        android:gravity="center"
+                        android:textColor="#FFFFFF"
+                        android:textColorHint="#8B96AC"
+                        android:hint="Fim previsto (ex: 23:30)"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/btnSalvarEvento"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_cta_start"
+                    android:padding="13dp"
+                    android:gravity="center"
+                    android:text="Salvar evento"
+                    android:textColor="#052018"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:clickable="true"
+                    android:focusable="true" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Eventos cadastrados"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
+
+            <LinearLayout
+                android:id="@+id/containerEventos"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>
