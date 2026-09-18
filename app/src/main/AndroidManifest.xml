@@ -108,6 +108,16 @@
             android:exported="false"
             android:label="Config" />
 
+        <activity
+            android:name=".ContasActivity"
+            android:exported="false"
+            android:label="Minhas Contas" />
+
+        <activity
+            android:name=".SaudeVeiculoActivity"
+            android:exported="false"
+            android:label="Saúde do Veículo" />
+
         <service
             android:name=".RideAccessibilityService"
             android:exported="true"
