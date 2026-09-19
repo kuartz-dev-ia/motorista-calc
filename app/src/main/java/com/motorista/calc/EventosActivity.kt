@@ -6,9 +6,7 @@ import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
-import android.view.Gravity
 import android.widget.EditText
-import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -26,8 +24,6 @@ class EventosActivity : AppCompatActivity() {
     private lateinit var edtData: EditText
     private lateinit var edtHorarioInicio: EditText
     private lateinit var edtHorarioFim: EditText
-    private lateinit var txtTextoExtraido: TextView
-    private lateinit var containerLista: LinearLayout
     private var categoriaSelecionada = "Show/Festival"
 
     private val chips by lazy {
@@ -47,8 +43,6 @@ class EventosActivity : AppCompatActivity() {
         edtData = findViewById(R.id.edtDataEvento)
         edtHorarioInicio = findViewById(R.id.edtHorarioInicioEvento)
         edtHorarioFim = findViewById(R.id.edtHorarioFimEvento)
-        txtTextoExtraido = findViewById(R.id.txtTextoExtraido)
-        containerLista = findViewById(R.id.containerEventos)
 
         for ((chip, categoria) in chips) {
             chip.setOnClickListener { selecionarCategoria(chip, categoria) }
@@ -57,11 +51,6 @@ class EventosActivity : AppCompatActivity() {
 
         findViewById<TextView>(R.id.btnExtrairImagem).setOnClickListener { escolherImagem() }
         findViewById<TextView>(R.id.btnSalvarEvento).setOnClickListener { salvar() }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        atualizarLista()
     }
 
     private fun selecionarCategoria(selecionado: TextView, categoria: String) {
@@ -94,8 +83,22 @@ class EventosActivity : AppCompatActivity() {
                 val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
                 recognizer.process(inputImage)
                     .addOnSuccessListener { visionText ->
-                        txtTextoExtraido.text = visionText.text.ifBlank { "Nenhum texto encontrado na imagem." }
-                        txtTextoExtraido.visibility = android.view.View.VISIBLE
+                        val texto = visionText.text
+                        if (texto.isBlank()) {
+                            Toast.makeText(this, "Nenhum texto encontrado na imagem", Toast.LENGTH_LONG).show()
+                            return@addOnSuccessListener
+                        }
+                        val endereco = EventoTextParser.extrairEndereco(texto)
+                        val nome = EventoTextParser.extrairNome(texto, endereco)
+                        val data2 = EventoTextParser.extrairData(texto)
+                        val horario = EventoTextParser.extrairHorarioInicio(texto)
+
+                        nome?.let { edtNome.setText(it) }
+                        endereco?.let { edtEndereco.setText(it) }
+                        data2?.let { edtData.setText(it) }
+                        horario?.let { edtHorarioInicio.setText(it) }
+
+                        Toast.makeText(this, "Dados extraídos — confira e ajuste se precisar", Toast.LENGTH_LONG).show()
                     }
                     .addOnFailureListener {
                         Toast.makeText(this, "Erro ao ler o texto da imagem: ${it.message}", Toast.LENGTH_LONG).show()
@@ -111,7 +114,7 @@ class EventosActivity : AppCompatActivity() {
         val endereco = edtEndereco.text.toString().trim()
 
         if (nome.isBlank() || endereco.isBlank()) {
-            Toast.makeText(this, "Preencha pelo menos o nome e o endereço", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Preencha pelo menos o nome e o endereço (extraia de uma imagem ou digite)", Toast.LENGTH_LONG).show()
             return
         }
 
@@ -122,112 +125,7 @@ class EventosActivity : AppCompatActivity() {
             edtHorarioFim.text.toString().trim()
         )
 
-        edtNome.text.clear()
-        edtEndereco.text.clear()
-        edtData.text.clear()
-        edtHorarioInicio.text.clear()
-        edtHorarioFim.text.clear()
-        txtTextoExtraido.visibility = android.view.View.GONE
-
         Toast.makeText(this, "Evento salvo", Toast.LENGTH_SHORT).show()
-        atualizarLista()
-    }
-
-    private fun abrirNoMapa(endereco: String) {
-        try {
-            val uri = Uri.parse("geo:0,0?q=" + Uri.encode(endereco))
-            val intent = Intent(Intent.ACTION_VIEW, uri).apply { setPackage("com.google.android.apps.maps") }
-            startActivity(intent)
-        } catch (e: Exception) {
-            try {
-                val uri = Uri.parse("geo:0,0?q=" + Uri.encode(endereco))
-                startActivity(Intent(Intent.ACTION_VIEW, uri))
-            } catch (e2: Exception) {
-                Toast.makeText(this, "Não encontrei um app de mapas instalado", Toast.LENGTH_LONG).show()
-            }
-        }
-    }
-
-    private fun atualizarLista() {
-        val eventos = EventoStorage.listarTodos(this)
-        containerLista.removeAllViews()
-
-        if (eventos.isEmpty()) {
-            containerLista.addView(TextView(this).apply {
-                text = "Nenhum evento cadastrado ainda."
-                setTextColor(Color.parseColor("#8B96AC"))
-                textSize = 13f
-            })
-            return
-        }
-
-        val emojiCategoria = mapOf("Show/Festival" to "🎤", "Jogo" to "⚽", "Outro" to "📍")
-
-        for (evento in eventos) {
-            val card = LinearLayout(this).apply {
-                orientation = LinearLayout.VERTICAL
-                background = ContextCompat.getDrawable(this@EventosActivity, R.drawable.bg_card_dark)
-                setPadding(24, 20, 24, 20)
-                layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT).apply {
-                    bottomMargin = 12
-                }
-            }
-
-            card.addView(TextView(this).apply {
-                text = "${emojiCategoria[evento.categoria] ?: "📍"} ${evento.nome}"
-                setTextColor(Color.WHITE)
-                textSize = 14f
-                setTypeface(typeface, android.graphics.Typeface.BOLD)
-            })
-
-            card.addView(TextView(this).apply {
-                text = evento.endereco
-                setTextColor(Color.parseColor("#8B96AC"))
-                textSize = 11.5f
-                setPadding(0, 4, 0, 4)
-            })
-
-            val infoHorario = listOfNotNull(
-                evento.dataTexto.ifBlank { null },
-                evento.horarioInicio.ifBlank { null }?.let { "início $it" },
-                evento.horarioFimEstimado.ifBlank { null }?.let { "término (previsto) $it" }
-            ).joinToString("  •  ")
-
-            if (infoHorario.isNotBlank()) {
-                card.addView(TextView(this).apply {
-                    text = infoHorario
-                    setTextColor(Color.parseColor("#1FE7C4"))
-                    textSize = 11.5f
-                    setTypeface(typeface, android.graphics.Typeface.BOLD)
-                    setPadding(0, 0, 0, 10)
-                })
-            }
-
-            val linhaBotoes = LinearLayout(this).apply {
-                orientation = LinearLayout.HORIZONTAL
-                gravity = Gravity.CENTER_VERTICAL
-            }
-
-            linhaBotoes.addView(TextView(this).apply {
-                text = "🗺️ Ver no mapa"
-                setTextColor(Color.parseColor("#3DB8F5"))
-                textSize = 12f
-                setTypeface(typeface, android.graphics.Typeface.BOLD)
-                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
-                setOnClickListener { abrirNoMapa(evento.endereco) }
-            })
-
-            linhaBotoes.addView(TextView(this).apply {
-                text = "🗑️"
-                textSize = 14f
-                setOnClickListener {
-                    EventoStorage.apagar(this@EventosActivity, evento.id)
-                    atualizarLista()
-                }
-            })
-
-            card.addView(linhaBotoes)
-            containerLista.addView(card)
-        }
+        finish()
     }
 }
