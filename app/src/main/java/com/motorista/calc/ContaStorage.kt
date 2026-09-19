@@ -4,7 +4,6 @@ import android.content.Context
 import org.json.JSONArray
 import org.json.JSONObject
 import java.text.SimpleDateFormat
-import java.util.Calendar
 import java.util.Locale
 
 data class Conta(
@@ -12,7 +11,7 @@ data class Conta(
     val nome: String,
     val categoria: String,
     val valorMensal: Double,
-    val diaVencimento: Int?,
+    val dataVencimentoMillis: Long?,
     var pagoMesReferencia: String?,
     val lembreteDias: Int
 )
@@ -35,7 +34,7 @@ object ContaStorage {
                     nome = obj.getString("nome"),
                     categoria = obj.optString("categoria", "Outro"),
                     valorMensal = obj.getDouble("valorMensal"),
-                    diaVencimento = if (obj.has("diaVencimento") && !obj.isNull("diaVencimento")) obj.getInt("diaVencimento") else null,
+                    dataVencimentoMillis = if (obj.has("dataVencimentoMillis") && !obj.isNull("dataVencimentoMillis")) obj.getLong("dataVencimentoMillis") else null,
                     pagoMesReferencia = if (obj.has("pagoMesReferencia") && !obj.isNull("pagoMesReferencia")) obj.getString("pagoMesReferencia") else null,
                     lembreteDias = obj.optInt("lembreteDias", 3)
                 )
@@ -52,7 +51,7 @@ object ContaStorage {
             obj.put("nome", c.nome)
             obj.put("categoria", c.categoria)
             obj.put("valorMensal", c.valorMensal)
-            c.diaVencimento?.let { obj.put("diaVencimento", it) }
+            c.dataVencimentoMillis?.let { obj.put("dataVencimentoMillis", it) }
             c.pagoMesReferencia?.let { obj.put("pagoMesReferencia", it) }
             obj.put("lembreteDias", c.lembreteDias)
             array.put(obj)
@@ -60,9 +59,18 @@ object ContaStorage {
         prefs(context).edit().putString(CHAVE_LISTA, array.toString()).apply()
     }
 
-    fun adicionar(context: Context, nome: String, categoria: String, valorMensal: Double, diaVencimento: Int?, lembreteDias: Int) {
+    fun adicionar(context: Context, nome: String, categoria: String, valorMensal: Double, dataVencimentoMillis: Long?, lembreteDias: Int) {
         val lista = listarTodos(context).toMutableList()
-        lista.add(0, Conta(System.currentTimeMillis(), nome, categoria, valorMensal, diaVencimento, null, lembreteDias))
+        lista.add(0, Conta(System.currentTimeMillis(), nome, categoria, valorMensal, dataVencimentoMillis, null, lembreteDias))
+        salvarTudo(context, lista)
+    }
+
+    fun atualizar(context: Context, id: Long, nome: String, categoria: String, valorMensal: Double, dataVencimentoMillis: Long?, lembreteDias: Int) {
+        val lista = listarTodos(context).toMutableList()
+        val idx = lista.indexOfFirst { it.id == id }
+        if (idx < 0) return
+        val pagoAnterior = lista[idx].pagoMesReferencia
+        lista[idx] = Conta(id, nome, categoria, valorMensal, dataVencimentoMillis, pagoAnterior, lembreteDias)
         salvarTudo(context, lista)
     }
 
@@ -71,12 +79,13 @@ object ContaStorage {
     }
 
     fun alternarPaga(context: Context, id: Long) {
-        val mesAtual = SimpleDateFormat("yyyy-MM", Locale.getDefault()).format(java.util.Date())
         val lista = listarTodos(context).toMutableList()
         val idx = lista.indexOfFirst { it.id == id }
         if (idx < 0) return
         val atual = lista[idx]
-        lista[idx] = atual.copy(pagoMesReferencia = if (atual.pagoMesReferencia == mesAtual) null else mesAtual)
+        val dataVencimento = atual.dataVencimentoMillis ?: return
+        val chaveMes = SimpleDateFormat("yyyy-MM", Locale.getDefault()).format(java.util.Date(dataVencimento))
+        lista[idx] = atual.copy(pagoMesReferencia = if (atual.pagoMesReferencia == chaveMes) null else chaveMes)
         salvarTudo(context, lista)
     }
 
@@ -84,24 +93,20 @@ object ContaStorage {
 
     /** Retorna (texto do status, cor hexadecimal) pra exibir na lista. */
     fun statusDaConta(conta: Conta): Pair<String, String> {
-        val mesAtual = SimpleDateFormat("yyyy-MM", Locale.getDefault()).format(java.util.Date())
+        val dataVencimento = conta.dataVencimentoMillis ?: return Pair("Sem data de vencimento", "#8B96AC")
 
-        if (conta.diaVencimento == null) {
-            return Pair("Sem data de vencimento", "#8B96AC")
-        }
-
-        if (conta.pagoMesReferencia == mesAtual) {
+        val chaveMes = SimpleDateFormat("yyyy-MM", Locale.getDefault()).format(java.util.Date(dataVencimento))
+        if (conta.pagoMesReferencia == chaveMes) {
             return Pair("Paga", "#1FE7A0")
         }
 
-        val diaHoje = Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
-        val diff = conta.diaVencimento - diaHoje
+        val diasRestantes = ((dataVencimento - System.currentTimeMillis()) / (24L * 60 * 60 * 1000)).toInt()
 
         return when {
-            diff < 0 -> Pair("Atrasada há ${-diff} dia(s)", "#F5576B")
-            diff == 0 -> Pair("Vence hoje", "#F5A623")
-            diff <= conta.lembreteDias -> Pair("Vence em $diff dia(s)", "#F5A623")
-            else -> Pair("Vence em $diff dia(s)", "#8B96AC")
+            diasRestantes < 0 -> Pair("Atrasada há ${-diasRestantes} dia(s)", "#F5576B")
+            diasRestantes == 0 -> Pair("Vence hoje", "#F5A623")
+            diasRestantes <= conta.lembreteDias -> Pair("Vence em $diasRestantes dia(s)", "#F5A623")
+            else -> Pair("Vence em $diasRestantes dia(s)", "#8B96AC")
         }
     }
 }
