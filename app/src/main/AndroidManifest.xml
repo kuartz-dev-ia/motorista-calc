@@ -121,6 +121,11 @@
         <activity
             android:name=".EventosActivity"
             android:exported="false"
+            android:label="Novo Evento" />
+
+        <activity
+            android:name=".EventosListaActivity"
+            android:exported="false"
             android:label="Radar de Eventos" />
         
 
