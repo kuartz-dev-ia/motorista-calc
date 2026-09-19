@@ -20,7 +20,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="📡 Radar de Eventos"
+                android:text="➕ Novo Evento"
                 android:textColor="#FFFFFF"
                 android:textSize="17sp"
                 android:textStyle="bold" />
@@ -28,7 +28,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Shows, jogos e eventos de alta demanda"
+                android:text="Extraia de um print ou preencha manualmente"
                 android:textColor="#8B96AC"
                 android:textSize="10sp" />
         </LinearLayout>
@@ -44,17 +44,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:background="@drawable/bg_card_dark"
-                android:padding="16dp"
-                android:layout_marginBottom="12dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Novo evento"
-                    android:textColor="#FFFFFF"
-                    android:textSize="15sp"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="10dp" />
+                android:padding="16dp">
 
                 <TextView
                     android:id="@+id/btnExtrairImagem"
@@ -63,26 +53,23 @@
                     android:background="@drawable/bg_input_verde"
                     android:padding="12dp"
                     android:gravity="center"
-                    android:text="📷 Extrair texto de uma imagem (print/panfleto)"
+                    android:text="📷 Extrair dados de uma imagem (print/panfleto)"
                     android:textColor="#3DB8F5"
                     android:textSize="12sp"
                     android:textStyle="bold"
-                    android:layout_marginBottom="10dp"
+                    android:layout_marginBottom="14dp"
                     android:clickable="true"
                     android:focusable="true" />
 
                 <TextView
-                    android:id="@+id/txtTextoExtraido"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/bg_tint_blue"
-                    android:padding="10dp"
-                    android:textColor="#E4E7EC"
-                    android:textSize="11sp"
-                    android:textIsSelectable="true"
-                    android:layout_marginBottom="10dp"
-                    android:visibility="gone" />
-
+                    android:gravity="center"
+                    android:text="NOME DO EVENTO"
+                    android:textColor="#1FE7A0"
+                    android:textSize="10.5sp"
+                    android:textStyle="bold"
+                    android:paddingBottom="4dp" />
                 <EditText
                     android:id="@+id/edtNomeEvento"
                     android:layout_width="match_parent"
@@ -93,10 +80,19 @@
                     android:gravity="center_vertical"
                     android:textColor="#FFFFFF"
                     android:textColorHint="#8B96AC"
-                    android:hint="Nome do evento"
+                    android:hint="Preenchido automaticamente"
                     android:textSize="13sp"
                     android:layout_marginBottom="10dp" />
 
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="ENDEREÇO / LOCAL"
+                    android:textColor="#1FE7A0"
+                    android:textSize="10.5sp"
+                    android:textStyle="bold"
+                    android:paddingBottom="4dp" />
                 <EditText
                     android:id="@+id/edtEnderecoEvento"
                     android:layout_width="match_parent"
@@ -107,9 +103,17 @@
                     android:gravity="center_vertical"
                     android:textColor="#FFFFFF"
                     android:textColorHint="#8B96AC"
-                    android:hint="Endereço / local / cidade-UF"
+                    android:hint="Preenchido automaticamente"
                     android:textSize="13sp"
                     android:layout_marginBottom="10dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Categoria"
+                    android:textColor="#8B96AC"
+                    android:textSize="11sp"
+                    android:layout_marginBottom="6dp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -162,6 +166,15 @@
                         android:focusable="true" />
                 </LinearLayout>
 
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="DATA"
+                    android:textColor="#1FE7A0"
+                    android:textSize="10.5sp"
+                    android:textStyle="bold"
+                    android:paddingBottom="4dp" />
                 <EditText
                     android:id="@+id/edtDataEvento"
                     android:layout_width="match_parent"
@@ -172,7 +185,7 @@
                     android:gravity="center_vertical"
                     android:textColor="#FFFFFF"
                     android:textColorHint="#8B96AC"
-                    android:hint="Data (ex: 15/10/2026)"
+                    android:hint="Preenchida automaticamente"
                     android:textSize="13sp"
                     android:layout_marginBottom="10dp" />
 
@@ -180,32 +193,62 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:layout_marginBottom="12dp">
+                    android:layout_marginBottom="14dp">
 
-                    <EditText
-                        android:id="@+id/edtHorarioInicioEvento"
+                    <LinearLayout
                         android:layout_width="0dp"
-                        android:layout_height="48dp"
+                        android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:layout_marginEnd="6dp"
-                        android:background="@drawable/bg_input_verde"
-                        android:gravity="center"
-                        android:textColor="#FFFFFF"
-                        android:textColorHint="#8B96AC"
-                        android:hint="Início (ex: 20:00)"
-                        android:textSize="12sp" />
+                        android:orientation="vertical"
+                        android:layout_marginEnd="6dp">
 
-                    <EditText
-                        android:id="@+id/edtHorarioFimEvento"
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="INÍCIO"
+                            android:textColor="#1FE7A0"
+                            android:textSize="10.5sp"
+                            android:textStyle="bold"
+                            android:paddingBottom="4dp" />
+                        <EditText
+                            android:id="@+id/edtHorarioInicioEvento"
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:background="@drawable/bg_input_verde"
+                            android:gravity="center"
+                            android:textColor="#FFFFFF"
+                            android:textColorHint="#8B96AC"
+                            android:hint="Automático"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
                         android:layout_width="0dp"
-                        android:layout_height="48dp"
+                        android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:background="@drawable/bg_input_verde"
-                        android:gravity="center"
-                        android:textColor="#FFFFFF"
-                        android:textColorHint="#8B96AC"
-                        android:hint="Fim previsto (ex: 23:30)"
-                        android:textSize="12sp" />
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="FIM PREVISTO (OPCIONAL)"
+                            android:textColor="#1FE7A0"
+                            android:textSize="10.5sp"
+                            android:textStyle="bold"
+                            android:paddingBottom="4dp" />
+                        <EditText
+                            android:id="@+id/edtHorarioFimEvento"
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:background="@drawable/bg_input_verde"
+                            android:gravity="center"
+                            android:textColor="#FFFFFF"
+                            android:textColorHint="#8B96AC"
+                            android:hint="Ex: 23:30"
+                            android:textSize="12sp" />
+                    </LinearLayout>
                 </LinearLayout>
 
                 <TextView
@@ -222,21 +265,6 @@
                     android:clickable="true"
                     android:focusable="true" />
             </LinearLayout>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Eventos cadastrados"
-                android:textColor="#FFFFFF"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="8dp" />
-
-            <LinearLayout
-                android:id="@+id/containerEventos"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical" />
 
         </LinearLayout>
     </LinearLayout>
