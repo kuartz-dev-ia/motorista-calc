@@ -16,7 +16,7 @@ class MaisOpcoesActivity : AppCompatActivity() {
         findViewById<android.view.View>(R.id.btnContas).setOnClickListener { startActivity(Intent(this, ContasActivity::class.java)) }
         findViewById<android.view.View>(R.id.btnSaudeVeiculo).setOnClickListener { startActivity(Intent(this, SaudeVeiculoActivity::class.java)) }
         findViewById<android.view.View>(R.id.btnPrints).setOnClickListener { startActivity(Intent(this, PrintsActivity::class.java)) }
-        findViewById<android.view.View>(R.id.btnEventos).setOnClickListener { startActivity(Intent(this, EventosActivity::class.java)) }
+        findViewById<android.view.View>(R.id.btnEventos).setOnClickListener { startActivity(Intent(this, EventosListaActivity::class.java)) }
         findViewById<android.view.View>(R.id.btnGravacoes).setOnClickListener { startActivity(Intent(this, RecordingsActivity::class.java)) }
     }
 }
