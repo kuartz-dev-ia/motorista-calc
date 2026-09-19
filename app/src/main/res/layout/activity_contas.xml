@@ -66,6 +66,7 @@
                 android:layout_marginBottom="12dp">
 
                 <TextView
+                    android:id="@+id/txtTituloFormConta"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Nova conta"
@@ -88,39 +89,39 @@
                     android:textSize="13sp"
                     android:layout_marginBottom="10dp" />
 
-                <LinearLayout
+                <EditText
+                    android:id="@+id/edtValorConta"
                     android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@drawable/bg_input_verde"
+                    android:gravity="center"
+                    android:textColor="#FFFFFF"
+                    android:textColorHint="#8B96AC"
+                    android:hint="Valor mensal (R$)"
+                    android:textSize="14sp"
+                    android:inputType="numberDecimal"
+                    android:layout_marginBottom="10dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="10dp">
+                    android:text="Data de vencimento (opcional)"
+                    android:textColor="#8B96AC"
+                    android:textSize="11sp"
+                    android:layout_marginBottom="6dp" />
 
-                    <EditText
-                        android:id="@+id/edtValorConta"
-                        android:layout_width="0dp"
-                        android:layout_height="48dp"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="6dp"
-                        android:background="@drawable/bg_input_verde"
-                        android:gravity="center"
-                        android:textColor="#FFFFFF"
-                        android:textColorHint="#8B96AC"
-                        android:hint="Valor (R$)"
-                        android:textSize="14sp"
-                        android:inputType="numberDecimal" />
-
-                    <EditText
-                        android:id="@+id/edtDiaVencimento"
-                        android:layout_width="0dp"
-                        android:layout_height="48dp"
-                        android:layout_weight="1"
-                        android:background="@drawable/bg_input_verde"
-                        android:gravity="center"
-                        android:textColor="#FFFFFF"
-                        android:textColorHint="#8B96AC"
-                        android:hint="Dia venc. (opcional)"
-                        android:textSize="12sp"
-                        android:inputType="number" />
-                </LinearLayout>
+                <TextView
+                    android:id="@+id/btnEscolherDataConta"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@drawable/bg_input_verde"
+                    android:gravity="center"
+                    android:textColor="#FFFFFF"
+                    android:text="📅 Toque para escolher a data"
+                    android:textSize="13sp"
+                    android:layout_marginBottom="12dp"
+                    android:clickable="true"
+                    android:focusable="true" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -222,6 +223,19 @@
                     android:textColor="#052018"
                     android:textSize="13sp"
                     android:textStyle="bold"
+                    android:layout_marginBottom="8dp"
+                    android:clickable="true"
+                    android:focusable="true" />
+
+                <TextView
+                    android:id="@+id/btnCancelarEdicaoConta"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="✕ Cancelar edição"
+                    android:textColor="#8B96AC"
+                    android:textSize="12sp"
+                    android:visibility="gone"
                     android:clickable="true"
                     android:focusable="true" />
             </LinearLayout>
@@ -229,7 +243,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Suas contas (toque no status pra marcar como paga/pendente)"
+                android:text="Suas contas (toque no status pra marcar como paga)"
                 android:textColor="#8B96AC"
                 android:textSize="10.5sp"
                 android:layout_marginBottom="8dp" />
