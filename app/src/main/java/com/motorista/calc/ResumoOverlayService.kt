@@ -9,8 +9,10 @@ import android.graphics.drawable.GradientDrawable
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.text.InputType
 import android.view.Gravity
 import android.view.WindowManager
+import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -74,13 +76,40 @@ class ResumoOverlayService : Service() {
                 text = detalhes
                 setTextColor(Color.parseColor("#8B96AC"))
                 textSize = 11f
-                setPadding(0, 0, 0, dp(10))
+                setPadding(0, 0, 0, dp(8))
             })
         } else {
             container.addView(android.view.View(this).apply {
-                layoutParams = LinearLayout.LayoutParams(0, dp(10))
+                layoutParams = LinearLayout.LayoutParams(0, dp(8))
             })
         }
+
+        container.addView(TextView(this).apply {
+            text = "KM PERCORRIDO NESSA CORRIDA (OPCIONAL)"
+            setTextColor(Color.parseColor("#1FE7C4"))
+            textSize = 9.5f
+            setTypeface(typeface, Typeface.BOLD)
+            setPadding(0, 0, 0, dp(4))
+        })
+
+        val edtKm = EditText(this).apply {
+            hint = "Ex: 8,5"
+            inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
+            setTextColor(Color.WHITE)
+            setHintTextColor(Color.parseColor("#5C6B80"))
+            gravity = Gravity.CENTER
+            background = GradientDrawable().apply {
+                setColor(Color.parseColor("#1A2236"))
+                cornerRadius = dp(10).toFloat()
+            }
+            setPadding(dp(10), dp(10), dp(10), dp(10))
+            textSize = 14f
+            setTypeface(typeface, Typeface.BOLD)
+            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT).apply {
+                bottomMargin = dp(10)
+            }
+        }
+        container.addView(edtKm)
 
         val linhaBotoes = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
 
@@ -93,7 +122,10 @@ class ResumoOverlayService : Service() {
             background = GradientDrawable().apply { setColor(Color.parseColor("#1FE7A0")); cornerRadius = dp(10).toFloat() }
             setPadding(dp(14), dp(10), dp(14), dp(10))
             layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f).apply { marginEnd = dp(8) }
-            setOnClickListener { salvar(valor, plataforma) }
+            setOnClickListener {
+                val km = edtKm.text.toString().replace(",", ".").toDoubleOrNull() ?: 0.0
+                salvar(valor, plataforma, km)
+            }
         }
 
         val btnIgnorar = TextView(this).apply {
@@ -119,28 +151,31 @@ class ResumoOverlayService : Service() {
             WindowManager.LayoutParams.WRAP_CONTENT,
             WindowManager.LayoutParams.WRAP_CONTENT,
             layoutType,
-            WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
+            WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
+                WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM,
             PixelFormat.TRANSLUCENT
         ).apply {
             gravity = Gravity.TOP or Gravity.CENTER_HORIZONTAL
-            y = dp(140)
-            width = dp(260)
+            y = dp(120)
+            width = dp(270)
+            softInputMode = WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE
         }
 
         overlayView = container
         try { windowManager?.addView(container, params) } catch (e: Exception) { }
 
-        handler.postDelayed({ limpar(); stopSelf() }, 20_000L)
+        handler.postDelayed({ limpar(); stopSelf() }, 30_000L)
     }
 
-    private fun salvar(valor: Double, plataforma: String) {
+    private fun salvar(valor: Double, plataforma: String, km: Double) {
         try {
+            val valorPorKm = if (km > 0) valor / km else null
             val (id, novo) = HistoricoStorage.adicionarRegistro(
                 context = this,
                 valorTotal = valor,
-                distanciaTotalKm = 0.0,
+                distanciaTotalKm = km,
                 tempoTotalMin = 0,
-                valorPorKm = null,
+                valorPorKm = valorPorKm,
                 valorPorHora = null,
                 lucroLiquido = valor,
                 valeAPena = true,
