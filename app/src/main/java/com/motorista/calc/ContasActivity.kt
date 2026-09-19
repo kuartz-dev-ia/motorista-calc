@@ -1,6 +1,7 @@
 package com.motorista.calc
 
 import android.app.AlertDialog
+import android.app.DatePickerDialog
 import android.graphics.Color
 import android.os.Bundle
 import android.view.Gravity
@@ -10,15 +11,26 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 class ContasActivity : AppCompatActivity() {
 
     private lateinit var edtNome: EditText
     private lateinit var edtValor: EditText
-    private lateinit var edtDiaVencimento: EditText
+    private lateinit var btnEscolherData: TextView
     private lateinit var containerLista: LinearLayout
     private lateinit var txtTotalMensal: TextView
+    private lateinit var txtTituloForm: TextView
+    private lateinit var btnSalvar: TextView
+    private lateinit var btnCancelarEdicao: TextView
+
     private var categoriaSelecionada = "Casa"
+    private var dataVencimentoSelecionada: Long? = null
+    private var idEmEdicao: Long? = null
+
+    private val formatoData = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
 
     private val chips by lazy {
         listOf(
@@ -36,21 +48,44 @@ class ContasActivity : AppCompatActivity() {
 
         edtNome = findViewById(R.id.edtNomeConta)
         edtValor = findViewById(R.id.edtValorConta)
-        edtDiaVencimento = findViewById(R.id.edtDiaVencimento)
+        btnEscolherData = findViewById(R.id.btnEscolherDataConta)
         containerLista = findViewById(R.id.containerContas)
         txtTotalMensal = findViewById(R.id.txtTotalContas)
+        txtTituloForm = findViewById(R.id.txtTituloFormConta)
+        btnSalvar = findViewById(R.id.btnSalvarConta)
+        btnCancelarEdicao = findViewById(R.id.btnCancelarEdicaoConta)
 
         for ((chip, categoria) in chips) {
             chip.setOnClickListener { selecionarCategoria(chip, categoria) }
         }
         selecionarCategoria(findViewById(R.id.chipCasa), "Casa")
 
-        findViewById<TextView>(R.id.btnSalvarConta).setOnClickListener { salvar() }
+        btnEscolherData.setOnClickListener { abrirSeletorData() }
+        btnSalvar.setOnClickListener { salvar() }
+        btnCancelarEdicao.setOnClickListener { cancelarEdicao() }
     }
 
     override fun onResume() {
         super.onResume()
         atualizarLista()
+    }
+
+    private fun abrirSeletorData() {
+        val cal = Calendar.getInstance()
+        dataVencimentoSelecionada?.let { cal.timeInMillis = it }
+
+        DatePickerDialog(
+            this,
+            R.style.DialogTemaEscuro,
+            { _, ano, mes, dia ->
+                val escolhida = Calendar.getInstance().apply {
+                    set(ano, mes, dia, 12, 0, 0)
+                }
+                dataVencimentoSelecionada = escolhida.timeInMillis
+                btnEscolherData.text = "📅 ${formatoData.format(escolhida.time)}"
+            },
+            cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)
+        ).show()
     }
 
     private fun selecionarCategoria(selecionado: TextView, categoria: String) {
@@ -64,23 +99,56 @@ class ContasActivity : AppCompatActivity() {
     private fun salvar() {
         val nome = edtNome.text.toString().trim()
         val valor = edtValor.text.toString().toDoubleOrNull()
-        val dia = edtDiaVencimento.text.toString().toIntOrNull()
 
         if (nome.isBlank() || valor == null || valor <= 0) {
             Toast.makeText(this, "Preencha o nome e o valor corretamente", Toast.LENGTH_LONG).show()
             return
         }
-        if (dia != null && (dia < 1 || dia > 31)) {
-            Toast.makeText(this, "Dia de vencimento precisa estar entre 1 e 31 (ou deixe vazio se não tiver data fixa)", Toast.LENGTH_LONG).show()
-            return
+
+        val id = idEmEdicao
+        if (id == null) {
+            ContaStorage.adicionar(this, nome, categoriaSelecionada, valor, dataVencimentoSelecionada, 3)
+            Toast.makeText(this, "Conta adicionada", Toast.LENGTH_SHORT).show()
+        } else {
+            ContaStorage.atualizar(this, id, nome, categoriaSelecionada, valor, dataVencimentoSelecionada, 3)
+            Toast.makeText(this, "Conta atualizada", Toast.LENGTH_SHORT).show()
         }
 
-        ContaStorage.adicionar(this, nome, categoriaSelecionada, valor, dia, 3)
+        limparFormulario()
+        atualizarLista()
+    }
+
+    private fun limparFormulario() {
+        idEmEdicao = null
         edtNome.text.clear()
         edtValor.text.clear()
-        edtDiaVencimento.text.clear()
-        Toast.makeText(this, "Conta adicionada", Toast.LENGTH_SHORT).show()
-        atualizarLista()
+        dataVencimentoSelecionada = null
+        btnEscolherData.text = "📅 Toque para escolher a data"
+        selecionarCategoria(findViewById(R.id.chipCasa), "Casa")
+        txtTituloForm.text = "Nova conta"
+        btnSalvar.text = "Salvar conta"
+        btnCancelarEdicao.visibility = android.view.View.GONE
+    }
+
+    private fun cancelarEdicao() {
+        limparFormulario()
+    }
+
+    private fun editarConta(conta: Conta) {
+        idEmEdicao = conta.id
+        edtNome.setText(conta.nome)
+        edtValor.setText("%.2f".format(conta.valorMensal))
+        dataVencimentoSelecionada = conta.dataVencimentoMillis
+        btnEscolherData.text = conta.dataVencimentoMillis?.let { "📅 ${formatoData.format(java.util.Date(it))}" } ?: "📅 Toque para escolher a data"
+
+        val chipCategoria = chips.firstOrNull { it.second == conta.categoria }?.first ?: findViewById(R.id.chipCasa)
+        selecionarCategoria(chipCategoria, conta.categoria)
+
+        txtTituloForm.text = "Editando conta"
+        btnSalvar.text = "Atualizar conta"
+        btnCancelarEdicao.visibility = android.view.View.VISIBLE
+
+        edtNome.requestFocus()
     }
 
     private fun atualizarLista() {
@@ -99,7 +167,7 @@ class ContasActivity : AppCompatActivity() {
 
         val emojiCategoria = mapOf("Casa" to "🏠", "Carro" to "🚗", "Moto" to "🏍️", "Cartão" to "💳", "Outro" to "📦")
 
-        for (conta in contas.sortedBy { it.diaVencimento ?: 99 }) {
+        for (conta in contas.sortedBy { it.dataVencimentoMillis ?: Long.MAX_VALUE }) {
             val (statusTexto, statusCor) = ContaStorage.statusDaConta(conta)
 
             val card = LinearLayout(this).apply {
@@ -130,6 +198,15 @@ class ContasActivity : AppCompatActivity() {
             })
             card.addView(linhaTopo)
 
+            conta.dataVencimentoMillis?.let {
+                card.addView(TextView(this).apply {
+                    text = "Vencimento: ${formatoData.format(java.util.Date(it))}"
+                    setTextColor(Color.parseColor("#8B96AC"))
+                    textSize = 11f
+                    setPadding(0, 4, 0, 0)
+                })
+            }
+
             val linhaBaixo = LinearLayout(this).apply {
                 orientation = LinearLayout.HORIZONTAL
                 gravity = Gravity.CENTER_VERTICAL
@@ -142,9 +219,17 @@ class ContasActivity : AppCompatActivity() {
                 setTypeface(typeface, android.graphics.Typeface.BOLD)
                 layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
                 setOnClickListener {
-                    ContaStorage.alternarPaga(this@ContasActivity, conta.id)
-                    atualizarLista()
+                    if (conta.dataVencimentoMillis != null) {
+                        ContaStorage.alternarPaga(this@ContasActivity, conta.id)
+                        atualizarLista()
+                    }
                 }
+            })
+            linhaBaixo.addView(TextView(this).apply {
+                text = "✏️"
+                textSize = 14f
+                setPadding(0, 0, 24, 0)
+                setOnClickListener { editarConta(conta) }
             })
             linhaBaixo.addView(TextView(this).apply {
                 text = "🗑️"
@@ -153,12 +238,8 @@ class ContasActivity : AppCompatActivity() {
             })
             card.addView(linhaBaixo)
 
-            container_add(card)
+            containerLista.addView(card)
         }
-    }
-
-    private fun container_add(view: android.view.View) {
-        containerLista.addView(view)
     }
 
     private fun confirmarExclusao(conta: Conta) {
@@ -167,6 +248,7 @@ class ContasActivity : AppCompatActivity() {
             .setMessage("Tem certeza que quer excluir \"${conta.nome}\"?")
             .setPositiveButton("Excluir") { _, _ ->
                 ContaStorage.apagar(this, conta.id)
+                if (idEmEdicao == conta.id) limparFormulario()
                 atualizarLista()
             }
             .setNegativeButton("Cancelar", null)
