@@ -1,6 +1,7 @@
 package com.motorista.calc
 
 import android.app.Service
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.PixelFormat
@@ -12,6 +13,7 @@ import android.os.Looper
 import android.text.InputType
 import android.view.Gravity
 import android.view.WindowManager
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -21,6 +23,7 @@ class ResumoOverlayService : Service() {
 
     private var windowManager: WindowManager? = null
     private var overlayView: android.view.View? = null
+    private var edtKmRef: EditText? = null
     private val handler = Handler(Looper.getMainLooper())
 
     override fun onBind(intent: Intent?) = null
@@ -93,11 +96,14 @@ class ResumoOverlayService : Service() {
         })
 
         val edtKm = EditText(this).apply {
-            hint = "Ex: 8,5"
+            hint = "Toque aqui pra digitar (ex: 8,5)"
             inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
             setTextColor(Color.WHITE)
             setHintTextColor(Color.parseColor("#5C6B80"))
             gravity = Gravity.CENTER
+            isFocusable = true
+            isFocusableInTouchMode = true
+            isCursorVisible = true
             background = GradientDrawable().apply {
                 setColor(Color.parseColor("#1A2236"))
                 cornerRadius = dp(10).toFloat()
@@ -108,7 +114,12 @@ class ResumoOverlayService : Service() {
             layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT).apply {
                 bottomMargin = dp(10)
             }
+            setOnClickListener {
+                requestFocus()
+                mostrarTeclado(this)
+            }
         }
+        edtKmRef = edtKm
         container.addView(edtKm)
 
         val linhaBotoes = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
@@ -123,6 +134,7 @@ class ResumoOverlayService : Service() {
             setPadding(dp(14), dp(10), dp(14), dp(10))
             layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f).apply { marginEnd = dp(8) }
             setOnClickListener {
+                esconderTeclado()
                 val km = edtKm.text.toString().replace(",", ".").toDoubleOrNull() ?: 0.0
                 salvar(valor, plataforma, km)
             }
@@ -136,7 +148,11 @@ class ResumoOverlayService : Service() {
             background = GradientDrawable().apply { setColor(Color.parseColor("#1A2236")); cornerRadius = dp(10).toFloat() }
             setPadding(dp(14), dp(10), dp(14), dp(10))
             layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
-            setOnClickListener { limpar(); stopSelf() }
+            setOnClickListener {
+                esconderTeclado()
+                limpar()
+                stopSelf()
+            }
         }
 
         linhaBotoes.addView(btnSalvar)
@@ -151,20 +167,36 @@ class ResumoOverlayService : Service() {
             WindowManager.LayoutParams.WRAP_CONTENT,
             WindowManager.LayoutParams.WRAP_CONTENT,
             layoutType,
-            WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
-                WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM,
+            WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
             PixelFormat.TRANSLUCENT
         ).apply {
             gravity = Gravity.TOP or Gravity.CENTER_HORIZONTAL
             y = dp(120)
             width = dp(270)
-            softInputMode = WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE
+            softInputMode = WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE or
+                WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE
         }
 
         overlayView = container
         try { windowManager?.addView(container, params) } catch (e: Exception) { }
 
-        handler.postDelayed({ limpar(); stopSelf() }, 30_000L)
+        handler.postDelayed({ esconderTeclado(); limpar(); stopSelf() }, 30_000L)
+    }
+
+    private fun mostrarTeclado(campo: EditText) {
+        handler.postDelayed({
+            try {
+                val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.showSoftInput(campo, InputMethodManager.SHOW_FORCED)
+            } catch (e: Exception) { }
+        }, 100L)
+    }
+
+    private fun esconderTeclado() {
+        try {
+            val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            edtKmRef?.let { imm.hideSoftInputFromWindow(it.windowToken, 0) }
+        } catch (e: Exception) { }
     }
 
     private fun salvar(valor: Double, plataforma: String, km: Double) {
@@ -193,11 +225,13 @@ class ResumoOverlayService : Service() {
     private fun limpar() {
         overlayView?.let { try { windowManager?.removeView(it) } catch (e: Exception) { } }
         overlayView = null
+        edtKmRef = null
         handler.removeCallbacksAndMessages(null)
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        esconderTeclado()
         limpar()
     }
 
