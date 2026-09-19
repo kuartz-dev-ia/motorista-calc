@@ -1,7 +1,6 @@
 package com.motorista.calc
 
 import android.os.Bundle
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 
 class EventosListaActivity : AppCompatActivity() {
@@ -9,18 +8,12 @@ class EventosListaActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setContentView(R.layout.activity_eventos_lista)
-    }
-
-    override fun onResume() {
-        super.onResume()
-
         /*
-         * A tela da lista será atualizada sempre que
-         * o usuário retornar para esta Activity.
+         * Esta Activity foi criada para resolver a navegação
+         * do botão "Eventos" em MaisOpcoesActivity.
          *
-         * A leitura dos eventos permanece centralizada
-         * no EventoStorage.
+         * O layout específico da lista de eventos será conectado
+         * quando o arquivo XML correspondente estiver disponível.
          */
     }
 }
