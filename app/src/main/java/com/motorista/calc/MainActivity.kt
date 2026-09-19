@@ -191,7 +191,7 @@ class MainActivity : AppCompatActivity() {
             findViewById<TextView>(R.id.txtJornadaPercentual).text = "%.0f%%".format(stats.percentualMeta)
             findViewById<TextView>(R.id.txtJornadaGanho).text = "R$ %.2f".format(stats.ganhoBruto)
             findViewById<TextView>(R.id.txtJornadaRPorHora).text = "R$ %.2f".format(stats.valorPorHora)
-            findViewById<TextView>(R.id.txtJornadaKm).text = "%.1f".format(stats.kmRodados)
+            findViewById<TextView>(R.id.txtJornadaRPorKm).text = "R$ %.2f".format(stats.valorPorKm)
             findViewById<TextView>(R.id.txtJornadaCombustivel).text = "R$ %.2f".format(stats.custoCombustivel)
 
             val txtLucro = findViewById<TextView>(R.id.txtJornadaLucro)
