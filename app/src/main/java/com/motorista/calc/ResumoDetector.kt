@@ -1,11 +1,10 @@
 package com.motorista.calc
 
 /** Detecta a tela que mostra o resultado de UMA corrida específica que acabou
- * de ser concluída — reconhece tanto a frase da Uber ("última viagem") quanto
- * a da 99 ("valor da última corrida") — e extrai o valor daquela viagem (que
- * aparece logo acima da frase), além da categoria e horário, se existirem
- * por perto. Isso soma corrida por corrida no histórico, em vez de pegar o
- * total acumulado do dia. */
+ * de ser concluída — reconhece a frase da Uber ("última viagem") e as
+ * variações da 99 ("valor da última viagem" / "valor da última corrida") —
+ * e extrai o valor daquela viagem (que aparece acima da frase, no canto
+ * esquerdo), além da categoria e horário, se existirem por perto. */
 object ResumoDetector {
 
     private val REGEX_VALOR = Regex("""R\$\s?(\d{1,3}(?:\.\d{3})*,\d{2}|\d+,\d{2})""")
@@ -16,6 +15,7 @@ object ResumoDetector {
     )
     private val FRASES_GATILHO = listOf(
         "última viagem", "ultima viagem",
+        "valor da última viagem", "valor da ultima viagem",
         "valor da última corrida", "valor da ultima corrida"
     )
 
@@ -27,9 +27,10 @@ object ResumoDetector {
     }
 
     /** Procura o valor em R$ mais próximo ACIMA da linha com a frase-gatilho
-     * (que é onde ele aparece, segundo o padrão descrito, tanto no Uber
-     * quanto na 99). Se não achar acima, tenta a mesma linha ou logo abaixo,
-     * como reforço. */
+     * (é onde ele normalmente aparece, tanto no Uber quanto na 99). A busca
+     * não tem mais um limite curto de linhas — varre desde a frase até o
+     * início do texto, pegando a ocorrência mais próxima. Se não achar acima,
+     * tenta a mesma linha ou abaixo, como reforço. */
     fun extrairValorUltimaViagem(texto: String): Double? {
         val linhas = texto.lines().map { normalizarLinha(it) }
         val indiceFrase = linhas.indexOfFirst { linha ->
@@ -38,11 +39,11 @@ object ResumoDetector {
         }
         if (indiceFrase == -1) return null
 
-        for (i in indiceFrase - 1 downTo maxOf(0, indiceFrase - 3)) {
+        for (i in indiceFrase - 1 downTo 0) {
             val match = REGEX_VALOR.find(linhas[i])
             if (match != null) return converterValor(match.groupValues[1])
         }
-        for (i in indiceFrase..minOf(linhas.size - 1, indiceFrase + 2)) {
+        for (i in indiceFrase until linhas.size) {
             val match = REGEX_VALOR.find(linhas[i])
             if (match != null) return converterValor(match.groupValues[1])
         }
