@@ -219,7 +219,7 @@ class ResumoOverlayService : Service() {
         overlayView = container
         try { windowManager?.addView(container, params) } catch (e: Exception) { }
 
-        handler.postDelayed({ esconderTeclado(); limpar(); stopSelf() }, 45_000L)
+        handler.postDelayed({ esconderTeclado(); limpar(); stopSelf() }, 10_000L)
     }
 
     private fun criarPill(texto: String, cor: String): TextView {
