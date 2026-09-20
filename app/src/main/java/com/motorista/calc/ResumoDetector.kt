@@ -7,7 +7,8 @@ package com.motorista.calc
  * esquerdo), além da categoria e horário, se existirem por perto. */
 object ResumoDetector {
 
-    private val REGEX_VALOR = Regex("""R\$\s?(\d{1,3}(?:\.\d{3})*,\d{2}|\d+,\d{2})""")
+    private val REGEX_VALOR_COM_CIFRAO = Regex("""R\$\s?(\d{1,3}(?:\.\d{3})*,\d{2}|\d+,\d{2})""")
+    private val REGEX_VALOR_SEM_CIFRAO = Regex("""\b(\d{1,3}(?:\.\d{3})*,\d{2}|\d{1,3},\d{2})\b""")
     private val REGEX_HORARIO = Regex("""\b([01]?\d|2[0-3]):([0-5]\d)\b""")
     private val CATEGORIAS = listOf(
         "uberx", "uber x", "comfort", "black", "99pop", "pop", "moto", "motoTáxi",
@@ -19,6 +20,9 @@ object ResumoDetector {
         "valor da última corrida", "valor da ultima corrida"
     )
 
+    private const val VALOR_MINIMO_PLAUSIVEL = 0.5
+    private const val VALOR_MAXIMO_PLAUSIVEL = 500.0
+
     private fun normalizarLinha(linha: String) = linha.trim()
 
     fun pareceUltimaViagem(texto: String): Boolean {
@@ -26,11 +30,11 @@ object ResumoDetector {
         return FRASES_GATILHO.any { textoLower.contains(it) }
     }
 
-    /** Procura o valor em R$ mais próximo ACIMA da linha com a frase-gatilho
-     * (é onde ele normalmente aparece, tanto no Uber quanto na 99). A busca
-     * não tem mais um limite curto de linhas — varre desde a frase até o
-     * início do texto, pegando a ocorrência mais próxima. Se não achar acima,
-     * tenta a mesma linha ou abaixo, como reforço. */
+    /** Procura o valor mais próximo ACIMA da linha com a frase-gatilho (é onde
+     * ele normalmente aparece, tanto no Uber quanto na 99). Primeiro tenta só
+     * valores com "R$" na frente (mais confiável); se não achar nenhum em
+     * toda a tela, tenta valores "soltos" (sem R$) na faixa plausível de uma
+     * corrida — cobre o caso de painéis que mostram só o número. */
     fun extrairValorUltimaViagem(texto: String): Double? {
         val linhas = texto.lines().map { normalizarLinha(it) }
         val indiceFrase = linhas.indexOfFirst { linha ->
@@ -39,13 +43,20 @@ object ResumoDetector {
         }
         if (indiceFrase == -1) return null
 
+        buscarComRegex(linhas, indiceFrase, REGEX_VALOR_COM_CIFRAO)?.let { return it }
+        return buscarComRegex(linhas, indiceFrase, REGEX_VALOR_SEM_CIFRAO, validarFaixa = true)
+    }
+
+    private fun buscarComRegex(linhas: List<String>, indiceFrase: Int, regex: Regex, validarFaixa: Boolean = false): Double? {
         for (i in indiceFrase - 1 downTo 0) {
-            val match = REGEX_VALOR.find(linhas[i])
-            if (match != null) return converterValor(match.groupValues[1])
+            val match = regex.find(linhas[i]) ?: continue
+            val valor = converterValor(match.groupValues[1]) ?: continue
+            if (!validarFaixa || valor in VALOR_MINIMO_PLAUSIVEL..VALOR_MAXIMO_PLAUSIVEL) return valor
         }
         for (i in indiceFrase until linhas.size) {
-            val match = REGEX_VALOR.find(linhas[i])
-            if (match != null) return converterValor(match.groupValues[1])
+            val match = regex.find(linhas[i]) ?: continue
+            val valor = converterValor(match.groupValues[1]) ?: continue
+            if (!validarFaixa || valor in VALOR_MINIMO_PLAUSIVEL..VALOR_MAXIMO_PLAUSIVEL) return valor
         }
         return null
     }
