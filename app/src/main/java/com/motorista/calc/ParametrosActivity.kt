@@ -1,5 +1,8 @@
 package com.motorista.calc
 
+import android.app.AlertDialog
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
@@ -42,6 +45,7 @@ class ParametrosActivity : AppCompatActivity() {
 
         val btnAtivarAcessibilidade = findViewById<TextView>(R.id.btnAtivarAcessibilidade)
         val btnPermitirOverlay = findViewById<TextView>(R.id.btnPermitirOverlay)
+        val btnVerDebugOcr = findViewById<TextView>(R.id.btnVerDebugOcr)
         val edtMinKm = findViewById<EditText>(R.id.edtMinKm)
         val edtMinHora = findViewById<EditText>(R.id.edtMinHora)
         val edtFinanciamento = findViewById<EditText>(R.id.edtFinanciamento)
@@ -94,6 +98,8 @@ class ParametrosActivity : AppCompatActivity() {
             startActivity(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName")))
         }
 
+        btnVerDebugOcr.setOnClickListener { mostrarDebugOcr() }
+
         findViewById<android.view.View>(R.id.btnAbrirBackup).setOnClickListener {
             startActivity(Intent(this, BackupActivity::class.java))
         }
@@ -128,6 +134,35 @@ class ParametrosActivity : AppCompatActivity() {
 
         atualizarStatus(txtStatus)
         atualizarResumoCombustiveis()
+    }
+
+    private fun mostrarDebugOcr() {
+        val status = prefs.getString(RideAccessibilityService.PREF_STATUS_OCR, null) ?: "Nenhum status registrado ainda."
+        val log = prefs.getString(RideAccessibilityService.PREF_ULTIMO_TEXTO, null) ?: "Nenhum texto lido ainda — o app só grava isso quando o serviço de acessibilidade está ativo e uma jornada está em andamento."
+
+        val conteudoCompleto = "STATUS ATUAL:\n$status\n\n----------\n\nÚLTIMOS TEXTOS LIDOS (mais recente primeiro):\n\n$log"
+
+        val scrollView = android.widget.ScrollView(this)
+        val textoView = TextView(this).apply {
+            text = conteudoCompleto
+            setTextColor(Color.parseColor("#E4E7EC"))
+            textSize = 11f
+            setTextIsSelectable(true)
+            setPadding(32, 24, 32, 24)
+        }
+        scrollView.addView(textoView)
+
+        val dialog = AlertDialog.Builder(this, R.style.DialogTemaEscuro)
+            .setTitle("🔍 Debug do OCR")
+            .setView(scrollView)
+            .setPositiveButton("Copiar tudo") { _, _ ->
+                val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+                clipboard.setPrimaryClip(ClipData.newPlainText("debug_ocr", conteudoCompleto))
+                android.widget.Toast.makeText(this, "Copiado! Cole numa mensagem pra me enviar.", android.widget.Toast.LENGTH_LONG).show()
+            }
+            .setNegativeButton("Fechar", null)
+            .show()
+        DialogUtils.aplicarCoresBotoes(dialog)
     }
 
     private fun trocarCombustivel(novo: String) {
