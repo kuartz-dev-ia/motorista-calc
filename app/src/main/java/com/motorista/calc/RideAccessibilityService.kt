@@ -33,6 +33,11 @@ class RideAccessibilityService : AccessibilityService() {
     private var ultimoTextoProcessado: String = ""
     private var capturandoNoMomento = false
 
+    /** Guarda "valor|horario" da última corrida já mostrada no cartão de
+     * confirmação, pra não ficar reexibindo o mesmo card enquanto a tela de
+     * resultado da corrida continuar parada (evita o "piscar"). */
+    private var ultimaViagemChaveProcessada: String? = null
+
     private val handler = Handler(Looper.getMainLooper())
     private val pollingIntervalMs = 1500L
     private val pollRunnable = object : Runnable {
@@ -309,7 +314,6 @@ class RideAccessibilityService : AccessibilityService() {
             Log.d(TAG, "Tela de 'última viagem' detectada via OCR. Processando...")
             processarUltimaViagem(texto)
         }
-
     }
 
     private fun registrarDebug(texto: String) {
@@ -338,7 +342,30 @@ class RideAccessibilityService : AccessibilityService() {
         }
     }
 
-    
+    private fun processarUltimaViagem(texto: String) {
+        val valor = ResumoDetector.extrairValorUltimaViagem(texto) ?: return
+        if (valor <= 0 || valor > VALOR_MAXIMO_PLAUSIVEL_RESUMO) return
+
+        val categoria = ResumoDetector.extrairCategoria(texto)
+        val horario = ResumoDetector.extrairHorario(texto)
+        val plataforma = detectarPlataforma()
+
+        // Trava: se essa mesma combinação de valor+horário já foi mostrada,
+        // não reexibe o card (evita o "piscar" enquanto a tela de resultado
+        // continua parada, sendo lida a cada 1,5s).
+        val chave = "%.2f|%s".format(valor, horario ?: "")
+        if (chave == ultimaViagemChaveProcessada) return
+        ultimaViagemChaveProcessada = chave
+
+        val intent = Intent(this, ResumoOverlayService::class.java).apply {
+            putExtra(ResumoOverlayService.EXTRA_VALOR, valor)
+            putExtra(ResumoOverlayService.EXTRA_PLATAFORMA, plataforma)
+            categoria?.let { putExtra(ResumoOverlayService.EXTRA_CATEGORIA, it) }
+            horario?.let { putExtra(ResumoOverlayService.EXTRA_HORARIO, it) }
+        }
+        startService(intent)
+    }
+
     private fun obterPrecoEConsumoAtivos(prefs: android.content.SharedPreferences): Pair<Double, Double> {
         return when (prefs.getString(PREF_COMBUSTIVEL_ATIVO, "etanol")) {
             "gasolina" -> Pair(
@@ -354,23 +381,6 @@ class RideAccessibilityService : AccessibilityService() {
                 prefs.getFloat(PREF_CONSUMO_ETANOL, 7.0f).toDouble()
             )
         }
-    }
-    
-    private fun processarUltimaViagem(texto: String) {
-        val valor = ResumoDetector.extrairValorUltimaViagem(texto) ?: return
-        if (valor <= 0 || valor > VALOR_MAXIMO_PLAUSIVEL_RESUMO) return
-
-        val categoria = ResumoDetector.extrairCategoria(texto)
-        val horario = ResumoDetector.extrairHorario(texto)
-        val plataforma = detectarPlataforma()
-
-        val intent = Intent(this, ResumoOverlayService::class.java).apply {
-            putExtra(ResumoOverlayService.EXTRA_VALOR, valor)
-            putExtra(ResumoOverlayService.EXTRA_PLATAFORMA, plataforma)
-            categoria?.let { putExtra(ResumoOverlayService.EXTRA_CATEGORIA, it) }
-            horario?.let { putExtra(ResumoOverlayService.EXTRA_HORARIO, it) }
-        }
-        startService(intent)
     }
 
     private fun processarTelaDeCorrida(texto: String) {
