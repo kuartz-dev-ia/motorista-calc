@@ -45,58 +45,90 @@ class ResumoOverlayService : Service() {
         windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
 
         val fundo = GradientDrawable().apply {
-            setColor(Color.parseColor("#0F1B2D"))
-            cornerRadius = dp(18).toFloat()
-            setStroke(dp(1), Color.parseColor("#661FE7C4"))
+            orientation = GradientDrawable.Orientation.TL_BR
+            colors = intArrayOf(Color.parseColor("#132030"), Color.parseColor("#0B141F"))
+            cornerRadius = dp(22).toFloat()
+            setStroke(dp(1), Color.parseColor("#801FE7C4"))
         }
 
         val container = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
+            gravity = Gravity.CENTER_HORIZONTAL
             background = fundo
-            setPadding(dp(18), dp(14), dp(18), dp(14))
+            setPadding(dp(22), dp(18), dp(22), dp(18))
         }
 
         val emoji = when (plataforma) { "Uber" -> "⬛"; "99" -> "🟡"; else -> "🚗" }
 
-        container.addView(TextView(this).apply {
-            text = "$emoji $plataforma · ÚLTIMA VIAGEM DETECTADA"
-            setTextColor(Color.parseColor("#8B96AC"))
-            textSize = 10.5f
-            setTypeface(typeface, Typeface.BOLD)
-        })
-
-        container.addView(TextView(this).apply {
-            text = "R$ %.2f".format(valor)
-            setTextColor(Color.parseColor("#1FE7A0"))
-            textSize = 22f
-            setTypeface(typeface, Typeface.BOLD)
-            setPadding(0, dp(4), 0, dp(2))
-        })
-
-        val detalhes = listOfNotNull(categoria, horario).joinToString("  •  ")
-        if (detalhes.isNotBlank()) {
-            container.addView(TextView(this).apply {
-                text = detalhes
-                setTextColor(Color.parseColor("#8B96AC"))
-                textSize = 11f
-                setPadding(0, 0, 0, dp(8))
-            })
-        } else {
-            container.addView(android.view.View(this).apply {
-                layoutParams = LinearLayout.LayoutParams(0, dp(8))
-            })
+        // Cabeçalho
+        val cabecalho = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER
         }
+        cabecalho.addView(TextView(this).apply {
+            text = "$emoji  $plataforma"
+            setTextColor(Color.parseColor("#E4E7EC"))
+            textSize = 12f
+            setTypeface(typeface, Typeface.BOLD)
+        })
+        container.addView(cabecalho)
 
         container.addView(TextView(this).apply {
-            text = "KM PERCORRIDO NESSA CORRIDA (OPCIONAL)"
+            text = "ÚLTIMA VIAGEM DETECTADA"
             setTextColor(Color.parseColor("#1FE7C4"))
             textSize = 9.5f
             setTypeface(typeface, Typeface.BOLD)
-            setPadding(0, 0, 0, dp(4))
+            gravity = Gravity.CENTER_HORIZONTAL
+            setPadding(0, dp(2), 0, dp(10))
+        })
+
+        // Valor em destaque
+        container.addView(TextView(this).apply {
+            text = "R$ %.2f".format(valor)
+            setTextColor(Color.parseColor("#1FE7A0"))
+            textSize = 30f
+            setTypeface(typeface, Typeface.BOLD)
+            gravity = Gravity.CENTER_HORIZONTAL
+        })
+
+        // Pills de horário/categoria
+        if (categoria != null || horario != null) {
+            val linhaPills = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = Gravity.CENTER
+                setPadding(0, dp(10), 0, dp(4))
+            }
+            horario?.let {
+                linhaPills.addView(criarPill("🕐 $it", "#3DB8F5"))
+            }
+            if (categoria != null && horario != null) {
+                linhaPills.addView(android.view.View(this).apply { layoutParams = LinearLayout.LayoutParams(dp(8), 1) })
+            }
+            categoria?.let {
+                linhaPills.addView(criarPill(it, "#9B6BF5"))
+            }
+            container.addView(linhaPills)
+        }
+
+        // Separador
+        container.addView(android.view.View(this).apply {
+            setBackgroundColor(Color.parseColor("#221FE7C4"))
+            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dp(1)).apply {
+                topMargin = dp(14); bottomMargin = dp(14)
+            }
+        })
+
+        container.addView(TextView(this).apply {
+            text = "KM PERCORRIDO (OPCIONAL)"
+            setTextColor(Color.parseColor("#8B96AC"))
+            textSize = 9.5f
+            setTypeface(typeface, Typeface.BOLD)
+            gravity = Gravity.CENTER_HORIZONTAL
+            setPadding(0, 0, 0, dp(6))
         })
 
         val edtKm = EditText(this).apply {
-            hint = "Toque aqui pra digitar (ex: 8,5)"
+            hint = "Toque pra digitar (ex: 8,5)"
             inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
             setTextColor(Color.WHITE)
             setHintTextColor(Color.parseColor("#5C6B80"))
@@ -106,13 +138,13 @@ class ResumoOverlayService : Service() {
             isCursorVisible = true
             background = GradientDrawable().apply {
                 setColor(Color.parseColor("#1A2236"))
-                cornerRadius = dp(10).toFloat()
+                cornerRadius = dp(12).toFloat()
             }
-            setPadding(dp(10), dp(10), dp(10), dp(10))
-            textSize = 14f
+            setPadding(dp(10), dp(12), dp(10), dp(12))
+            textSize = 15f
             setTypeface(typeface, Typeface.BOLD)
             layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT).apply {
-                bottomMargin = dp(10)
+                bottomMargin = dp(14)
             }
             setOnClickListener {
                 requestFocus()
@@ -125,13 +157,17 @@ class ResumoOverlayService : Service() {
         val linhaBotoes = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
 
         val btnSalvar = TextView(this).apply {
-            text = "✔ Salvar corrida"
+            text = "✔  Salvar corrida"
             setTextColor(Color.parseColor("#052018"))
-            textSize = 12.5f
+            textSize = 13f
             setTypeface(typeface, Typeface.BOLD)
             gravity = Gravity.CENTER
-            background = GradientDrawable().apply { setColor(Color.parseColor("#1FE7A0")); cornerRadius = dp(10).toFloat() }
-            setPadding(dp(14), dp(10), dp(14), dp(10))
+            background = GradientDrawable().apply {
+                orientation = GradientDrawable.Orientation.LEFT_RIGHT
+                colors = intArrayOf(Color.parseColor("#14C98B"), Color.parseColor("#0FBFA0"))
+                cornerRadius = dp(12).toFloat()
+            }
+            setPadding(dp(14), dp(12), dp(14), dp(12))
             layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f).apply { marginEnd = dp(8) }
             setOnClickListener {
                 esconderTeclado()
@@ -141,12 +177,15 @@ class ResumoOverlayService : Service() {
         }
 
         val btnIgnorar = TextView(this).apply {
-            text = "✕ Ignorar"
+            text = "✕  Ignorar"
             setTextColor(Color.parseColor("#8B96AC"))
-            textSize = 12.5f
+            textSize = 13f
             gravity = Gravity.CENTER
-            background = GradientDrawable().apply { setColor(Color.parseColor("#1A2236")); cornerRadius = dp(10).toFloat() }
-            setPadding(dp(14), dp(10), dp(14), dp(10))
+            background = GradientDrawable().apply {
+                setColor(Color.parseColor("#1A2236"))
+                cornerRadius = dp(12).toFloat()
+            }
+            setPadding(dp(14), dp(12), dp(14), dp(12))
             layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
             setOnClickListener {
                 esconderTeclado()
@@ -170,9 +209,9 @@ class ResumoOverlayService : Service() {
             WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
             PixelFormat.TRANSLUCENT
         ).apply {
-            gravity = Gravity.TOP or Gravity.CENTER_HORIZONTAL
-            y = dp(120)
-            width = dp(270)
+            // Centralizado na tela (não mais colado no topo).
+            gravity = Gravity.CENTER
+            width = dp(280)
             softInputMode = WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE or
                 WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE
         }
@@ -180,7 +219,21 @@ class ResumoOverlayService : Service() {
         overlayView = container
         try { windowManager?.addView(container, params) } catch (e: Exception) { }
 
-        handler.postDelayed({ esconderTeclado(); limpar(); stopSelf() }, 30_000L)
+        handler.postDelayed({ esconderTeclado(); limpar(); stopSelf() }, 45_000L)
+    }
+
+    private fun criarPill(texto: String, cor: String): TextView {
+        return TextView(this).apply {
+            text = texto
+            setTextColor(Color.parseColor(cor))
+            textSize = 10.5f
+            setTypeface(typeface, Typeface.BOLD)
+            background = GradientDrawable().apply {
+                setColor(Color.parseColor("#1A2236"))
+                cornerRadius = dp(20).toFloat()
+            }
+            setPadding(dp(10), dp(5), dp(10), dp(5))
+        }
     }
 
     private fun mostrarTeclado(campo: EditText) {
