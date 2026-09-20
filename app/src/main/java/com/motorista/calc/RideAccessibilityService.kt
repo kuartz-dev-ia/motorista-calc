@@ -33,10 +33,18 @@ class RideAccessibilityService : AccessibilityService() {
     private var ultimoTextoProcessado: String = ""
     private var capturandoNoMomento = false
 
-    /** Guarda "valor|horario" da última corrida já mostrada no cartão de
-     * confirmação, pra não ficar reexibindo o mesmo card enquanto a tela de
-     * resultado da corrida continuar parada (evita o "piscar"). */
-    private var ultimaViagemChaveProcessada: String? = null
+    /** Guarda o último valor lido numa tela de OFERTA de corrida ainda não
+     * confirmado. Só processa (mostra o card com cálculos) quando o MESMO
+     * valor aparecer em duas leituras seguidas — evita pegar a tela no meio
+     * de uma animação/transição e calcular em cima de um número errado. */
+    private var candidatoValorCorrida: Double? = null
+    private var candidatoTextoCorrida: String? = null
+
+    /** Controla o "cooldown" do card de última viagem: enquanto não passar
+     * esse tempo desde a última vez que ele apareceu, não mostra de novo —
+     * evita o card ficar piscando enquanto a tela de resultado da corrida
+     * continuar parada na tela (sendo lida a cada 1,5s). */
+    private var ultimaViagemMostradaEm: Long = 0L
 
     private val handler = Handler(Looper.getMainLooper())
     private val pollingIntervalMs = 1500L
@@ -297,22 +305,49 @@ class RideAccessibilityService : AccessibilityService() {
     }
 
     private fun processarTextoOcr(textoBruto: String) {
-        if (textoBruto.isBlank() || textoBruto == ultimoTextoProcessado) return
-        ultimoTextoProcessado = textoBruto
-
+        if (textoBruto.isBlank()) return
         val texto = TriggerPatterns.limparTextoContaminado(textoBruto)
 
         registrarDebug(texto)
 
         if (TriggerPatterns.pareceTelaDeCorrida(texto)) {
-            Log.d(TAG, "Tela de corrida detectada via OCR. Processando...")
-            processarTelaDeCorrida(texto)
+            confirmarEProcessarOferta(texto)
             return
         }
+
+        // Saiu da tela de oferta — descarta qualquer candidato pendente.
+        candidatoValorCorrida = null
+        candidatoTextoCorrida = null
 
         if (ResumoDetector.pareceUltimaViagem(texto)) {
             Log.d(TAG, "Tela de 'última viagem' detectada via OCR. Processando...")
             processarUltimaViagem(texto)
+        }
+    }
+
+    /** Só processa de verdade a tela de oferta quando o MESMO valor aparecer
+     * em duas leituras seguidas (com ~1,5s de intervalo). Isso evita calcular
+     * em cima de uma leitura feita no meio de uma animação/transição da tela
+     * do Uber/99, que costuma ser a causa de valores errados/negativos
+     * aparecerem por um instante no card. */
+    private fun confirmarEProcessarOferta(texto: String) {
+        val valorLido = TriggerPatterns.extrairValorTotal(texto)
+        if (valorLido == null) {
+            candidatoValorCorrida = null
+            candidatoTextoCorrida = null
+            return
+        }
+
+        val candidatoAnterior = candidatoValorCorrida
+        if (candidatoAnterior != null && candidatoAnterior == valorLido) {
+            if (texto == ultimoTextoProcessado) return
+            ultimoTextoProcessado = texto
+            candidatoValorCorrida = null
+            candidatoTextoCorrida = null
+            processarTelaDeCorrida(texto)
+        } else {
+            candidatoValorCorrida = valorLido
+            candidatoTextoCorrida = texto
         }
     }
 
@@ -343,6 +378,8 @@ class RideAccessibilityService : AccessibilityService() {
     }
 
     private fun processarUltimaViagem(texto: String) {
+        if (System.currentTimeMillis() - ultimaViagemMostradaEm < COOLDOWN_ULTIMA_VIAGEM_MS) return
+
         val valor = ResumoDetector.extrairValorUltimaViagem(texto) ?: return
         if (valor <= 0 || valor > VALOR_MAXIMO_PLAUSIVEL_RESUMO) return
 
@@ -350,12 +387,7 @@ class RideAccessibilityService : AccessibilityService() {
         val horario = ResumoDetector.extrairHorario(texto)
         val plataforma = detectarPlataforma()
 
-        // Trava: se essa mesma combinação de valor+horário já foi mostrada,
-        // não reexibe o card (evita o "piscar" enquanto a tela de resultado
-        // continua parada, sendo lida a cada 1,5s).
-        val chave = "%.2f|%s".format(valor, horario ?: "")
-        if (chave == ultimaViagemChaveProcessada) return
-        ultimaViagemChaveProcessada = chave
+        ultimaViagemMostradaEm = System.currentTimeMillis()
 
         val intent = Intent(this, ResumoOverlayService::class.java).apply {
             putExtra(ResumoOverlayService.EXTRA_VALOR, valor)
@@ -567,5 +599,6 @@ class RideAccessibilityService : AccessibilityService() {
         private const val CANAL_JORNADA_ID = "jornada_ao_vivo"
         private const val NOTIFICACAO_JORNADA_ID = 774
         private const val INTERVALO_LEMBRETE_META_MS = 30L * 60 * 1000
+        private const val COOLDOWN_ULTIMA_VIAGEM_MS = 10_000L
     }
 }
