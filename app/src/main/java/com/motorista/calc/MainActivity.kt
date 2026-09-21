@@ -1,7 +1,6 @@
 package com.motorista.calc
 
 import android.Manifest
-import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -80,21 +79,20 @@ class MainActivity : AppCompatActivity() {
         edtCargaHoraria.addTextChangedListener(watcherAtualizaPreview)
 
         findViewById<TextView>(R.id.btnIniciarJornada).setOnClickListener { iniciarJornada() }
-        findViewById<TextView>(R.id.btnEncerrarJornada).setOnClickListener {
+        findViewById<android.view.View>(R.id.btnEncerrarJornada).setOnClickListener {
             startActivity(Intent(this, EncerrarJornadaActivity::class.java))
         }
-        findViewById<TextView>(R.id.btnGravar).setOnClickListener { alternarGravacao() }
-        findViewById<TextView>(R.id.btnVerCorridas).setOnClickListener {
+        findViewById<android.view.View>(R.id.btnGravar).setOnClickListener { alternarGravacao() }
+        findViewById<android.view.View>(R.id.btnVerCorridas).setOnClickListener {
             startActivity(Intent(this, CorridasDaJornadaActivity::class.java))
         }
-        findViewById<TextView>(R.id.btnAdicionarCorridaHome).setOnClickListener {
+        findViewById<android.view.View>(R.id.btnAdicionarCorridaHome).setOnClickListener {
             startActivity(Intent(this, AdicionarCorridaActivity::class.java))
         }
 
         findViewById<android.view.View>(R.id.btnAbrirMaisOpcoes).setOnClickListener {
             startActivity(Intent(this, MaisOpcoesActivity::class.java))
         }
-        findViewById<TextView>(R.id.btnVerDicas).setOnClickListener { mostrarDicas() }
 
         findViewById<android.view.View>(R.id.navInicio).setOnClickListener { }
         findViewById<android.view.View>(R.id.navRelatorios).setOnClickListener { startActivity(Intent(this, WeeklyActivity::class.java)) }
@@ -120,7 +118,7 @@ class MainActivity : AppCompatActivity() {
     private fun selecionarChipMeta(selecionado: TextView, valor: String) {
         for ((chip, _) in chipsMeta) {
             chip.background = ContextCompat.getDrawable(this, if (chip == selecionado) R.drawable.bg_chip_selected else R.drawable.bg_chip_unselected)
-            chip.setTextColor(if (chip == selecionado) Color.parseColor("#08131A") else Color.parseColor("#8B96AC"))
+            chip.setTextColor(if (chip == selecionado) Color.parseColor("#06231F") else Color.parseColor("#8A94A3"))
         }
         edtMetaDiaria.setText(valor)
     }
@@ -128,7 +126,7 @@ class MainActivity : AppCompatActivity() {
     private fun selecionarChipCarga(selecionado: TextView, valor: String) {
         for ((chip, _) in chipsCarga) {
             chip.background = ContextCompat.getDrawable(this, if (chip == selecionado) R.drawable.bg_chip_selected else R.drawable.bg_chip_unselected)
-            chip.setTextColor(if (chip == selecionado) Color.parseColor("#08131A") else Color.parseColor("#8B96AC"))
+            chip.setTextColor(if (chip == selecionado) Color.parseColor("#06231F") else Color.parseColor("#8A94A3"))
         }
         edtCargaHoraria.setText(valor)
     }
@@ -172,11 +170,13 @@ class MainActivity : AppCompatActivity() {
     private fun atualizarTelaJornada() {
         val grupoNovaJornada = findViewById<android.view.View>(R.id.grupoNovaJornada)
         val grupoAndamento = findViewById<android.view.View>(R.id.grupoJornadaAndamento)
+        val txtStatusTopo = findViewById<TextView>(R.id.txtStatusTopo)
 
         val jornada = JornadaStorage.jornadaAtiva(this)
         if (jornada == null) {
             grupoNovaJornada.visibility = android.view.View.VISIBLE
             grupoAndamento.visibility = android.view.View.GONE
+            txtStatusTopo.text = "Nenhuma jornada ativa"
             atualizarPreviewMetaPorHora()
         } else {
             grupoNovaJornada.visibility = android.view.View.GONE
@@ -186,70 +186,21 @@ class MainActivity : AppCompatActivity() {
             val horas = stats.tempoTrabalhadoMin / 60
             val minutos = stats.tempoTrabalhadoMin % 60
 
-            findViewById<TextView>(R.id.txtJornadaTempo).text = "%02d:%02d".format(horas, minutos)
-            findViewById<TextView>(R.id.txtJornadaMeta).text = "R$%.0f".format(jornada.metaDiaria)
-            findViewById<TextView>(R.id.txtJornadaPercentual).text = "%.0f%%".format(stats.percentualMeta)
-            findViewById<TextView>(R.id.txtJornadaGanho).text = "R$ %.2f".format(stats.ganhoBruto)
-            findViewById<TextView>(R.id.txtJornadaRPorHora).text = "R$ %.2f".format(stats.valorPorHora)
-            findViewById<TextView>(R.id.txtJornadaRPorKm).text = "R$ %.2f".format(stats.valorPorKm)
-            findViewById<TextView>(R.id.txtJornadaKm).text = "%.1f".format(stats.kmRodados)
-            findViewById<TextView>(R.id.txtJornadaCombustivel).text = "R$ %.2f".format(stats.custoCombustivel)
+            txtStatusTopo.text = "Jornada ativa · %02d:%02d".format(horas, minutos)
+            findViewById<TextView>(R.id.txtJornadaTempo).text = "⏱ %02d:%02d na jornada".format(horas, minutos)
+            findViewById<TextView>(R.id.txtJornadaMeta).text = "  da meta de R$%.0f".format(jornada.metaDiaria)
+            findViewById<TextView>(R.id.txtJornadaPercentual).text = "↑ %.0f%%".format(stats.percentualMeta)
+            findViewById<TextView>(R.id.txtJornadaGanho).text = "R$%.0f".format(stats.ganhoBruto)
+            findViewById<TextView>(R.id.txtJornadaRPorHora).text = "R$%.0f".format(stats.valorPorHora)
+            findViewById<TextView>(R.id.txtJornadaRPorKm).text = "R$%.2f".format(stats.valorPorKm)
+            findViewById<TextView>(R.id.txtJornadaCombustivel).text = "R$%.0f".format(stats.custoCombustivel)
 
             val txtLucro = findViewById<TextView>(R.id.txtJornadaLucro)
             txtLucro.text = "R$ %.2f".format(stats.lucroLiquido)
-            txtLucro.setTextColor(Color.parseColor(if (stats.lucroLiquido >= 0) "#1FE7A0" else "#F55757"))
-
-            val anel = findViewById<android.view.View>(R.id.anelMeta)
-            anel.setBackgroundResource(if (stats.percentualMeta >= 100) R.drawable.bg_ring_progress else R.drawable.bg_ring_progress_baixo)
+            txtLucro.setTextColor(Color.parseColor(if (stats.lucroLiquido >= 0) "#F2F4F7" else "#C9807E"))
         }
 
         atualizarBotaoGravar()
-    }
-
-    private fun mostrarDicas() {
-        val dicas = mutableListOf<String>()
-
-        val jornadaAtiva = JornadaStorage.jornadaAtiva(this)
-        val ultimaJornada = jornadaAtiva ?: JornadaStorage.listarTodas(this).firstOrNull { it.dataFimMillis != null }
-
-        if (ultimaJornada != null) {
-            val stats = JornadaStorage.calcularStats(this, ultimaJornada)
-            if (stats.ganhoBruto > 0) {
-                val percentualCombustivel = (stats.custoCombustivel / stats.ganhoBruto) * 100
-                if (percentualCombustivel > 25) {
-                    dicas.add("⛽ O combustível está consumindo %.0f%% do seu ganho bruto — considere revisar o consumo do carro ou o combustível usado em Config.".format(percentualCombustivel))
-                }
-            }
-            if (stats.valorPorHora > 0 && stats.valorPorHora < 20) {
-                dicas.add("🕐 Seu R$/hora está em R$ %.2f, abaixo do recomendado. Avalie evitar corridas muito longas em horários de trânsito parado.".format(stats.valorPorHora))
-            }
-        }
-
-        val consumoMedio = AbastecimentoStorage.consumoMedio(AbastecimentoStorage.listarTodos(this))
-        if (consumoMedio != null) {
-            dicas.add("📊 Seu consumo real medido é de %.1f km/l — confira se esse valor está atualizado em Config > Combustível.".format(consumoMedio))
-        }
-
-        val manutencoesPendentes = ManutencaoStorage.pendencias(this)
-        if (manutencoesPendentes.isNotEmpty()) {
-            dicas.add("🔧 Você tem ${manutencoesPendentes.size} manutenção(ões) pendente(s) — resolver isso evita gastos maiores depois.")
-        }
-
-        val documentosPendentes = DocumentoStorage.pendencias(this)
-        if (documentosPendentes.isNotEmpty()) {
-            dicas.add("📄 Tem documento(s) vencendo ou vencido(s) — dá uma olhada na aba Documentos.")
-        }
-
-        if (dicas.isEmpty()) {
-            dicas.add("✅ Está tudo em ordem por enquanto! Continue registrando corridas, abastecimentos e manutenções pra eu te dar dicas cada vez mais precisas.")
-        }
-
-        val dialog = AlertDialog.Builder(this, R.style.DialogTemaEscuro)
-            .setTitle("🤖 Dicas do Agente financeiro")
-            .setMessage(dicas.joinToString("\n\n"))
-            .setPositiveButton("Entendi", null)
-            .show()
-        DialogUtils.aplicarCoresBotoes(dialog)
     }
 
     private fun atualizarTrial() {
@@ -266,13 +217,19 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun atualizarBotaoGravar() {
-        val btnGravar = findViewById<TextView>(R.id.btnGravar)
+        val btnGravar = findViewById<android.view.View>(R.id.btnGravar)
+        val iconeGravar = findViewById<TextView>(R.id.iconeGravar)
+        val labelGravar = findViewById<TextView>(R.id.labelGravar)
         if (RideRecorderService.emGravacao) {
-            btnGravar.text = "⏺️  Gravação iniciada — toque para encerrar"
+            iconeGravar.text = "⏺️"
+            labelGravar.text = "Gravando… toque p/ parar"
             btnGravar.background = ContextCompat.getDrawable(this, R.drawable.bg_cta_stop)
+            labelGravar.setTextColor(Color.parseColor("#C9807E"))
         } else {
-            btnGravar.text = "▶  Iniciar Gravação da Corrida"
+            iconeGravar.text = "🔴"
+            labelGravar.text = "Gravar corrida"
             btnGravar.background = ContextCompat.getDrawable(this, R.drawable.bg_cta_start)
+            labelGravar.setTextColor(Color.parseColor("#06231F"))
         }
     }
 
