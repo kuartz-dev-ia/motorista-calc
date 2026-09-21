@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#070C14">
+    android:background="#0A0D12">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -13,846 +13,751 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:padding="18dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="6dp">
+
+                <TextView
+                    android:layout_width="34dp"
+                    android:layout_height="34dp"
+                    android:background="@drawable/bg_card_dark"
+                    android:gravity="center"
+                    android:text="🚗"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:id="@+id/txtStatusTopo"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="Nenhuma jornada ativa"
+                    android:textColor="#5D6773"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/btnAbrirMaisOpcoes"
+                    android:layout_width="34dp"
+                    android:layout_height="34dp"
+                    android:background="@drawable/bg_card_dark"
+                    android:gravity="center"
+                    android:text="⚙️"
+                    android:textSize="14sp"
+                    android:clickable="true"
+                    android:focusable="true" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/cardAviso"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:background="#0F1B2D"
-                android:padding="16dp"
-                android:paddingBottom="20dp">
+                android:background="@drawable/bg_card_dark"
+                android:padding="12dp"
+                android:layout_marginTop="10dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/txtTeste"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="#C9807E"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/grupoNovaJornada"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
-
-                    <ImageView
-                        android:layout_width="34dp"
-                        android:layout_height="34dp"
-                        android:src="@drawable/logo_motorista"
-                        android:layout_marginEnd="10dp"
-                        android:contentDescription="Logo do app" />
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Motorista Calc"
-                            android:textColor="#FFFFFF"
-                            android:textSize="17sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Controle, planeje, conquiste!"
-                            android:textColor="#8B96AC"
-                            android:textSize="10sp" />
-                    </LinearLayout>
+                    android:orientation="vertical"
+                    android:background="@drawable/bg_card_accent"
+                    android:padding="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="14dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="🌙"
-                        android:textSize="16sp" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
-
-                <LinearLayout
-                    android:id="@+id/cardAviso"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:background="@drawable/bg_card_dark"
-                    android:padding="12dp"
-                    android:layout_marginBottom="14dp"
-                    android:visibility="gone">
-
-                    <TextView
-                        android:id="@+id/txtTeste"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:textColor="#F55757"
-                        android:textSize="12sp" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/grupoNovaJornada"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:background="@drawable/bg_tint_green"
-                        android:padding="16dp"
-                        android:layout_marginBottom="14dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="🎯 Nova Jornada"
-                            android:textColor="#FFFFFF"
-                            android:textSize="16sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Configure suas metas e inicie"
-                            android:textColor="#8B96AC"
-                            android:textSize="12sp"
-                            android:layout_marginTop="2dp" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:background="@drawable/bg_card_dark"
-                        android:padding="16dp"
-                        android:layout_marginBottom="12dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Meta Diária"
-                            android:textColor="#FFFFFF"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            android:layout_marginBottom="10dp" />
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:layout_marginBottom="10dp">
-
-                            <TextView
-                                android:id="@+id/chipMeta200"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:layout_marginEnd="4dp"
-                                android:background="@drawable/bg_chip_unselected"
-                                android:gravity="center"
-                                android:padding="8dp"
-                                android:text="200"
-                                android:textColor="#8B96AC"
-                                android:textSize="11sp"
-                                android:clickable="true"
-                                android:focusable="true" />
-
-                            <TextView
-                                android:id="@+id/chipMeta300"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:layout_marginEnd="4dp"
-                                android:background="@drawable/bg_chip_unselected"
-                                android:gravity="center"
-                                android:padding="8dp"
-                                android:text="300"
-                                android:textColor="#8B96AC"
-                                android:textSize="11sp"
-                                android:clickable="true"
-                                android:focusable="true" />
-
-                            <TextView
-                                android:id="@+id/chipMeta400"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:layout_marginEnd="4dp"
-                                android:background="@drawable/bg_chip_unselected"
-                                android:gravity="center"
-                                android:padding="8dp"
-                                android:text="400"
-                                android:textColor="#8B96AC"
-                                android:textSize="11sp"
-                                android:clickable="true"
-                                android:focusable="true" />
-
-                            <TextView
-                                android:id="@+id/chipMeta500"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:layout_marginEnd="4dp"
-                                android:background="@drawable/bg_chip_unselected"
-                                android:gravity="center"
-                                android:padding="8dp"
-                                android:text="500"
-                                android:textColor="#8B96AC"
-                                android:textSize="11sp"
-                                android:clickable="true"
-                                android:focusable="true" />
-
-                            <TextView
-                                android:id="@+id/chipMeta600"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:background="@drawable/bg_chip_unselected"
-                                android:gravity="center"
-                                android:padding="8dp"
-                                android:text="600"
-                                android:textColor="#8B96AC"
-                                android:textSize="11sp"
-                                android:clickable="true"
-                                android:focusable="true" />
-                        </LinearLayout>
-
-                        <EditText
-                            android:id="@+id/edtMetaDiaria"
-                            android:layout_width="match_parent"
-                            android:layout_height="48dp"
-                            android:background="@drawable/bg_input_verde"
-                            android:paddingStart="14dp"
-                            android:paddingEnd="14dp"
-                            android:gravity="center_vertical"
-                            android:textColor="#FFFFFF"
-                            android:textColorHint="#8B96AC"
-                            android:hint="R$ 0"
-                            android:textSize="16sp"
-                            android:textStyle="bold"
-                            android:inputType="numberDecimal" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:background="@drawable/bg_card_dark"
-                        android:padding="16dp"
-                        android:layout_marginBottom="12dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Carga Horária"
-                            android:textColor="#FFFFFF"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            android:layout_marginBottom="10dp" />
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:layout_marginBottom="10dp">
-
-                            <TextView
-                                android:id="@+id/chipCarga6"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:layout_marginEnd="4dp"
-                                android:background="@drawable/bg_chip_unselected"
-                                android:gravity="center"
-                                android:padding="8dp"
-                                android:text="6h"
-                                android:textColor="#8B96AC"
-                                android:textSize="12sp"
-                                android:clickable="true"
-                                android:focusable="true" />
-
-                            <TextView
-                                android:id="@+id/chipCarga8"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:layout_marginEnd="4dp"
-                                android:background="@drawable/bg_chip_unselected"
-                                android:gravity="center"
-                                android:padding="8dp"
-                                android:text="8h"
-                                android:textColor="#8B96AC"
-                                android:textSize="12sp"
-                                android:clickable="true"
-                                android:focusable="true" />
-
-                            <TextView
-                                android:id="@+id/chipCarga10"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:layout_marginEnd="4dp"
-                                android:background="@drawable/bg_chip_unselected"
-                                android:gravity="center"
-                                android:padding="8dp"
-                                android:text="10h"
-                                android:textColor="#8B96AC"
-                                android:textSize="12sp"
-                                android:clickable="true"
-                                android:focusable="true" />
-
-                            <TextView
-                                android:id="@+id/chipCarga12"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:background="@drawable/bg_chip_unselected"
-                                android:gravity="center"
-                                android:padding="8dp"
-                                android:text="12h"
-                                android:textColor="#8B96AC"
-                                android:textSize="12sp"
-                                android:clickable="true"
-                                android:focusable="true" />
-                        </LinearLayout>
-
-                        <EditText
-                            android:id="@+id/edtCargaHoraria"
-                            android:layout_width="match_parent"
-                            android:layout_height="48dp"
-                            android:background="@drawable/bg_input_verde"
-                            android:paddingStart="14dp"
-                            android:paddingEnd="14dp"
-                            android:gravity="center_vertical"
-                            android:textColor="#FFFFFF"
-                            android:textColorHint="#8B96AC"
-                            android:hint="Horas"
-                            android:textSize="16sp"
-                            android:textStyle="bold"
-                            android:inputType="numberDecimal" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:background="@drawable/bg_card_dark"
-                        android:padding="16dp"
-                        android:layout_marginBottom="12dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Odômetro Inicial"
-                            android:textColor="#FFFFFF"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            android:layout_marginBottom="8dp" />
-
-                        <EditText
-                            android:id="@+id/edtOdometroInicial"
-                            android:layout_width="match_parent"
-                            android:layout_height="48dp"
-                            android:background="@drawable/bg_input_verde"
-                            android:paddingStart="14dp"
-                            android:paddingEnd="14dp"
-                            android:gravity="center_vertical"
-                            android:textColor="#FFFFFF"
-                            android:textColorHint="#8B96AC"
-                            android:hint="Ex: 125000"
-                            android:textSize="14sp"
-                            android:inputType="numberDecimal" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:background="@drawable/bg_tint_green"
-                        android:padding="14dp"
-                        android:gravity="center_vertical"
-                        android:layout_marginBottom="16dp">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Meta por Hora"
-                            android:textColor="#8B96AC"
-                            android:textSize="12sp" />
-
-                        <TextView
-                            android:id="@+id/txtMetaPorHoraPreview"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="R$ 0,00/h"
-                            android:textColor="#1FE7A0"
-                            android:textSize="16sp"
-                            android:textStyle="bold" />
-                    </LinearLayout>
-
-                    <TextView
-                        android:id="@+id/btnIniciarJornada"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/bg_cta_start"
-                        android:padding="14dp"
-                        android:gravity="center"
-                        android:text="▶  Iniciar Jornada"
-                        android:textColor="#052018"
-                        android:textSize="14sp"
-                        android:textStyle="bold"
-                        android:layout_marginBottom="16dp"
-                        android:clickable="true"
-                        android:focusable="true" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/grupoJornadaAndamento"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:visibility="gone">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:background="@drawable/bg_tint_green"
-                        android:padding="16dp"
-                        android:layout_marginBottom="12dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="🟢 Jornada em andamento"
-                            android:textColor="#1FE7C4"
-                            android:textSize="13sp"
-                            android:textStyle="bold"
-                            android:layout_marginBottom="10dp" />
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical">
-
-                            <LinearLayout
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:orientation="vertical">
-
-                                <TextView
-                                    android:id="@+id/txtJornadaTempo"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="00:00"
-                                    android:textColor="#FFFFFF"
-                                    android:textSize="32sp"
-                                    android:textStyle="bold" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Tempo de viagem"
-                                    android:textColor="#8B96AC"
-                                    android:textSize="10.5sp" />
-                            </LinearLayout>
-
-                            <FrameLayout
-                                android:layout_width="76dp"
-                                android:layout_height="76dp">
-
-                                <View
-                                    android:id="@+id/anelMeta"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:background="@drawable/bg_ring_progress_baixo" />
-
-                                <LinearLayout
-                                    android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:orientation="vertical"
-                                    android:gravity="center">
-
-                                    <TextView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:text="Meta"
-                                        android:textColor="#8B96AC"
-                                        android:textSize="8sp" />
-
-                                    <TextView
-                                        android:id="@+id/txtJornadaMeta"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:text="R$0"
-                                        android:textColor="#FFFFFF"
-                                        android:textSize="12sp"
-                                        android:textStyle="bold" />
-
-                                    <TextView
-                                        android:id="@+id/txtJornadaPercentual"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:text="0%"
-                                        android:textColor="#1FE7C4"
-                                        android:textSize="10sp"
-                                        android:textStyle="bold" />
-                                </LinearLayout>
-                            </FrameLayout>
-                        </LinearLayout>
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginBottom="8dp">
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical"
-                            android:background="@drawable/bg_tint_green"
-                            android:padding="10dp"
-                            android:layout_marginEnd="6dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="💲"
-                                android:textSize="14sp" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="GANHOS"
-                                android:textColor="#8B96AC"
-                                android:textSize="8.5sp" />
-
-                            <TextView
-                                android:id="@+id/txtJornadaGanho"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="R$ 0,00"
-                                android:textColor="#1FE7A0"
-                                android:textSize="14sp"
-                                android:textStyle="bold" />
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical"
-                            android:background="@drawable/bg_tint_blue"
-                            android:padding="10dp"
-                            android:layout_marginEnd="6dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="🕐"
-                                android:textSize="14sp" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="R$/H"
-                                android:textColor="#8B96AC"
-                                android:textSize="8.5sp" />
-
-                            <TextView
-                                android:id="@+id/txtJornadaRPorHora"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="R$ 0,00"
-                                android:textColor="#3DB8F5"
-                                android:textSize="14sp"
-                                android:textStyle="bold" />
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical"
-                            android:background="@drawable/bg_tint_purple"
-                            android:padding="10dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="📍"
-                                android:textSize="14sp" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="R$/KM"
-                                android:textColor="#8B96AC"
-                                android:textSize="8.5sp" />
-
-                            <TextView
-                                android:id="@+id/txtJornadaRPorKm"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="R$ 0,00"
-                                android:textColor="#9B6BF5"
-                                android:textSize="14sp"
-                                android:textStyle="bold" />
-                        </LinearLayout>
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginBottom="16dp">
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical"
-                            android:background="@drawable/bg_tint_purple"
-                            android:padding="10dp"
-                            android:layout_marginEnd="6dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="📍"
-                                android:textSize="14sp" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="KM"
-                                android:textColor="#8B96AC"
-                                android:textSize="8.5sp" />
-
-                            <TextView
-                                android:id="@+id/txtJornadaKm"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="0,0"
-                                android:textColor="#9B6BF5"
-                                android:textSize="14sp"
-                                android:textStyle="bold" />
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical"
-                            android:background="@drawable/bg_tint_red"
-                            android:padding="10dp"
-                            android:layout_marginEnd="6dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="⛽"
-                                android:textSize="14sp" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="COMBUSTÍVEL"
-                                android:textColor="#8B96AC"
-                                android:textSize="8.5sp" />
-
-                            <TextView
-                                android:id="@+id/txtJornadaCombustivel"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="R$ 0,00"
-                                android:textColor="#F5576B"
-                                android:textSize="14sp"
-                                android:textStyle="bold" />
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical"
-                            android:background="@drawable/bg_tint_green"
-                            android:padding="10dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="💧"
-                                android:textSize="14sp" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="LUCRO LÍQUIDO"
-                                android:textColor="#8B96AC"
-                                android:textSize="8.5sp" />
-
-                            <TextView
-                                android:id="@+id/txtJornadaLucro"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="R$ 0,00"
-                                android:textColor="#1FE7A0"
-                                android:textSize="14sp"
-                                android:textStyle="bold" />
-                        </LinearLayout>
-                    </LinearLayout>
-
-                    <TextView
-                        android:id="@+id/btnAdicionarCorridaHome"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/bg_input_verde"
-                        android:padding="14dp"
-                        android:gravity="center"
-                        android:text="➕ Adicionar corrida manual"
-                        android:textColor="#1FE7A0"
-                        android:textSize="13sp"
-                        android:textStyle="bold"
-                        android:layout_marginBottom="12dp"
-                        android:clickable="true"
-                        android:focusable="true" />
-
-                    <TextView
-                        android:id="@+id/btnVerCorridas"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/bg_card_dark"
-                        android:padding="14dp"
-                        android:gravity="center"
-                        android:text="📋 Ver/editar corridas de hoje"
-                        android:textColor="#3DB8F5"
-                        android:textSize="13sp"
-                        android:textStyle="bold"
-                        android:layout_marginBottom="12dp"
-                        android:clickable="true"
-                        android:focusable="true" />
-
-                    <TextView
-                        android:id="@+id/btnGravar"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:padding="14dp"
-                        android:gravity="center"
-                        android:background="@drawable/bg_cta_start"
-                        android:text="▶  Iniciar Gravação da Corrida"
-                        android:textColor="#052018"
-                        android:textSize="13sp"
-                        android:textStyle="bold"
-                        android:layout_marginBottom="10dp"
-                        android:clickable="true"
-                        android:focusable="true" />
-
-                    <TextView
-                        android:id="@+id/btnEncerrarJornada"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/bg_cta_stop"
-                        android:padding="14dp"
-                        android:gravity="center"
-                        android:text="⏹  Encerrar Jornada"
-                        android:textColor="#2E1500"
-                        android:textSize="13sp"
-                        android:textStyle="bold"
-                        android:layout_marginBottom="16dp"
-                        android:clickable="true"
-                        android:focusable="true" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/btnAbrirMaisOpcoes"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:background="@drawable/bg_card_dark"
-                    android:padding="16dp"
-                    android:layout_marginBottom="14dp"
-                    android:clickable="true"
-                    android:focusable="true">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="⚙️ Mais opções"
-                        android:textColor="#FFFFFF"
-                        android:textSize="13sp"
+                        android:text="Nova jornada"
+                        android:textColor="#E7EAEE"
+                        android:textSize="15sp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="›"
-                        android:textColor="#8B96AC"
-                        android:textSize="18sp" />
+                        android:text="Configure suas metas e inicie"
+                        android:textColor="#5D6773"
+                        android:textSize="11.5sp"
+                        android:layout_marginTop="2dp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:background="@drawable/bg_card_dark"
+                    android:padding="16dp"
+                    android:layout_marginBottom="12dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="META DIÁRIA"
+                        android:textColor="#5D6773"
+                        android:textSize="10.5sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="10dp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="10dp">
+
+                        <TextView
+                            android:id="@+id/chipMeta200"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="4dp"
+                            android:background="@drawable/bg_chip_unselected"
+                            android:gravity="center"
+                            android:padding="8dp"
+                            android:text="200"
+                            android:textColor="#8A94A3"
+                            android:textSize="11sp"
+                            android:clickable="true"
+                            android:focusable="true" />
+
+                        <TextView
+                            android:id="@+id/chipMeta300"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="4dp"
+                            android:background="@drawable/bg_chip_unselected"
+                            android:gravity="center"
+                            android:padding="8dp"
+                            android:text="300"
+                            android:textColor="#8A94A3"
+                            android:textSize="11sp"
+                            android:clickable="true"
+                            android:focusable="true" />
+
+                        <TextView
+                            android:id="@+id/chipMeta400"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="4dp"
+                            android:background="@drawable/bg_chip_unselected"
+                            android:gravity="center"
+                            android:padding="8dp"
+                            android:text="400"
+                            android:textColor="#8A94A3"
+                            android:textSize="11sp"
+                            android:clickable="true"
+                            android:focusable="true" />
+
+                        <TextView
+                            android:id="@+id/chipMeta500"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="4dp"
+                            android:background="@drawable/bg_chip_unselected"
+                            android:gravity="center"
+                            android:padding="8dp"
+                            android:text="500"
+                            android:textColor="#8A94A3"
+                            android:textSize="11sp"
+                            android:clickable="true"
+                            android:focusable="true" />
+
+                        <TextView
+                            android:id="@+id/chipMeta600"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_chip_unselected"
+                            android:gravity="center"
+                            android:padding="8dp"
+                            android:text="600"
+                            android:textColor="#8A94A3"
+                            android:textSize="11sp"
+                            android:clickable="true"
+                            android:focusable="true" />
+                    </LinearLayout>
+
+                    <EditText
+                        android:id="@+id/edtMetaDiaria"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@drawable/bg_input_verde"
+                        android:paddingStart="14dp"
+                        android:paddingEnd="14dp"
+                        android:gravity="center_vertical"
+                        android:textColor="#E7EAEE"
+                        android:textColorHint="#5D6773"
+                        android:hint="R$ 0"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:inputType="numberDecimal" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:background="@drawable/bg_card_dark"
+                    android:padding="16dp"
+                    android:layout_marginBottom="12dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="CARGA HORÁRIA"
+                        android:textColor="#5D6773"
+                        android:textSize="10.5sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="10dp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="10dp">
+
+                        <TextView
+                            android:id="@+id/chipCarga6"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="4dp"
+                            android:background="@drawable/bg_chip_unselected"
+                            android:gravity="center"
+                            android:padding="8dp"
+                            android:text="6h"
+                            android:textColor="#8A94A3"
+                            android:textSize="12sp"
+                            android:clickable="true"
+                            android:focusable="true" />
+
+                        <TextView
+                            android:id="@+id/chipCarga8"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="4dp"
+                            android:background="@drawable/bg_chip_unselected"
+                            android:gravity="center"
+                            android:padding="8dp"
+                            android:text="8h"
+                            android:textColor="#8A94A3"
+                            android:textSize="12sp"
+                            android:clickable="true"
+                            android:focusable="true" />
+
+                        <TextView
+                            android:id="@+id/chipCarga10"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="4dp"
+                            android:background="@drawable/bg_chip_unselected"
+                            android:gravity="center"
+                            android:padding="8dp"
+                            android:text="10h"
+                            android:textColor="#8A94A3"
+                            android:textSize="12sp"
+                            android:clickable="true"
+                            android:focusable="true" />
+
+                        <TextView
+                            android:id="@+id/chipCarga12"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_chip_unselected"
+                            android:gravity="center"
+                            android:padding="8dp"
+                            android:text="12h"
+                            android:textColor="#8A94A3"
+                            android:textSize="12sp"
+                            android:clickable="true"
+                            android:focusable="true" />
+                    </LinearLayout>
+
+                    <EditText
+                        android:id="@+id/edtCargaHoraria"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@drawable/bg_input_verde"
+                        android:paddingStart="14dp"
+                        android:paddingEnd="14dp"
+                        android:gravity="center_vertical"
+                        android:textColor="#E7EAEE"
+                        android:textColorHint="#5D6773"
+                        android:hint="Horas"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:inputType="numberDecimal" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:background="@drawable/bg_card_dark"
+                    android:padding="16dp"
+                    android:layout_marginBottom="12dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="ODÔMETRO INICIAL"
+                        android:textColor="#5D6773"
+                        android:textSize="10.5sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="8dp" />
+
+                    <EditText
+                        android:id="@+id/edtOdometroInicial"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@drawable/bg_input_verde"
+                        android:paddingStart="14dp"
+                        android:paddingEnd="14dp"
+                        android:gravity="center_vertical"
+                        android:textColor="#E7EAEE"
+                        android:textColorHint="#5D6773"
+                        android:hint="Ex: 125000"
+                        android:textSize="14sp"
+                        android:inputType="numberDecimal" />
                 </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:background="@drawable/bg_tint_green"
+                    android:background="@drawable/bg_card_accent"
                     android:padding="14dp"
-                    android:gravity="center_vertical">
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="16dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Meta por hora"
+                        android:textColor="#8A94A3"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/txtMetaPorHoraPreview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="R$ 0,00/h"
+                        android:textColor="#2FB4A6"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/btnIniciarJornada"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_cta_start"
+                    android:padding="14dp"
+                    android:gravity="center"
+                    android:text="▶  Iniciar jornada"
+                    android:textColor="#06231F"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:clickable="true"
+                    android:focusable="true" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/grupoJornadaAndamento"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center_horizontal"
+                    android:padding="16dp"
+                    android:layout_marginBottom="4dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="🤖"
-                        android:textSize="22sp"
-                        android:layout_marginEnd="10dp" />
+                        android:text="LUCRO LÍQUIDO HOJE"
+                        android:textColor="#5D6773"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="6dp" />
+
+                    <TextView
+                        android:id="@+id/txtJornadaLucro"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="R$ 0,00"
+                        android:textColor="#F2F4F7"
+                        android:textSize="42sp"
+                        android:textStyle="bold" />
+
+                    <LinearLayout
+                        android:id="@+id/pillMeta"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:background="@drawable/bg_chip_unselected"
+                        android:paddingStart="14dp"
+                        android:paddingEnd="14dp"
+                        android:paddingTop="6dp"
+                        android:paddingBottom="6dp"
+                        android:layout_marginTop="10dp">
+
+                        <TextView
+                            android:id="@+id/txtJornadaPercentual"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="↑ 0%"
+                            android:textColor="#2FB4A6"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/txtJornadaMeta"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="  da meta de R$0"
+                            android:textColor="#8A94A3"
+                            android:textSize="10.5sp"
+                            android:layout_marginStart="4dp" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/txtJornadaTempo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="⏱ 00:00 na jornada"
+                        android:textColor="#5D6773"
+                        android:textSize="11sp"
+                        android:layout_marginTop="10dp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="18dp">
 
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:orientation="vertical">
+                        android:orientation="vertical"
+                        android:gravity="center">
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Agente financeiro ✨"
-                            android:textColor="#1FE7C4"
+                            android:text="💰"
+                            android:textSize="18sp" />
+
+                        <TextView
+                            android:id="@+id/txtJornadaGanho"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="R$0"
+                            android:textColor="#E7EAEE"
                             android:textSize="13sp"
-                            android:textStyle="bold" />
+                            android:textStyle="bold"
+                            android:layout_marginTop="4dp" />
 
                         <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Analisa seus ganhos e gastos e mostra onde economizar."
-                            android:textColor="#8B96AC"
-                            android:textSize="10.5sp"
-                            android:layout_marginTop="2dp" />
-
-                        <TextView
-                            android:id="@+id/btnVerDicas"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Ver dicas agora →"
-                            android:textColor="#1FE7C4"
-                            android:textSize="11sp"
+                            android:text="ganhos"
+                            android:textColor="#5D6773"
+                            android:textSize="8.5sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="⏱️"
+                            android:textSize="18sp" />
+
+                        <TextView
+                            android:id="@+id/txtJornadaRPorHora"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="R$0"
+                            android:textColor="#E7EAEE"
+                            android:textSize="13sp"
                             android:textStyle="bold"
-                            android:layout_marginTop="8dp"
-                            android:clickable="true"
-                            android:focusable="true" />
+                            android:layout_marginTop="4dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="por hora"
+                            android:textColor="#5D6773"
+                            android:textSize="8.5sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="📍"
+                            android:textSize="18sp" />
+
+                        <TextView
+                            android:id="@+id/txtJornadaRPorKm"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="R$0"
+                            android:textColor="#E7EAEE"
+                            android:textSize="13sp"
+                            android:textStyle="bold"
+                            android:layout_marginTop="4dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="por km"
+                            android:textColor="#5D6773"
+                            android:textSize="8.5sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="⛽"
+                            android:textSize="18sp" />
+
+                        <TextView
+                            android:id="@+id/txtJornadaCombustivel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="R$0"
+                            android:textColor="#C9807E"
+                            android:textSize="13sp"
+                            android:textStyle="bold"
+                            android:layout_marginTop="4dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="combustível"
+                            android:textColor="#5D6773"
+                            android:textSize="8.5sp" />
                     </LinearLayout>
                 </LinearLayout>
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="10dp">
+
+                    <LinearLayout
+                        android:id="@+id/btnGravar"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="10dp"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:background="@drawable/bg_cta_start"
+                        android:padding="16dp"
+                        android:clickable="true"
+                        android:focusable="true">
+
+                        <TextView
+                            android:id="@+id/iconeGravar"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="🔴"
+                            android:textSize="20sp" />
+
+                        <TextView
+                            android:id="@+id/labelGravar"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Gravar corrida"
+                            android:textColor="#06231F"
+                            android:textSize="11.5sp"
+                            android:textStyle="bold"
+                            android:layout_marginTop="6dp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/btnAdicionarCorridaHome"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:background="@drawable/bg_card_dark"
+                        android:padding="16dp"
+                        android:clickable="true"
+                        android:focusable="true">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="➕"
+                            android:textSize="20sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Adicionar corrida"
+                            android:textColor="#E7EAEE"
+                            android:textSize="11.5sp"
+                            android:textStyle="bold"
+                            android:layout_marginTop="6dp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="18dp">
+
+                    <LinearLayout
+                        android:id="@+id/btnVerCorridas"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="10dp"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:background="@drawable/bg_card_dark"
+                        android:padding="16dp"
+                        android:clickable="true"
+                        android:focusable="true">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="📋"
+                            android:textSize="20sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Corridas de hoje"
+                            android:textColor="#E7EAEE"
+                            android:textSize="11.5sp"
+                            android:textStyle="bold"
+                            android:layout_marginTop="6dp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/btnEncerrarJornada"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:background="@drawable/bg_cta_stop"
+                        android:padding="16dp"
+                        android:clickable="true"
+                        android:focusable="true">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="⏹️"
+                            android:textSize="20sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Encerrar jornada"
+                            android:textColor="#C9807E"
+                            android:textSize="11.5sp"
+                            android:textStyle="bold"
+                            android:layout_marginTop="6dp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/anelMeta"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:visibility="gone" />
             </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="@drawable/bg_card_dark"
+                android:padding="16dp"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="⚙️  Mais opções"
+                    android:textColor="#E7EAEE"
+                    android:textSize="12.5sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="›"
+                    android:textColor="#5D6773"
+                    android:textSize="18sp" />
+            </LinearLayout>
+
         </LinearLayout>
     </ScrollView>
 
@@ -860,16 +765,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:background="#0A0E17"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp">
+        android:background="#0D1015"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp">
 
         <LinearLayout
             android:id="@+id/navInicio"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical"
             android:gravity="center"
             android:clickable="true"
             android:focusable="true">
@@ -878,16 +782,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="🏠"
-                android:textSize="16sp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Início"
-                android:textColor="#1FE7C4"
-                android:textSize="9sp"
-                android:textStyle="bold"
-                android:layout_marginTop="2dp" />
+                android:textSize="17sp"
+                android:alpha="0.95" />
         </LinearLayout>
 
         <LinearLayout
@@ -895,7 +791,6 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical"
             android:gravity="center"
             android:clickable="true"
             android:focusable="true">
@@ -904,15 +799,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="📊"
-                android:textSize="16sp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Relatórios"
-                android:textColor="#8B96AC"
-                android:textSize="9sp"
-                android:layout_marginTop="2dp" />
+                android:textSize="17sp"
+                android:alpha="0.45" />
         </LinearLayout>
 
         <LinearLayout
@@ -920,7 +808,6 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical"
             android:gravity="center"
             android:clickable="true"
             android:focusable="true">
@@ -929,15 +816,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="🕐"
-                android:textSize="16sp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Histórico"
-                android:textColor="#8B96AC"
-                android:textSize="9sp"
-                android:layout_marginTop="2dp" />
+                android:textSize="17sp"
+                android:alpha="0.45" />
         </LinearLayout>
 
         <LinearLayout
@@ -945,7 +825,6 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical"
             android:gravity="center"
             android:clickable="true"
             android:focusable="true">
@@ -954,15 +833,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="⚙️"
-                android:textSize="16sp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Config"
-                android:textColor="#8B96AC"
-                android:textSize="9sp"
-                android:layout_marginTop="2dp" />
+                android:textSize="17sp"
+                android:alpha="0.45" />
         </LinearLayout>
 
     </LinearLayout>
