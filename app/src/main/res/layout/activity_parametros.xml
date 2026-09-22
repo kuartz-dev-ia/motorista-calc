@@ -2,7 +2,7 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#070C14">
+    android:background="#0A0D12">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -13,31 +13,100 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="#0F1B2D"
-            android:padding="16dp"
-            android:paddingBottom="18dp">
+            android:padding="18dp"
+            android:paddingBottom="10dp">
 
             <TextView
+                android:id="@+id/txtTituloConfig"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="⚙️ Config"
-                android:textColor="#FFFFFF"
-                android:textSize="17sp"
-                android:textStyle="bold" />
+                android:text="Config"
+                android:textColor="#E7EAEE"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:clickable="true"
+                android:focusable="true" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Ajustes do app e do veículo"
-                android:textColor="#8B96AC"
-                android:textSize="10sp" />
+                android:textColor="#5D6773"
+                android:textSize="11sp" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:padding="18dp"
+            android:paddingTop="0dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_card_accent"
+                android:padding="16dp"
+                android:layout_marginBottom="12dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Licença do app"
+                    android:textColor="#E7EAEE"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="6dp" />
+
+                <TextView
+                    android:id="@+id/txtStatusLicenca"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Verificando..."
+                    android:textColor="#8A94A3"
+                    android:textSize="12sp"
+                    android:layout_marginBottom="10dp" />
+
+                <TextView
+                    android:id="@+id/txtIdDispositivo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="ID do aparelho: carregando..."
+                    android:textColor="#5D6773"
+                    android:textSize="10.5sp"
+                    android:textIsSelectable="true"
+                    android:layout_marginBottom="10dp" />
+
+                <EditText
+                    android:id="@+id/edtChaveLicenca"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@drawable/bg_input_verde"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp"
+                    android:gravity="center_vertical"
+                    android:textColor="#E7EAEE"
+                    android:textColorHint="#5D6773"
+                    android:hint="Cole sua chave de licença aqui"
+                    android:textSize="13sp"
+                    android:layout_marginBottom="10dp"
+                    android:inputType="textCapCharacters" />
+
+                <TextView
+                    android:id="@+id/btnAtivarLicenca"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_cta_start"
+                    android:padding="12dp"
+                    android:gravity="center"
+                    android:text="Ativar licença"
+                    android:textColor="#06231F"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:clickable="true"
+                    android:focusable="true" />
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -58,7 +127,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Modo Escuro"
-                        android:textColor="#FFFFFF"
+                        android:textColor="#E7EAEE"
                         android:textSize="14sp"
                         android:textStyle="bold" />
 
@@ -66,7 +135,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Otimizado para condução noturna"
-                        android:textColor="#8B96AC"
+                        android:textColor="#5D6773"
                         android:textSize="11sp" />
                 </LinearLayout>
 
@@ -79,7 +148,7 @@
                     android:paddingTop="4dp"
                     android:paddingBottom="4dp"
                     android:text="Ativo"
-                    android:textColor="#08131A"
+                    android:textColor="#06231F"
                     android:textSize="11sp"
                     android:textStyle="bold" />
             </LinearLayout>
@@ -96,7 +165,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Metas por Período"
-                    android:textColor="#FFFFFF"
+                    android:textColor="#E7EAEE"
                     android:textSize="15sp"
                     android:textStyle="bold"
                     android:layout_marginBottom="10dp" />
@@ -105,7 +174,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Meta Semanal (R$)"
-                    android:textColor="#8B96AC"
+                    android:textColor="#8A94A3"
                     android:textSize="11sp"
                     android:paddingBottom="4dp" />
                 <EditText
@@ -116,8 +185,8 @@
                     android:paddingStart="14dp"
                     android:paddingEnd="14dp"
                     android:gravity="center_vertical"
-                    android:textColor="#FFFFFF"
-                    android:textColorHint="#8B96AC"
+                    android:textColor="#E7EAEE"
+                    android:textColorHint="#5D6773"
                     android:hint="Ex: 3500"
                     android:textSize="16sp"
                     android:textStyle="bold"
@@ -128,7 +197,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Meta Mensal (R$)"
-                    android:textColor="#8B96AC"
+                    android:textColor="#8A94A3"
                     android:textSize="11sp"
                     android:paddingBottom="4dp" />
                 <EditText
@@ -139,8 +208,8 @@
                     android:paddingStart="14dp"
                     android:paddingEnd="14dp"
                     android:gravity="center_vertical"
-                    android:textColor="#FFFFFF"
-                    android:textColorHint="#8B96AC"
+                    android:textColor="#E7EAEE"
+                    android:textColorHint="#5D6773"
                     android:hint="Ex: 14000"
                     android:textSize="16sp"
                     android:textStyle="bold"
@@ -159,7 +228,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Configuração de Combustível"
-                    android:textColor="#FFFFFF"
+                    android:textColor="#E7EAEE"
                     android:textSize="15sp"
                     android:textStyle="bold"
                     android:layout_marginBottom="10dp" />
@@ -179,8 +248,8 @@
                         android:background="@drawable/bg_chip_unselected"
                         android:gravity="center"
                         android:padding="10dp"
-                        android:text="⛽ Gasolina"
-                        android:textColor="#8B96AC"
+                        android:text="Gasolina"
+                        android:textColor="#8A94A3"
                         android:textSize="11sp"
                         android:clickable="true"
                         android:focusable="true" />
@@ -194,8 +263,8 @@
                         android:background="@drawable/bg_chip_selected"
                         android:gravity="center"
                         android:padding="10dp"
-                        android:text="🌿 Etanol"
-                        android:textColor="#08131A"
+                        android:text="Etanol"
+                        android:textColor="#06231F"
                         android:textSize="11sp"
                         android:textStyle="bold"
                         android:clickable="true"
@@ -209,8 +278,8 @@
                         android:background="@drawable/bg_chip_unselected"
                         android:gravity="center"
                         android:padding="10dp"
-                        android:text="⚡ GNV"
-                        android:textColor="#8B96AC"
+                        android:text="GNV"
+                        android:textColor="#8A94A3"
                         android:textSize="11sp"
                         android:clickable="true"
                         android:focusable="true" />
@@ -220,7 +289,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Preço por litro"
-                    android:textColor="#8B96AC"
+                    android:textColor="#8A94A3"
                     android:textSize="11sp"
                     android:paddingBottom="4dp" />
                 <EditText
@@ -231,7 +300,7 @@
                     android:paddingStart="14dp"
                     android:paddingEnd="14dp"
                     android:gravity="center_vertical"
-                    android:textColor="#FFFFFF"
+                    android:textColor="#E7EAEE"
                     android:textSize="16sp"
                     android:textStyle="bold"
                     android:inputType="numberDecimal"
@@ -241,7 +310,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Consumo do veículo (km/l)"
-                    android:textColor="#8B96AC"
+                    android:textColor="#8A94A3"
                     android:textSize="11sp"
                     android:paddingBottom="4dp" />
                 <EditText
@@ -252,7 +321,7 @@
                     android:paddingStart="14dp"
                     android:paddingEnd="14dp"
                     android:gravity="center_vertical"
-                    android:textColor="#FFFFFF"
+                    android:textColor="#E7EAEE"
                     android:textSize="16sp"
                     android:textStyle="bold"
                     android:inputType="numberDecimal"
@@ -271,8 +340,8 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="ℹ️ Custo por Km (Prévia)"
-                        android:textColor="#8B96AC"
+                        android:text="Custo por Km (Prévia)"
+                        android:textColor="#8A94A3"
                         android:textSize="12sp" />
 
                     <TextView
@@ -280,7 +349,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="R$ 0,00/km"
-                        android:textColor="#1FE7A0"
+                        android:textColor="#2FB4A6"
                         android:textSize="17sp"
                         android:textStyle="bold" />
                 </LinearLayout>
@@ -292,8 +361,8 @@
                     android:background="@drawable/bg_cta_start"
                     android:padding="13dp"
                     android:gravity="center"
-                    android:text="💾 Salvar Configurações"
-                    android:textColor="#052018"
+                    android:text="Salvar Configurações"
+                    android:textColor="#06231F"
                     android:textSize="13sp"
                     android:textStyle="bold"
                     android:layout_marginBottom="12dp"
@@ -304,7 +373,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Resumo dos Combustíveis"
-                    android:textColor="#FFFFFF"
+                    android:textColor="#E7EAEE"
                     android:textSize="13sp"
                     android:textStyle="bold"
                     android:layout_marginBottom="6dp" />
@@ -313,33 +382,8 @@
                     android:id="@+id/txtResumoCombustiveis"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textColor="#8B96AC"
-                    android:textSize="12sp"
-                    android:layout_marginBottom="10dp" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:background="#26F5A623"
-                    android:padding="12dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="💡 Dica"
-                        android:textColor="#F5A623"
-                        android:textSize="12sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="O custo por km é calculado dividindo o preço do combustível pelo consumo do veículo. Mantenha esses valores atualizados para um cálculo de lucro líquido preciso."
-                        android:textColor="#F5A623"
-                        android:textSize="11sp"
-                        android:layout_marginTop="4dp" />
-                </LinearLayout>
+                    android:textColor="#8A94A3"
+                    android:textSize="12sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -354,7 +398,7 @@
                     android:id="@+id/txtStatus"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textColor="#E4E7EC"
+                    android:textColor="#C7CDD6"
                     android:layout_marginBottom="12dp" />
 
                 <TextView
@@ -365,7 +409,7 @@
                     android:padding="12dp"
                     android:gravity="center"
                     android:text="1. Ativar serviço de acessibilidade"
-                    android:textColor="#3DB8F5"
+                    android:textColor="#E7EAEE"
                     android:textSize="12.5sp"
                     android:textStyle="bold"
                     android:layout_marginBottom="8dp"
@@ -380,7 +424,7 @@
                     android:padding="12dp"
                     android:gravity="center"
                     android:text="2. Permitir exibir sobre outros apps"
-                    android:textColor="#3DB8F5"
+                    android:textColor="#E7EAEE"
                     android:textSize="12.5sp"
                     android:textStyle="bold"
                     android:layout_marginBottom="8dp"
@@ -394,8 +438,8 @@
                     android:background="@drawable/bg_input_verde"
                     android:padding="12dp"
                     android:gravity="center"
-                    android:text="🔍 Ver texto lido pela câmera (debug OCR)"
-                    android:textColor="#9B6BF5"
+                    android:text="Ver texto lido pela câmera (debug OCR)"
+                    android:textColor="#E7EAEE"
                     android:textSize="12.5sp"
                     android:textStyle="bold"
                     android:clickable="true"
@@ -414,7 +458,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="R$/km mínimo aceitável"
-                    android:textColor="#8B96AC"
+                    android:textColor="#8A94A3"
                     android:textSize="11sp" />
                 <EditText
                     android:id="@+id/edtMinKm"
@@ -424,7 +468,7 @@
                     android:paddingStart="14dp"
                     android:paddingEnd="14dp"
                     android:gravity="center_vertical"
-                    android:textColor="#FFFFFF"
+                    android:textColor="#E7EAEE"
                     android:inputType="numberDecimal"
                     android:layout_marginTop="4dp"
                     android:layout_marginBottom="12dp" />
@@ -433,7 +477,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="R$/hora mínimo aceitável"
-                    android:textColor="#8B96AC"
+                    android:textColor="#8A94A3"
                     android:textSize="11sp" />
                 <EditText
                     android:id="@+id/edtMinHora"
@@ -443,7 +487,7 @@
                     android:paddingStart="14dp"
                     android:paddingEnd="14dp"
                     android:gravity="center_vertical"
-                    android:textColor="#FFFFFF"
+                    android:textColor="#E7EAEE"
                     android:inputType="numberDecimal"
                     android:layout_marginTop="4dp" />
             </LinearLayout>
@@ -460,7 +504,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Custos fixos mensais"
-                    android:textColor="#FFFFFF"
+                    android:textColor="#E7EAEE"
                     android:textSize="15sp"
                     android:textStyle="bold"
                     android:layout_marginBottom="10dp" />
@@ -483,7 +527,7 @@
                             android:layout_height="wrap_content"
                             android:gravity="center"
                             android:text="FINANCIAMENTO"
-                            android:textColor="#1FE7A0"
+                            android:textColor="#5D6773"
                             android:textSize="10.5sp"
                             android:textStyle="bold"
                             android:paddingBottom="4dp" />
@@ -494,7 +538,7 @@
                             android:layout_height="44dp"
                             android:background="@drawable/bg_input_verde"
                             android:gravity="center"
-                            android:textColor="#FFFFFF"
+                            android:textColor="#E7EAEE"
                             android:hint="0"
                             android:textSize="16sp"
                             android:textStyle="bold"
@@ -512,7 +556,7 @@
                             android:layout_height="wrap_content"
                             android:gravity="center"
                             android:text="SEGURO"
-                            android:textColor="#1FE7A0"
+                            android:textColor="#5D6773"
                             android:textSize="10.5sp"
                             android:textStyle="bold"
                             android:paddingBottom="4dp" />
@@ -523,7 +567,7 @@
                             android:layout_height="44dp"
                             android:background="@drawable/bg_input_verde"
                             android:gravity="center"
-                            android:textColor="#FFFFFF"
+                            android:textColor="#E7EAEE"
                             android:hint="0"
                             android:textSize="16sp"
                             android:textStyle="bold"
@@ -549,7 +593,7 @@
                             android:layout_height="wrap_content"
                             android:gravity="center"
                             android:text="IPVA (ANO)"
-                            android:textColor="#1FE7A0"
+                            android:textColor="#5D6773"
                             android:textSize="10.5sp"
                             android:textStyle="bold"
                             android:paddingBottom="4dp" />
@@ -560,7 +604,7 @@
                             android:layout_height="44dp"
                             android:background="@drawable/bg_input_verde"
                             android:gravity="center"
-                            android:textColor="#FFFFFF"
+                            android:textColor="#E7EAEE"
                             android:hint="0"
                             android:textSize="16sp"
                             android:textStyle="bold"
@@ -578,7 +622,7 @@
                             android:layout_height="wrap_content"
                             android:gravity="center"
                             android:text="LICENCIAMENTO"
-                            android:textColor="#1FE7A0"
+                            android:textColor="#5D6773"
                             android:textSize="10.5sp"
                             android:textStyle="bold"
                             android:paddingBottom="4dp" />
@@ -589,7 +633,7 @@
                             android:layout_height="44dp"
                             android:background="@drawable/bg_input_verde"
                             android:gravity="center"
-                            android:textColor="#FFFFFF"
+                            android:textColor="#E7EAEE"
                             android:hint="0"
                             android:textSize="16sp"
                             android:textStyle="bold"
@@ -615,7 +659,7 @@
                             android:layout_height="wrap_content"
                             android:gravity="center"
                             android:text="MANUTENÇÃO"
-                            android:textColor="#1FE7A0"
+                            android:textColor="#5D6773"
                             android:textSize="10.5sp"
                             android:textStyle="bold"
                             android:paddingBottom="4dp" />
@@ -626,7 +670,7 @@
                             android:layout_height="44dp"
                             android:background="@drawable/bg_input_verde"
                             android:gravity="center"
-                            android:textColor="#FFFFFF"
+                            android:textColor="#E7EAEE"
                             android:hint="0"
                             android:textSize="16sp"
                             android:textStyle="bold"
@@ -644,7 +688,7 @@
                             android:layout_height="wrap_content"
                             android:gravity="center"
                             android:text="CONTAS PESSOAIS"
-                            android:textColor="#1FE7A0"
+                            android:textColor="#5D6773"
                             android:textSize="10.5sp"
                             android:textStyle="bold"
                             android:paddingBottom="4dp" />
@@ -655,7 +699,7 @@
                             android:layout_height="44dp"
                             android:background="@drawable/bg_input_verde"
                             android:gravity="center"
-                            android:textColor="#FFFFFF"
+                            android:textColor="#E7EAEE"
                             android:hint="0"
                             android:textSize="16sp"
                             android:textStyle="bold"
@@ -668,7 +712,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:text="KM RODADOS POR MÊS (MÉDIA)"
-                    android:textColor="#1FE7A0"
+                    android:textColor="#5D6773"
                     android:textSize="10.5sp"
                     android:textStyle="bold"
                     android:paddingBottom="4dp" />
@@ -678,7 +722,7 @@
                     android:layout_height="44dp"
                     android:background="@drawable/bg_input_verde"
                     android:gravity="center"
-                    android:textColor="#FFFFFF"
+                    android:textColor="#E7EAEE"
                     android:hint="0"
                     android:textSize="16sp"
                     android:textStyle="bold"
@@ -697,7 +741,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Segurança"
-                    android:textColor="#FFFFFF"
+                    android:textColor="#E7EAEE"
                     android:textSize="15sp"
                     android:textStyle="bold"
                     android:layout_marginBottom="8dp" />
@@ -706,7 +750,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Avisar pausa a cada quantas horas dirigindo"
-                    android:textColor="#8B96AC" />
+                    android:textColor="#8A94A3" />
                 <EditText
                     android:id="@+id/edtLimitePausa"
                     android:layout_width="match_parent"
@@ -715,7 +759,7 @@
                     android:paddingStart="14dp"
                     android:paddingEnd="14dp"
                     android:gravity="center_vertical"
-                    android:textColor="#FFFFFF"
+                    android:textColor="#E7EAEE"
                     android:inputType="numberDecimal"
                     android:layout_marginTop="6dp" />
             </LinearLayout>
@@ -736,8 +780,8 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="💾 Backup e Restauração"
-                    android:textColor="#FFFFFF"
+                    android:text="Backup e Restauração"
+                    android:textColor="#E7EAEE"
                     android:textSize="13sp"
                     android:textStyle="bold" />
 
@@ -745,8 +789,79 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="›"
-                    android:textColor="#8B96AC"
+                    android:textColor="#5D6773"
                     android:textSize="18sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/cardGeradorChaveDev"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_card_accent"
+                android:padding="16dp"
+                android:layout_marginBottom="12dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🔑 Gerador de chaves (uso interno)"
+                    android:textColor="#E7EAEE"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="8dp" />
+
+                <TextView
+                    android:id="@+id/txtChaveGerada"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_input_verde"
+                    android:padding="14dp"
+                    android:gravity="center"
+                    android:text="Toque em gerar"
+                    android:textColor="#2FB4A6"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:textIsSelectable="true"
+                    android:layout_marginBottom="10dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/btnGerarChave"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="8dp"
+                        android:background="@drawable/bg_cta_start"
+                        android:padding="12dp"
+                        android:gravity="center"
+                        android:text="Gerar nova chave"
+                        android:textColor="#06231F"
+                        android:textSize="12.5sp"
+                        android:textStyle="bold"
+                        android:clickable="true"
+                        android:focusable="true" />
+
+                    <TextView
+                        android:id="@+id/btnCopiarChaveGerada"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_input_verde"
+                        android:padding="12dp"
+                        android:gravity="center"
+                        android:text="Copiar"
+                        android:textColor="#E7EAEE"
+                        android:textSize="12.5sp"
+                        android:textStyle="bold"
+                        android:clickable="true"
+                        android:focusable="true" />
+                </LinearLayout>
             </LinearLayout>
 
             <TextView
@@ -757,7 +872,7 @@
                 android:padding="14dp"
                 android:gravity="center"
                 android:text="Salvar configurações"
-                android:textColor="#052018"
+                android:textColor="#06231F"
                 android:textSize="14sp"
                 android:textStyle="bold"
                 android:clickable="true"
