@@ -1,36 +1,28 @@
 package com.motorista.calc
 
 import android.content.Context
-import android.content.pm.PackageManager
 
-/** Controla o período de teste do app usando a data de instalação do APK
- * (informação do próprio Android, que não é apagada ao "limpar dados" do
- * app — só some se a pessoa desinstalar e instalar de novo). */
 object TrialManager {
-    const val DIAS_DE_TESTE = 10
 
-    private fun dataDeInstalacaoMillis(context: Context): Long {
-        return try {
-            @Suppress("DEPRECATION")
-            val info = context.packageManager.getPackageInfo(context.packageName, 0)
-            info.firstInstallTime
-        } catch (e: PackageManager.NameNotFoundException) {
-            System.currentTimeMillis()
-        }
-    }
+    private const val DIAS_TESTE = 10
 
     fun garantirInicializado(context: Context) {
-        // Não precisa mais salvar nada manualmente — a data de instalação
-        // já é mantida pelo próprio sistema Android.
+        // Nenhuma ação necessária — a contagem usa a data de instalação do
+        // sistema, não uma preferência própria.
     }
 
-    fun diasUsados(context: Context): Int {
-        val inicio = dataDeInstalacaoMillis(context)
-        val diffMillis = (System.currentTimeMillis() - inicio).coerceAtLeast(0)
-        return (diffMillis / (24L * 60 * 60 * 1000)).toInt()
+    fun expirou(context: Context): Boolean {
+        if (LicenseManager.estaLiberadoPorLicenca(context)) return false
+        return diasRestantes(context) <= 0
     }
 
-    fun diasRestantes(context: Context): Int = (DIAS_DE_TESTE - diasUsados(context)).coerceAtLeast(0)
-
-    fun expirou(context: Context): Boolean = diasUsados(context) >= DIAS_DE_TESTE
+    fun diasRestantes(context: Context): Int {
+        val dataInstalacao = try {
+            context.packageManager.getPackageInfo(context.packageName, 0).firstInstallTime
+        } catch (e: Exception) {
+            return DIAS_TESTE
+        }
+        val diasDecorridos = ((System.currentTimeMillis() - dataInstalacao) / (24L * 60 * 60 * 1000)).toInt()
+        return (DIAS_TESTE - diasDecorridos).coerceAtLeast(0)
+    }
 }
