@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "38541400366",
+    "project_id": "motorista-calc",
+    "storage_bucket": "motorista-calc.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:38541400366:android:9484b7865f3724804002bf",
+        "android_client_info": {
+          "package_name": "com.motorista.calc"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCizZvHR-OE3XcobxOWdRC5lv1PyydtOmM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
