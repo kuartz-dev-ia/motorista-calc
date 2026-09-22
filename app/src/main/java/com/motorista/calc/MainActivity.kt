@@ -102,6 +102,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        LicenseManager.verificarEmSegundoPlano(this)
         atualizarTrial()
         atualizarTelaJornada()
         RideRecorderService.aoMudarEstado = { atualizarBotaoGravar() }
