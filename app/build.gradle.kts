@@ -1,6 +1,7 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -43,4 +44,9 @@ dependencies {
     // OCR on-device: lê texto a partir de PRINTS da tela (necessário porque a tela
     // de nova corrida não expõe texto pra leitura direta via acessibilidade).
     implementation("com.google.mlkit:text-recognition:16.0.1")
+
+    // Firebase: usado só pro sistema de licença remota (liberar/bloquear
+    // acesso de cada aparelho à distância).
+    implementation(platform("com.google.firebase:firebase-bom:33.5.1"))
+    implementation("com.google.firebase:firebase-firestore-ktx")
 }
