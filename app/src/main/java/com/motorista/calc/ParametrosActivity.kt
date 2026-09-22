@@ -11,6 +11,7 @@ import android.provider.Settings
 import android.view.accessibility.AccessibilityManager
 import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
@@ -29,6 +30,9 @@ class ParametrosActivity : AppCompatActivity() {
 
     private var combustivelSelecionado: String = "etanol"
 
+    private var contadorToquesTitulo = 0
+    private var ultimoToqueTituloEm = 0L
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_parametros)
@@ -42,6 +46,14 @@ class ParametrosActivity : AppCompatActivity() {
         edtConsumo = findViewById(R.id.edtConsumo)
         txtCustoPorKmPreview = findViewById(R.id.txtCustoPorKmPreview)
         txtResumoCombustiveis = findViewById(R.id.txtResumoCombustiveis)
+
+        val edtChaveLicenca = findViewById<EditText>(R.id.edtChaveLicenca)
+        val btnAtivarLicenca = findViewById<TextView>(R.id.btnAtivarLicenca)
+        val txtTituloConfig = findViewById<TextView>(R.id.txtTituloConfig)
+        val cardGeradorChaveDev = findViewById<android.view.View>(R.id.cardGeradorChaveDev)
+        val txtChaveGerada = findViewById<TextView>(R.id.txtChaveGerada)
+        val btnGerarChave = findViewById<TextView>(R.id.btnGerarChave)
+        val btnCopiarChaveGerada = findViewById<TextView>(R.id.btnCopiarChaveGerada)
 
         val btnAtivarAcessibilidade = findViewById<TextView>(R.id.btnAtivarAcessibilidade)
         val btnPermitirOverlay = findViewById<TextView>(R.id.btnPermitirOverlay)
@@ -61,6 +73,8 @@ class ParametrosActivity : AppCompatActivity() {
         val btnSalvar = findViewById<TextView>(R.id.btnSalvar)
         val btnSalvarCombustivel = findViewById<TextView>(R.id.btnSalvarCombustivel)
         val txtStatus = findViewById<TextView>(R.id.txtStatus)
+
+        findViewById<TextView>(R.id.txtIdDispositivo).text = "ID do aparelho: ${LicenseManager.obterIdDispositivo(this)}"
 
         combustivelSelecionado = prefs.getString(RideAccessibilityService.PREF_COMBUSTIVEL_ATIVO, "etanol") ?: "etanol"
         selecionarPill(combustivelSelecionado, carregarCampos = true)
@@ -104,11 +118,45 @@ class ParametrosActivity : AppCompatActivity() {
             startActivity(Intent(this, BackupActivity::class.java))
         }
 
+        btnAtivarLicenca.setOnClickListener {
+            val chave = edtChaveLicenca.text.toString()
+            if (chave.isBlank()) {
+                Toast.makeText(this, "Digite a chave de licença", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            Toast.makeText(this, "Esse campo é do sistema antigo de chave local — a liberação agora é feita remotamente pelo ID do aparelho acima.", Toast.LENGTH_LONG).show()
+        }
+
+        // Toca 7x seguidas no título "Config" pra revelar o gerador de
+        // chaves — não é visível pro usuário comum, só pra você.
+        txtTituloConfig.setOnClickListener {
+            val agora = System.currentTimeMillis()
+            if (agora - ultimoToqueTituloEm > 2000) contadorToquesTitulo = 0
+            ultimoToqueTituloEm = agora
+            contadorToquesTitulo++
+            if (contadorToquesTitulo >= 7) {
+                contadorToquesTitulo = 0
+                cardGeradorChaveDev.visibility = android.view.View.VISIBLE
+                Toast.makeText(this, "Painel interno liberado", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        btnGerarChave.setOnClickListener {
+            txtChaveGerada.text = "Sistema migrado pro Firebase — use o ID do aparelho pra liberar."
+        }
+
+        btnCopiarChaveGerada.setOnClickListener {
+            val id = LicenseManager.obterIdDispositivo(this)
+            val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+            clipboard.setPrimaryClip(ClipData.newPlainText("id_dispositivo", id))
+            Toast.makeText(this, "ID do aparelho copiado!", Toast.LENGTH_SHORT).show()
+        }
+
         val acaoSalvarCombustivel = {
             salvarCamposDoCombustivel(combustivelSelecionado)
             prefs.edit().putString(RideAccessibilityService.PREF_COMBUSTIVEL_ATIVO, combustivelSelecionado).apply()
             atualizarResumoCombustiveis()
-            android.widget.Toast.makeText(this, "Combustível salvo", android.widget.Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Combustível salvo", Toast.LENGTH_SHORT).show()
         }
         btnSalvarCombustivel.setOnClickListener { acaoSalvarCombustivel() }
 
@@ -129,23 +177,41 @@ class ParametrosActivity : AppCompatActivity() {
                 putFloat(RideAccessibilityService.PREF_META_MENSAL, edtMetaMensal.text.toString().toFloatOrNull() ?: 0f)
                 apply()
             }
-            android.widget.Toast.makeText(this, "Configurações salvas", android.widget.Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Configurações salvas", Toast.LENGTH_SHORT).show()
         }
 
         atualizarStatus(txtStatus)
         atualizarResumoCombustiveis()
+        atualizarStatusLicenca()
+    }
+
+    private fun atualizarStatusLicenca() {
+        val txtStatusLicenca = findViewById<TextView>(R.id.txtStatusLicenca)
+        if (LicenseManager.estaLiberadoPorLicenca(this)) {
+            txtStatusLicenca.text = "✔ Licença ativada — uso liberado"
+            txtStatusLicenca.setTextColor(Color.parseColor("#2FB4A6"))
+        } else {
+            val dias = TrialManager.diasRestantes(this)
+            if (dias > 0) {
+                txtStatusLicenca.text = "Teste gratuito — $dias dia(s) restante(s)"
+                txtStatusLicenca.setTextColor(Color.parseColor("#8A94A3"))
+            } else {
+                txtStatusLicenca.text = "⛔ Teste gratuito encerrado — envie o ID do aparelho abaixo pra liberar"
+                txtStatusLicenca.setTextColor(Color.parseColor("#C9807E"))
+            }
+        }
     }
 
     private fun mostrarDebugOcr() {
         val status = prefs.getString(RideAccessibilityService.PREF_STATUS_OCR, null) ?: "Nenhum status registrado ainda."
-        val log = prefs.getString(RideAccessibilityService.PREF_ULTIMO_TEXTO, null) ?: "Nenhum texto lido ainda — o app só grava isso quando o serviço de acessibilidade está ativo e uma jornada está em andamento."
+        val log = prefs.getString(RideAccessibilityService.PREF_ULTIMO_TEXTO, null) ?: "Nenhum texto lido ainda."
 
         val conteudoCompleto = "STATUS ATUAL:\n$status\n\n----------\n\nÚLTIMOS TEXTOS LIDOS (mais recente primeiro):\n\n$log"
 
         val scrollView = android.widget.ScrollView(this)
         val textoView = TextView(this).apply {
             text = conteudoCompleto
-            setTextColor(Color.parseColor("#E4E7EC"))
+            setTextColor(Color.parseColor("#C7CDD6"))
             textSize = 11f
             setTextIsSelectable(true)
             setPadding(32, 24, 32, 24)
@@ -153,12 +219,12 @@ class ParametrosActivity : AppCompatActivity() {
         scrollView.addView(textoView)
 
         val dialog = AlertDialog.Builder(this, R.style.DialogTemaEscuro)
-            .setTitle("🔍 Debug do OCR")
+            .setTitle("Debug do OCR")
             .setView(scrollView)
             .setPositiveButton("Copiar tudo") { _, _ ->
                 val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
                 clipboard.setPrimaryClip(ClipData.newPlainText("debug_ocr", conteudoCompleto))
-                android.widget.Toast.makeText(this, "Copiado! Cole numa mensagem pra me enviar.", android.widget.Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Copiado! Cole numa mensagem pra me enviar.", Toast.LENGTH_LONG).show()
             }
             .setNegativeButton("Fechar", null)
             .show()
@@ -177,7 +243,7 @@ class ParametrosActivity : AppCompatActivity() {
         for ((chaveTipo, chip) in pills) {
             val selecionado = chaveTipo == tipo
             chip.background = ContextCompat.getDrawable(this, if (selecionado) R.drawable.bg_chip_selected else R.drawable.bg_chip_unselected)
-            chip.setTextColor(if (selecionado) Color.parseColor("#08131A") else Color.parseColor("#8B96AC"))
+            chip.setTextColor(if (selecionado) Color.parseColor("#06231F") else Color.parseColor("#8A94A3"))
             chip.setTypeface(chip.typeface, if (selecionado) android.graphics.Typeface.BOLD else android.graphics.Typeface.NORMAL)
         }
 
@@ -243,7 +309,9 @@ class ParametrosActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        LicenseManager.verificarEmSegundoPlano(this)
         findViewById<TextView>(R.id.txtStatus)?.let { atualizarStatus(it) }
+        atualizarStatusLicenca()
     }
 
     private fun atualizarStatus(txtStatus: TextView) {
