@@ -105,6 +105,7 @@ class MainActivity : AppCompatActivity() {
         LicenseManager.verificarEmSegundoPlano(this)
         atualizarTrial()
         atualizarTelaJornada()
+        atualizarMetaBrutaNecessaria()
         RideRecorderService.aoMudarEstado = { atualizarBotaoGravar() }
         handler.removeCallbacks(tickerRunnable)
         handler.postDelayed(tickerRunnable, 15_000L)
@@ -114,6 +115,12 @@ class MainActivity : AppCompatActivity() {
         super.onPause()
         RideRecorderService.aoMudarEstado = null
         handler.removeCallbacks(tickerRunnable)
+    }
+
+    private fun atualizarMetaBrutaNecessaria() {
+        val resultado = MetaMensalCalculator.calcular(this)
+        findViewById<TextView>(R.id.txtMetaBrutaNecessaria).text = "R$ %.2f/dia".format(resultado.metaBrutaDiaria)
+        findViewById<TextView>(R.id.txtMetaBrutaSubtitulo).text = "para cobrir R$ %.2f/mês em %d dia(s) de trabalho".format(resultado.custoMensalTotal, resultado.diasTrabalho)
     }
 
     private fun selecionarChipMeta(selecionado: TextView, valor: String) {
@@ -179,6 +186,7 @@ class MainActivity : AppCompatActivity() {
             grupoAndamento.visibility = android.view.View.GONE
             txtStatusTopo.text = "Nenhuma jornada ativa"
             atualizarPreviewMetaPorHora()
+            atualizarMetaBrutaNecessaria()
         } else {
             grupoNovaJornada.visibility = android.view.View.GONE
             grupoAndamento.visibility = android.view.View.VISIBLE
