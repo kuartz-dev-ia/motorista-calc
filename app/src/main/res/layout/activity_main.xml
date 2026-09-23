@@ -85,7 +85,7 @@
                     android:background="@drawable/bg_card_accent"
                     android:padding="16dp"
                     android:layout_marginTop="16dp"
-                    android:layout_marginBottom="14dp">
+                    android:layout_marginBottom="12dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -101,6 +101,42 @@
                         android:text="Configure suas metas e inicie"
                         android:textColor="#5D6773"
                         android:textSize="11.5sp"
+                        android:layout_marginTop="2dp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:background="@drawable/bg_card_dark"
+                    android:padding="14dp"
+                    android:layout_marginBottom="14dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="VOCÊ PRECISA FATURAR (BRUTO) PRA COBRIR SUAS CONTAS"
+                        android:textColor="#5D6773"
+                        android:textSize="9.5sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txtMetaBrutaNecessaria"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="R$ 0,00/dia"
+                        android:textColor="#2FB4A6"
+                        android:textSize="22sp"
+                        android:textStyle="bold"
+                        android:layout_marginTop="4dp" />
+
+                    <TextView
+                        android:id="@+id/txtMetaBrutaSubtitulo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="para cobrir R$ 0,00/mês em 22 dia(s) de trabalho"
+                        android:textColor="#8A94A3"
+                        android:textSize="10.5sp"
                         android:layout_marginTop="2dp" />
                 </LinearLayout>
 
