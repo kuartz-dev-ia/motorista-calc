@@ -17,15 +17,12 @@
             android:paddingBottom="10dp">
 
             <TextView
-                android:id="@+id/txtTituloConfig"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Config"
                 android:textColor="#E7EAEE"
                 android:textSize="18sp"
-                android:textStyle="bold"
-                android:clickable="true"
-                android:focusable="true" />
+                android:textStyle="bold" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -78,8 +75,55 @@
                     android:textIsSelectable="true"
                     android:layout_marginBottom="10dp" />
 
+                <TextView
+                    android:id="@+id/btnCopiarIdDispositivo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_input_verde"
+                    android:padding="12dp"
+                    android:gravity="center"
+                    android:text="Copiar ID do aparelho"
+                    android:textColor="#E7EAEE"
+                    android:textSize="12.5sp"
+                    android:textStyle="bold"
+                    android:clickable="true"
+                    android:focusable="true" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_card_dark"
+                android:padding="16dp"
+                android:layout_marginBottom="12dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Meta Bruta Necessária"
+                    android:textColor="#E7EAEE"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="6dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Soma todos os seus custos mensais (custos fixos + Minhas Contas + combustível estimado) e divide pelos dias que você pretende trabalhar"
+                    android:textColor="#5D6773"
+                    android:textSize="11sp"
+                    android:layout_marginBottom="12dp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Dias que pretendo trabalhar no mês"
+                    android:textColor="#8A94A3"
+                    android:textSize="11sp"
+                    android:paddingBottom="4dp" />
                 <EditText
-                    android:id="@+id/edtChaveLicenca"
+                    android:id="@+id/edtDiasTrabalhoMes"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
                     android:background="@drawable/bg_input_verde"
@@ -88,24 +132,44 @@
                     android:gravity="center_vertical"
                     android:textColor="#E7EAEE"
                     android:textColorHint="#5D6773"
-                    android:hint="Cole sua chave de licença aqui"
-                    android:textSize="13sp"
-                    android:layout_marginBottom="10dp"
-                    android:inputType="textCapCharacters" />
+                    android:hint="Ex: 22"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:inputType="number"
+                    android:layout_marginBottom="12dp" />
 
-                <TextView
-                    android:id="@+id/btnAtivarLicenca"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/bg_cta_start"
-                    android:padding="12dp"
-                    android:gravity="center"
-                    android:text="Ativar licença"
-                    android:textColor="#06231F"
-                    android:textSize="13sp"
-                    android:textStyle="bold"
-                    android:clickable="true"
-                    android:focusable="true" />
+                    android:orientation="vertical"
+                    android:background="@drawable/bg_card_accent"
+                    android:padding="14dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="VOCÊ PRECISA FATURAR (BRUTO)"
+                        android:textColor="#5D6773"
+                        android:textSize="9.5sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txtMetaBrutaPreviewConfig"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="R$ 0,00/dia"
+                        android:textColor="#2FB4A6"
+                        android:textSize="22sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txtMetaBrutaSubtituloConfig"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="pra cobrir R$ 0,00/mês"
+                        android:textColor="#8A94A3"
+                        android:textSize="10.5sp" />
+                </LinearLayout>
             </LinearLayout>
 
             <LinearLayout
@@ -791,77 +855,6 @@
                     android:text="›"
                     android:textColor="#5D6773"
                     android:textSize="18sp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/cardGeradorChaveDev"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@drawable/bg_card_accent"
-                android:padding="16dp"
-                android:layout_marginBottom="12dp"
-                android:visibility="gone">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="🔑 Gerador de chaves (uso interno)"
-                    android:textColor="#E7EAEE"
-                    android:textSize="13sp"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="8dp" />
-
-                <TextView
-                    android:id="@+id/txtChaveGerada"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/bg_input_verde"
-                    android:padding="14dp"
-                    android:gravity="center"
-                    android:text="Toque em gerar"
-                    android:textColor="#2FB4A6"
-                    android:textSize="15sp"
-                    android:textStyle="bold"
-                    android:textIsSelectable="true"
-                    android:layout_marginBottom="10dp" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:id="@+id/btnGerarChave"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="8dp"
-                        android:background="@drawable/bg_cta_start"
-                        android:padding="12dp"
-                        android:gravity="center"
-                        android:text="Gerar nova chave"
-                        android:textColor="#06231F"
-                        android:textSize="12.5sp"
-                        android:textStyle="bold"
-                        android:clickable="true"
-                        android:focusable="true" />
-
-                    <TextView
-                        android:id="@+id/btnCopiarChaveGerada"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:background="@drawable/bg_input_verde"
-                        android:padding="12dp"
-                        android:gravity="center"
-                        android:text="Copiar"
-                        android:textColor="#E7EAEE"
-                        android:textSize="12.5sp"
-                        android:textStyle="bold"
-                        android:clickable="true"
-                        android:focusable="true" />
-                </LinearLayout>
             </LinearLayout>
 
             <TextView
