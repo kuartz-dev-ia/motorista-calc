@@ -162,9 +162,6 @@ class ParametrosActivity : AppCompatActivity() {
     }
 
     private fun atualizarPreviewMetaBruta() {
-        // Salva o valor de dias-de-trabalho digitado temporariamente (sem
-        // precisar tocar em "Salvar configurações") só pra essa prévia
-        // ficar correta em tempo real.
         val diasDigitados = edtDiasTrabalhoMes.text.toString().toIntOrNull()
         val diasOriginais = prefs.getInt(RideAccessibilityService.PREF_DIAS_TRABALHO_MES, 22)
         if (diasDigitados != null && diasDigitados > 0) {
@@ -173,7 +170,7 @@ class ParametrosActivity : AppCompatActivity() {
 
         val resultado = MetaMensalCalculator.calcular(this)
         findViewById<TextView>(R.id.txtMetaBrutaPreviewConfig).text = "R$ %.2f/dia".format(resultado.metaBrutaDiaria)
-        findViewById<TextView>(R.id.txtMetaBrutaSubtituloConfig).text = "pra cobrir R$ %.2f/mês em %d dia(s)".format(resultado.custoMensalTotal, resultado.diasTrabalho)
+        findViewById<TextView>(R.id.txtMetaBrutaSubtituloConfig).text = "pra cobrir R$ %.2f/mês em %d dia(s) restantes (meta base R$ %.2f/dia)".format(resultado.custoMensalTotal, resultado.diasRestantes, resultado.metaBrutaDiariaBase)
 
         if (diasDigitados == null || diasDigitados <= 0) {
             prefs.edit().putInt(RideAccessibilityService.PREF_DIAS_TRABALHO_MES, diasOriginais).apply()
