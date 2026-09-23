@@ -119,8 +119,19 @@ class MainActivity : AppCompatActivity() {
 
     private fun atualizarMetaBrutaNecessaria() {
         val resultado = MetaMensalCalculator.calcular(this)
-        findViewById<TextView>(R.id.txtMetaBrutaNecessaria).text = "R$ %.2f/dia".format(resultado.metaBrutaDiaria)
-        findViewById<TextView>(R.id.txtMetaBrutaSubtitulo).text = "para cobrir R$ %.2f/mês em %d dia(s) de trabalho".format(resultado.custoMensalTotal, resultado.diasTrabalho)
+        val txtValor = findViewById<TextView>(R.id.txtMetaBrutaNecessaria)
+        val txtSubtitulo = findViewById<TextView>(R.id.txtMetaBrutaSubtitulo)
+
+        txtValor.text = "R$ %.2f/dia".format(resultado.metaBrutaDiaria)
+
+        val diferenca = resultado.metaBrutaDiariaBase - resultado.metaBrutaDiaria
+        val comparativo = when {
+            resultado.ganhoAcumuladoMes <= 0.0 -> ""
+            diferenca > 0.5 -> " • você está adiantado, R$ %.2f a menos que a meta base".format(diferenca)
+            diferenca < -0.5 -> " • você está atrasado, R$ %.2f a mais que a meta base".format(-diferenca)
+            else -> " • em dia com a meta base"
+        }
+        txtSubtitulo.text = "pra cobrir R$ %.2f/mês em %d dia(s) restantes%s".format(resultado.custoMensalTotal, resultado.diasRestantes, comparativo)
     }
 
     private fun selecionarChipMeta(selecionado: TextView, valor: String) {
