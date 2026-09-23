@@ -27,11 +27,9 @@ class ParametrosActivity : AppCompatActivity() {
     private lateinit var edtConsumo: EditText
     private lateinit var txtCustoPorKmPreview: TextView
     private lateinit var txtResumoCombustiveis: TextView
+    private lateinit var edtDiasTrabalhoMes: EditText
 
     private var combustivelSelecionado: String = "etanol"
-
-    private var contadorToquesTitulo = 0
-    private var ultimoToqueTituloEm = 0L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,15 +44,9 @@ class ParametrosActivity : AppCompatActivity() {
         edtConsumo = findViewById(R.id.edtConsumo)
         txtCustoPorKmPreview = findViewById(R.id.txtCustoPorKmPreview)
         txtResumoCombustiveis = findViewById(R.id.txtResumoCombustiveis)
+        edtDiasTrabalhoMes = findViewById(R.id.edtDiasTrabalhoMes)
 
-        val edtChaveLicenca = findViewById<EditText>(R.id.edtChaveLicenca)
-        val btnAtivarLicenca = findViewById<TextView>(R.id.btnAtivarLicenca)
-        val txtTituloConfig = findViewById<TextView>(R.id.txtTituloConfig)
-        val cardGeradorChaveDev = findViewById<android.view.View>(R.id.cardGeradorChaveDev)
-        val txtChaveGerada = findViewById<TextView>(R.id.txtChaveGerada)
-        val btnGerarChave = findViewById<TextView>(R.id.btnGerarChave)
-        val btnCopiarChaveGerada = findViewById<TextView>(R.id.btnCopiarChaveGerada)
-
+        val btnCopiarIdDispositivo = findViewById<TextView>(R.id.btnCopiarIdDispositivo)
         val btnAtivarAcessibilidade = findViewById<TextView>(R.id.btnAtivarAcessibilidade)
         val btnPermitirOverlay = findViewById<TextView>(R.id.btnPermitirOverlay)
         val btnVerDebugOcr = findViewById<TextView>(R.id.btnVerDebugOcr)
@@ -75,6 +67,12 @@ class ParametrosActivity : AppCompatActivity() {
         val txtStatus = findViewById<TextView>(R.id.txtStatus)
 
         findViewById<TextView>(R.id.txtIdDispositivo).text = "ID do aparelho: ${LicenseManager.obterIdDispositivo(this)}"
+        btnCopiarIdDispositivo.setOnClickListener {
+            val id = LicenseManager.obterIdDispositivo(this)
+            val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+            clipboard.setPrimaryClip(ClipData.newPlainText("id_dispositivo", id))
+            Toast.makeText(this, "ID copiado! Envie pra quem for liberar seu acesso.", Toast.LENGTH_LONG).show()
+        }
 
         combustivelSelecionado = prefs.getString(RideAccessibilityService.PREF_COMBUSTIVEL_ATIVO, "etanol") ?: "etanol"
         selecionarPill(combustivelSelecionado, carregarCampos = true)
@@ -91,6 +89,7 @@ class ParametrosActivity : AppCompatActivity() {
         preencherSeExistir(edtLimitePausa, RideAccessibilityService.PREF_LIMITE_PAUSA_HORAS)
         preencherSeExistir(edtMetaSemanal, RideAccessibilityService.PREF_META_SEMANAL)
         preencherSeExistir(edtMetaMensal, RideAccessibilityService.PREF_META_MENSAL)
+        edtDiasTrabalhoMes.setText(prefs.getInt(RideAccessibilityService.PREF_DIAS_TRABALHO_MES, 22).toString())
 
         val watcherPreview = object : android.text.TextWatcher {
             override fun afterTextChanged(s: android.text.Editable?) { atualizarPreviewCustoPorKm() }
@@ -99,6 +98,13 @@ class ParametrosActivity : AppCompatActivity() {
         }
         edtPrecoCombustivel.addTextChangedListener(watcherPreview)
         edtConsumo.addTextChangedListener(watcherPreview)
+
+        val watcherMetaBruta = object : android.text.TextWatcher {
+            override fun afterTextChanged(s: android.text.Editable?) { atualizarPreviewMetaBruta() }
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        }
+        edtDiasTrabalhoMes.addTextChangedListener(watcherMetaBruta)
 
         chipGasolina.setOnClickListener { trocarCombustivel("gasolina") }
         chipEtanol.setOnClickListener { trocarCombustivel("etanol") }
@@ -118,44 +124,11 @@ class ParametrosActivity : AppCompatActivity() {
             startActivity(Intent(this, BackupActivity::class.java))
         }
 
-        btnAtivarLicenca.setOnClickListener {
-            val chave = edtChaveLicenca.text.toString()
-            if (chave.isBlank()) {
-                Toast.makeText(this, "Digite a chave de licença", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-            Toast.makeText(this, "Esse campo é do sistema antigo de chave local — a liberação agora é feita remotamente pelo ID do aparelho acima.", Toast.LENGTH_LONG).show()
-        }
-
-        // Toca 7x seguidas no título "Config" pra revelar o gerador de
-        // chaves — não é visível pro usuário comum, só pra você.
-        txtTituloConfig.setOnClickListener {
-            val agora = System.currentTimeMillis()
-            if (agora - ultimoToqueTituloEm > 2000) contadorToquesTitulo = 0
-            ultimoToqueTituloEm = agora
-            contadorToquesTitulo++
-            if (contadorToquesTitulo >= 7) {
-                contadorToquesTitulo = 0
-                cardGeradorChaveDev.visibility = android.view.View.VISIBLE
-                Toast.makeText(this, "Painel interno liberado", Toast.LENGTH_SHORT).show()
-            }
-        }
-
-        btnGerarChave.setOnClickListener {
-            txtChaveGerada.text = "Sistema migrado pro Firebase — use o ID do aparelho pra liberar."
-        }
-
-        btnCopiarChaveGerada.setOnClickListener {
-            val id = LicenseManager.obterIdDispositivo(this)
-            val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
-            clipboard.setPrimaryClip(ClipData.newPlainText("id_dispositivo", id))
-            Toast.makeText(this, "ID do aparelho copiado!", Toast.LENGTH_SHORT).show()
-        }
-
         val acaoSalvarCombustivel = {
             salvarCamposDoCombustivel(combustivelSelecionado)
             prefs.edit().putString(RideAccessibilityService.PREF_COMBUSTIVEL_ATIVO, combustivelSelecionado).apply()
             atualizarResumoCombustiveis()
+            atualizarPreviewMetaBruta()
             Toast.makeText(this, "Combustível salvo", Toast.LENGTH_SHORT).show()
         }
         btnSalvarCombustivel.setOnClickListener { acaoSalvarCombustivel() }
@@ -175,14 +148,36 @@ class ParametrosActivity : AppCompatActivity() {
                 putFloat(RideAccessibilityService.PREF_LIMITE_PAUSA_HORAS, edtLimitePausa.text.toString().toFloatOrNull() ?: 3.0f)
                 putFloat(RideAccessibilityService.PREF_META_SEMANAL, edtMetaSemanal.text.toString().toFloatOrNull() ?: 0f)
                 putFloat(RideAccessibilityService.PREF_META_MENSAL, edtMetaMensal.text.toString().toFloatOrNull() ?: 0f)
+                putInt(RideAccessibilityService.PREF_DIAS_TRABALHO_MES, edtDiasTrabalhoMes.text.toString().toIntOrNull() ?: 22)
                 apply()
             }
+            atualizarPreviewMetaBruta()
             Toast.makeText(this, "Configurações salvas", Toast.LENGTH_SHORT).show()
         }
 
         atualizarStatus(txtStatus)
         atualizarResumoCombustiveis()
         atualizarStatusLicenca()
+        atualizarPreviewMetaBruta()
+    }
+
+    private fun atualizarPreviewMetaBruta() {
+        // Salva o valor de dias-de-trabalho digitado temporariamente (sem
+        // precisar tocar em "Salvar configurações") só pra essa prévia
+        // ficar correta em tempo real.
+        val diasDigitados = edtDiasTrabalhoMes.text.toString().toIntOrNull()
+        val diasOriginais = prefs.getInt(RideAccessibilityService.PREF_DIAS_TRABALHO_MES, 22)
+        if (diasDigitados != null && diasDigitados > 0) {
+            prefs.edit().putInt(RideAccessibilityService.PREF_DIAS_TRABALHO_MES, diasDigitados).apply()
+        }
+
+        val resultado = MetaMensalCalculator.calcular(this)
+        findViewById<TextView>(R.id.txtMetaBrutaPreviewConfig).text = "R$ %.2f/dia".format(resultado.metaBrutaDiaria)
+        findViewById<TextView>(R.id.txtMetaBrutaSubtituloConfig).text = "pra cobrir R$ %.2f/mês em %d dia(s)".format(resultado.custoMensalTotal, resultado.diasTrabalho)
+
+        if (diasDigitados == null || diasDigitados <= 0) {
+            prefs.edit().putInt(RideAccessibilityService.PREF_DIAS_TRABALHO_MES, diasOriginais).apply()
+        }
     }
 
     private fun atualizarStatusLicenca() {
@@ -234,6 +229,7 @@ class ParametrosActivity : AppCompatActivity() {
     private fun trocarCombustivel(novo: String) {
         salvarCamposDoCombustivel(combustivelSelecionado)
         selecionarPill(novo, carregarCampos = true)
+        atualizarPreviewMetaBruta()
     }
 
     private fun selecionarPill(tipo: String, carregarCampos: Boolean) {
