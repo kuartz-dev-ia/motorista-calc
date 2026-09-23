@@ -33,17 +33,9 @@ class RideAccessibilityService : AccessibilityService() {
     private var ultimoTextoProcessado: String = ""
     private var capturandoNoMomento = false
 
-    /** Guarda o último valor lido numa tela de OFERTA de corrida ainda não
-     * confirmado. Só processa (mostra o card com cálculos) quando o MESMO
-     * valor aparecer em duas leituras seguidas — evita pegar a tela no meio
-     * de uma animação/transição e calcular em cima de um número errado. */
     private var candidatoValorCorrida: Double? = null
     private var candidatoTextoCorrida: String? = null
 
-    /** Controla o "cooldown" do card de última viagem: enquanto não passar
-     * esse tempo desde a última vez que ele apareceu, não mostra de novo —
-     * evita o card ficar piscando enquanto a tela de resultado da corrida
-     * continuar parada na tela (sendo lida a cada 1,5s). */
     private var ultimaViagemMostradaEm: Long = 0L
 
     private val handler = Handler(Looper.getMainLooper())
@@ -315,7 +307,6 @@ class RideAccessibilityService : AccessibilityService() {
             return
         }
 
-        // Saiu da tela de oferta — descarta qualquer candidato pendente.
         candidatoValorCorrida = null
         candidatoTextoCorrida = null
 
@@ -325,11 +316,6 @@ class RideAccessibilityService : AccessibilityService() {
         }
     }
 
-    /** Só processa de verdade a tela de oferta quando o MESMO valor aparecer
-     * em duas leituras seguidas (com ~1,5s de intervalo). Isso evita calcular
-     * em cima de uma leitura feita no meio de uma animação/transição da tela
-     * do Uber/99, que costuma ser a causa de valores errados/negativos
-     * aparecerem por um instante no card. */
     private fun confirmarEProcessarOferta(texto: String) {
         val valorLido = TriggerPatterns.extrairValorTotal(texto)
         if (valorLido == null) {
@@ -590,6 +576,7 @@ class RideAccessibilityService : AccessibilityService() {
         const val PREF_META_SEMANAL = "meta_semanal"
         const val PREF_META_MENSAL = "meta_mensal"
         const val PREF_ULTIMA_NOTIFICACAO_JORNADA = "ultima_notificacao_jornada_millis"
+        const val PREF_DIAS_TRABALHO_MES = "dias_trabalho_mes"
         private const val VALOR_MAXIMO_PLAUSIVEL = 300.0
         private const val VALOR_MAXIMO_PLAUSIVEL_RESUMO = 3000.0
         private const val CANAL_PAUSA_ID = "lembrete_pausa"
