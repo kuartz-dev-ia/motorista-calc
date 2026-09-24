@@ -5,8 +5,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission
-        android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE"
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE"
         tools:targetApi="34" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.VIBRATE" />
@@ -14,12 +13,10 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CAMERA" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
-
-    <uses-feature
-        android:name="android.hardware.camera.front"
-        android:required="false" />
+    <uses-feature android:name="android.hardware.camera.front" android:required="false" />
 
     <application
+        android:name=".MotoristaCalcApp"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round"
@@ -31,18 +28,11 @@
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
-
-        <activity
-            android:name=".DashboardActivity"
-            android:exported="false"
-            android:label="Dashboard" />
 
         <activity
             android:name=".HistoricoActivity"
@@ -105,11 +95,6 @@
             android:label="Backup" />
 
         <activity
-            android:name=".ParametrosActivity"
-            android:exported="false"
-            android:label="Config" />
-
-        <activity
             android:name=".ContasActivity"
             android:exported="false"
             android:label="Minhas Contas" />
@@ -128,22 +113,23 @@
             android:name=".EventosListaActivity"
             android:exported="false"
             android:label="Radar de Eventos" />
-        
+
+        <activity
+            android:name=".ParametrosActivity"
+            android:exported="false"
+            android:label="Config" />
 
         <service
             android:name=".RideAccessibilityService"
             android:exported="true"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
             android:foregroundServiceType="specialUse">
-
             <intent-filter>
                 <action android:name="android.accessibilityservice.AccessibilityService" />
             </intent-filter>
-
             <meta-data
                 android:name="android.accessibilityservice"
                 android:resource="@xml/accessibility_service_config" />
-
         </service>
 
         <service
@@ -154,7 +140,7 @@
             android:name=".RideRecorderService"
             android:exported="false"
             android:foregroundServiceType="camera|microphone" />
-        
+
         <service
             android:name=".ChatHeadService"
             android:exported="false"
@@ -163,17 +149,15 @@
         <service
             android:name=".ResumoOverlayService"
             android:exported="false" />
-        
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
-
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
-
         </provider>
 
     </application>
