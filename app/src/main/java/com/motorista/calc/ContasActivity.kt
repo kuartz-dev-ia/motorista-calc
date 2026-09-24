@@ -74,7 +74,7 @@ class ContasActivity : AppCompatActivity() {
         val cal = Calendar.getInstance()
         dataVencimentoSelecionada?.let { cal.timeInMillis = it }
 
-        DatePickerDialog(
+        val dialog = DatePickerDialog(
             this,
             R.style.DialogTemaEscuro,
             { _, ano, mes, dia ->
@@ -85,7 +85,12 @@ class ContasActivity : AppCompatActivity() {
                 btnEscolherData.text = "📅 ${formatoData.format(escolhida.time)}"
             },
             cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)
-        ).show()
+        )
+        // O DatePickerDialog nem sempre herda a cor certa dos botões "OK" e
+        // "Cancelar" só pelo tema — forçamos a cor certa igual fazemos nos
+        // outros diálogos do app.
+        dialog.setOnShowListener { DialogUtils.aplicarCoresBotoes(dialog) }
+        dialog.show()
     }
 
     private fun selecionarCategoria(selecionado: TextView, categoria: String) {
