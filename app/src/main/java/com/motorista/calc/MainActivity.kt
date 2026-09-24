@@ -28,7 +28,7 @@ class MainActivity : AppCompatActivity() {
     private val tickerRunnable = object : Runnable {
         override fun run() {
             atualizarTelaJornada()
-            handler.postDelayed(this, 15_000L)
+            handler.postDelayed(this, 1_000L)
         }
     }
 
@@ -108,7 +108,7 @@ class MainActivity : AppCompatActivity() {
         atualizarMetaBrutaNecessaria()
         RideRecorderService.aoMudarEstado = { atualizarBotaoGravar() }
         handler.removeCallbacks(tickerRunnable)
-        handler.postDelayed(tickerRunnable, 15_000L)
+        handler.postDelayed(tickerRunnable, 1_000L)
     }
 
     override fun onPause() {
@@ -202,12 +202,15 @@ class MainActivity : AppCompatActivity() {
             grupoNovaJornada.visibility = android.view.View.GONE
             grupoAndamento.visibility = android.view.View.VISIBLE
 
-            val stats = JornadaStorage.calcularStats(this, jornada)
-            val horas = stats.tempoTrabalhadoMin / 60
-            val minutos = stats.tempoTrabalhadoMin % 60
+            val segundosTotais = (System.currentTimeMillis() - jornada.dataInicioMillis) / 1000
+            val horas = segundosTotais / 3600
+            val minutos = (segundosTotais % 3600) / 60
+            val segundos = segundosTotais % 60
 
-            txtStatusTopo.text = "Jornada ativa · %02d:%02d".format(horas, minutos)
-            findViewById<TextView>(R.id.txtJornadaTempo).text = "⏱ %02d:%02d na jornada".format(horas, minutos)
+            txtStatusTopo.text = "Jornada ativa · %02d:%02d:%02d".format(horas, minutos, segundos)
+
+            val stats = JornadaStorage.calcularStats(this, jornada)
+
             findViewById<TextView>(R.id.txtJornadaMeta).text = "  da meta de R$%.0f".format(jornada.metaDiaria)
             findViewById<TextView>(R.id.txtJornadaPercentual).text = "↑ %.0f%%".format(stats.percentualMeta)
             findViewById<TextView>(R.id.txtJornadaGanho).text = "R$%.0f".format(stats.ganhoBruto)
@@ -218,6 +221,9 @@ class MainActivity : AppCompatActivity() {
             val txtLucro = findViewById<TextView>(R.id.txtJornadaLucro)
             txtLucro.text = "R$ %.2f".format(stats.lucroLiquido)
             txtLucro.setTextColor(Color.parseColor(if (stats.lucroLiquido >= 0) "#F2F4F7" else "#C9807E"))
+
+            val resultadoMeta = MetaMensalCalculator.calcular(this)
+            findViewById<TextView>(R.id.txtMetaBrutaHoje).text = "R$ %.2f".format(resultadoMeta.metaBrutaDiaria)
         }
 
         atualizarBotaoGravar()
