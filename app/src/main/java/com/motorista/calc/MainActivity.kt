@@ -90,8 +90,8 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, AdicionarCorridaActivity::class.java))
         }
 
-        findViewById<android.view.View>(R.id.btnAbrirMaisOpcoes).setOnClickListener {
-            startActivity(Intent(this, MaisOpcoesActivity::class.java))
+        findViewById<android.view.View>(R.id.btnAbrirPrints).setOnClickListener {
+            startActivity(Intent(this, PrintsActivity::class.java))
         }
 
         findViewById<android.view.View>(R.id.navInicio).setOnClickListener { }
@@ -158,6 +158,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun iniciarJornada() {
+        if (LicenseManager.estaBloqueadoExplicitamente(this)) {
+            Toast.makeText(this, "Seu acesso foi bloqueado. Entre em contato para mais informações.", Toast.LENGTH_LONG).show()
+            return
+        }
         if (TrialManager.expirou(this)) {
             Toast.makeText(this, "Período de teste encerrado.", Toast.LENGTH_LONG).show()
             return
@@ -235,7 +239,7 @@ class MainActivity : AppCompatActivity() {
 
         if (TrialManager.expirou(this)) {
             cardAviso.visibility = android.view.View.VISIBLE
-            txtTeste.text = "⛔ Monitoramento desativado. Entre em contato pra reativar."
+            txtTeste.text = if (LicenseManager.estaBloqueadoExplicitamente(this)) "⛔ Acesso bloqueado." else "⛔ Monitoramento desativado. Entre em contato pra reativar."
             prefs.edit().putBoolean(RideAccessibilityService.PREF_MONITORAMENTO_ATIVO, false).apply()
         } else {
             cardAviso.visibility = android.view.View.GONE
