@@ -110,7 +110,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Soma todos os seus custos mensais (custos fixos + Minhas Contas + combustível estimado) e divide pelos dias que você pretende trabalhar"
+                    android:text="Soma custos fixos + Minhas Contas + combustível estimado e divide pelos dias que você pretende trabalhar"
                     android:textColor="#5D6773"
                     android:textSize="11sp"
                     android:layout_marginBottom="12dp" />
@@ -291,7 +291,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Configuração de Combustível"
+                    android:text="Configuração de Combustível/Energia"
                     android:textColor="#E7EAEE"
                     android:textSize="15sp"
                     android:textStyle="bold"
@@ -311,10 +311,10 @@
                         android:layout_marginEnd="4dp"
                         android:background="@drawable/bg_chip_unselected"
                         android:gravity="center"
-                        android:padding="10dp"
+                        android:padding="9dp"
                         android:text="Gasolina"
                         android:textColor="#8A94A3"
-                        android:textSize="11sp"
+                        android:textSize="10sp"
                         android:clickable="true"
                         android:focusable="true" />
 
@@ -326,10 +326,10 @@
                         android:layout_marginEnd="4dp"
                         android:background="@drawable/bg_chip_selected"
                         android:gravity="center"
-                        android:padding="10dp"
+                        android:padding="9dp"
                         android:text="Etanol"
                         android:textColor="#06231F"
-                        android:textSize="11sp"
+                        android:textSize="10sp"
                         android:textStyle="bold"
                         android:clickable="true"
                         android:focusable="true" />
@@ -339,17 +339,33 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
+                        android:layout_marginEnd="4dp"
                         android:background="@drawable/bg_chip_unselected"
                         android:gravity="center"
-                        android:padding="10dp"
+                        android:padding="9dp"
                         android:text="GNV"
                         android:textColor="#8A94A3"
-                        android:textSize="11sp"
+                        android:textSize="10sp"
+                        android:clickable="true"
+                        android:focusable="true" />
+
+                    <TextView
+                        android:id="@+id/chipEletrico"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_chip_unselected"
+                        android:gravity="center"
+                        android:padding="9dp"
+                        android:text="Elétrico"
+                        android:textColor="#8A94A3"
+                        android:textSize="10sp"
                         android:clickable="true"
                         android:focusable="true" />
                 </LinearLayout>
 
                 <TextView
+                    android:id="@+id/txtLabelPrecoCombustivel"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Preço por litro"
@@ -365,12 +381,14 @@
                     android:paddingEnd="14dp"
                     android:gravity="center_vertical"
                     android:textColor="#E7EAEE"
+                    android:textColorHint="#5D6773"
                     android:textSize="16sp"
                     android:textStyle="bold"
                     android:inputType="numberDecimal"
                     android:layout_marginBottom="10dp" />
 
                 <TextView
+                    android:id="@+id/txtLabelConsumoCombustivel"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Consumo do veículo (km/l)"
@@ -386,6 +404,7 @@
                     android:paddingEnd="14dp"
                     android:gravity="center_vertical"
                     android:textColor="#E7EAEE"
+                    android:textColorHint="#5D6773"
                     android:textSize="16sp"
                     android:textStyle="bold"
                     android:inputType="numberDecimal"
@@ -436,7 +455,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Resumo dos Combustíveis"
+                    android:text="Resumo"
                     android:textColor="#E7EAEE"
                     android:textSize="13sp"
                     android:textStyle="bold"
@@ -533,6 +552,7 @@
                     android:paddingEnd="14dp"
                     android:gravity="center_vertical"
                     android:textColor="#E7EAEE"
+                    android:textColorHint="#5D6773"
                     android:inputType="numberDecimal"
                     android:layout_marginTop="4dp"
                     android:layout_marginBottom="12dp" />
@@ -552,6 +572,7 @@
                     android:paddingEnd="14dp"
                     android:gravity="center_vertical"
                     android:textColor="#E7EAEE"
+                    android:textColorHint="#5D6773"
                     android:inputType="numberDecimal"
                     android:layout_marginTop="4dp" />
             </LinearLayout>
@@ -603,6 +624,7 @@
                             android:background="@drawable/bg_input_verde"
                             android:gravity="center"
                             android:textColor="#E7EAEE"
+                            android:textColorHint="#5D6773"
                             android:hint="0"
                             android:textSize="16sp"
                             android:textStyle="bold"
@@ -632,6 +654,7 @@
                             android:background="@drawable/bg_input_verde"
                             android:gravity="center"
                             android:textColor="#E7EAEE"
+                            android:textColorHint="#5D6773"
                             android:hint="0"
                             android:textSize="16sp"
                             android:textStyle="bold"
@@ -669,6 +692,7 @@
                             android:background="@drawable/bg_input_verde"
                             android:gravity="center"
                             android:textColor="#E7EAEE"
+                            android:textColorHint="#5D6773"
                             android:hint="0"
                             android:textSize="16sp"
                             android:textStyle="bold"
@@ -698,6 +722,7 @@
                             android:background="@drawable/bg_input_verde"
                             android:gravity="center"
                             android:textColor="#E7EAEE"
+                            android:textColorHint="#5D6773"
                             android:hint="0"
                             android:textSize="16sp"
                             android:textStyle="bold"
@@ -735,6 +760,7 @@
                             android:background="@drawable/bg_input_verde"
                             android:gravity="center"
                             android:textColor="#E7EAEE"
+                            android:textColorHint="#5D6773"
                             android:hint="0"
                             android:textSize="16sp"
                             android:textStyle="bold"
@@ -764,6 +790,7 @@
                             android:background="@drawable/bg_input_verde"
                             android:gravity="center"
                             android:textColor="#E7EAEE"
+                            android:textColorHint="#5D6773"
                             android:hint="0"
                             android:textSize="16sp"
                             android:textStyle="bold"
@@ -787,10 +814,32 @@
                     android:background="@drawable/bg_input_verde"
                     android:gravity="center"
                     android:textColor="#E7EAEE"
+                    android:textColorHint="#5D6773"
                     android:hint="0"
                     android:textSize="16sp"
                     android:textStyle="bold"
                     android:inputType="numberDecimal" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/btnAbrirMaisConfiguracoes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:background="@drawable/bg_card_dark"
+                android:padding="16dp"
+                android:layout_marginBottom="12dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="⚙️  Mais Configurações"
+                    android:textColor="#E7EAEE"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
             </LinearLayout>
 
             <LinearLayout
@@ -824,6 +873,7 @@
                     android:paddingEnd="14dp"
                     android:gravity="center_vertical"
                     android:textColor="#E7EAEE"
+                    android:textColorHint="#5D6773"
                     android:inputType="numberDecimal"
                     android:layout_marginTop="6dp" />
             </LinearLayout>
