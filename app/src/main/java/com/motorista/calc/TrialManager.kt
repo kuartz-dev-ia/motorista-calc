@@ -7,11 +7,11 @@ object TrialManager {
     private const val DIAS_TESTE = 10
 
     fun garantirInicializado(context: Context) {
-        // Nenhuma ação necessária — a contagem usa a data de instalação do
-        // sistema, não uma preferência própria.
+        // Nenhuma ação necessária.
     }
 
     fun expirou(context: Context): Boolean {
+        if (LicenseManager.estaBloqueadoExplicitamente(context)) return true
         if (LicenseManager.estaLiberadoPorLicenca(context)) return false
         return diasRestantes(context) <= 0
     }
