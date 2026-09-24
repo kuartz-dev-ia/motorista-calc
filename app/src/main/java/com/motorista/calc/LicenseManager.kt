@@ -2,20 +2,37 @@ package com.motorista.calc
 
 import android.content.Context
 import android.provider.Settings
+import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Source
 
 /** Controla a liberação remota do app via Firebase Firestore. Cada aparelho
- * tem um ID único (gerado pelo próprio Android); você libera ou bloqueia
- * cada ID direto no site do Firebase, sem precisar mexer no app. O app
- * guarda o último status confirmado localmente, pra continuar funcionando
- * alguns dias mesmo sem internet no momento — depois disso, exige conexão de
- * novo pra confirmar que ainda está liberado. */
+ * tem um ID único; você libera ou bloqueia cada ID direto no site do
+ * Firebase, sem precisar mexer no app.
+ *
+ * Usa duas fontes de verificação:
+ * 1) Uma ESCUTA EM TEMPO REAL (addSnapshotListener), iniciada uma vez em
+ *    MotoristaCalcApp — enquanto o app tiver processo vivo e internet,
+ *    qualquer mudança no Firebase chega quase na hora, sem esperar reabrir
+ *    uma tela.
+ * 2) Uma consulta pontual (verificarEmSegundoPlano), chamada no onResume das
+ *    telas principais, como reforço caso a escuta não tenha pego por algum
+ *    motivo (app reaberto depois de ficar fechado, por exemplo).
+ *
+ * Quando o Firebase já confirmou explicitamente "liberado = false" pra esse
+ * aparelho, o bloqueio é IMEDIATO e não dá direito a nenhum teste
+ * gratuito — diferente de simplesmente "não estar liberado" (aparelho novo,
+ * nunca cadastrado), que ainda usa o teste de 10 dias normalmente. */
 object LicenseManager {
     private const val COLECAO = "licencas"
     private const val PREF_ULTIMO_STATUS = "licenca_ultimo_status_liberado"
     private const val PREF_ULTIMA_VERIFICACAO = "licenca_ultima_verificacao_millis"
+    private const val PREF_DOCUMENTO_EXISTE = "licenca_documento_existe"
     private const val DIAS_TOLERANCIA_OFFLINE = 3
+
+    @Volatile
+    private var listenerAtivo: ListenerRegistration? = null
 
     fun obterIdDispositivo(context: Context): String {
         return Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID) ?: "id-desconhecido"
@@ -23,35 +40,58 @@ object LicenseManager {
 
     private fun prefs(context: Context) = context.getSharedPreferences(RideAccessibilityService.PREFS_NAME, Context.MODE_PRIVATE)
 
-    /** Consulta o Firestore em segundo plano (não trava a tela) e atualiza o
-     * cache local com o resultado. Chame isso sempre que uma tela principal
-     * abrir (onResume). */
-    fun verificarEmSegundoPlano(context: Context) {
-        val id = obterIdDispositivo(context)
+    fun iniciarEscutaEmTempoReal(context: Context) {
+        if (listenerAtivo != null) return
         try {
+            val id = obterIdDispositivo(context)
+            listenerAtivo = FirebaseFirestore.getInstance()
+                .collection(COLECAO)
+                .document(id)
+                .addSnapshotListener { doc, erro ->
+                    if (erro != null || doc == null) return@addSnapshotListener
+                    salvarResultado(context, doc.exists(), doc.getBoolean("liberado") ?: false)
+                }
+        } catch (e: Exception) {
+            Log.e("LicenseManager", "Erro ao iniciar escuta do Firebase: ${e.message}")
+        }
+    }
+
+    fun verificarEmSegundoPlano(context: Context) {
+        try {
+            val id = obterIdDispositivo(context)
             FirebaseFirestore.getInstance()
                 .collection(COLECAO)
                 .document(id)
                 .get(Source.SERVER)
                 .addOnSuccessListener { doc ->
-                    val liberado = doc.getBoolean("liberado") ?: false
-                    prefs(context).edit()
-                        .putBoolean(PREF_ULTIMO_STATUS, liberado)
-                        .putLong(PREF_ULTIMA_VERIFICACAO, System.currentTimeMillis())
-                        .apply()
+                    salvarResultado(context, doc.exists(), doc.getBoolean("liberado") ?: false)
                 }
-                .addOnFailureListener {
-                    // Sem internet agora ou documento não existe ainda —
-                    // mantém o último status conhecido, sem travar nada.
-                }
-        } catch (e: Exception) {
-            // Firebase pode falhar ao inicializar em casos raros — ignora
-            // silenciosamente, o teste gratuito local continua valendo.
-        }
+                .addOnFailureListener { }
+        } catch (e: Exception) { }
     }
 
-    /** true se o app está liberado por licença remota — considerando o
-     * último status confirmado, com uma margem de dias offline. */
+    private fun salvarResultado(context: Context, documentoExiste: Boolean, liberado: Boolean) {
+        val editor = prefs(context).edit().putBoolean(PREF_DOCUMENTO_EXISTE, documentoExiste)
+        if (documentoExiste) {
+            editor.putBoolean(PREF_ULTIMO_STATUS, liberado)
+            editor.putLong(PREF_ULTIMA_VERIFICACAO, System.currentTimeMillis())
+        }
+        editor.apply()
+    }
+
+    /** true quando o Firebase JÁ confirmou explicitamente que esse aparelho
+     * está bloqueado (documento existe e liberado = false) — bloqueio na
+     * hora, sem teste gratuito nem tolerância offline. */
+    fun estaBloqueadoExplicitamente(context: Context): Boolean {
+        val p = prefs(context)
+        val documentoExiste = p.getBoolean(PREF_DOCUMENTO_EXISTE, false)
+        if (!documentoExiste) return false
+        return !p.getBoolean(PREF_ULTIMO_STATUS, false)
+    }
+
+    /** true se liberado por licença remota confirmada, dentro da margem de
+     * tolerância offline (só vale enquanto o último status confirmado foi
+     * "liberado"). */
     fun estaLiberadoPorLicenca(context: Context): Boolean {
         val p = prefs(context)
         val ultimoStatus = p.getBoolean(PREF_ULTIMO_STATUS, false)
