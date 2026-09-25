@@ -2,27 +2,18 @@ package com.motorista.calc
 
 import android.content.Context
 
+/** Não existe mais teste gratuito automático. O único jeito de usar o app é
+ * o administrador liberar o ID do aparelho no Firebase (liberado = true).
+ * Enquanto isso não acontecer — aparelho novo, nunca cadastrado, ou
+ * explicitamente bloqueado — o app trata como "expirado"/bloqueado. */
 object TrialManager {
-
-    private const val DIAS_TESTE = 10
 
     fun garantirInicializado(context: Context) {
         // Nenhuma ação necessária.
     }
 
+    /** true = não pode usar (precisa de liberação no Firebase). */
     fun expirou(context: Context): Boolean {
-        if (LicenseManager.estaBloqueadoExplicitamente(context)) return true
-        if (LicenseManager.estaLiberadoPorLicenca(context)) return false
-        return diasRestantes(context) <= 0
-    }
-
-    fun diasRestantes(context: Context): Int {
-        val dataInstalacao = try {
-            context.packageManager.getPackageInfo(context.packageName, 0).firstInstallTime
-        } catch (e: Exception) {
-            return DIAS_TESTE
-        }
-        val diasDecorridos = ((System.currentTimeMillis() - dataInstalacao) / (24L * 60 * 60 * 1000)).toInt()
-        return (DIAS_TESTE - diasDecorridos).coerceAtLeast(0)
+        return !LicenseManager.estaLiberadoPorLicenca(context)
     }
 }
