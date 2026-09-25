@@ -195,17 +195,11 @@ class ParametrosActivity : AppCompatActivity() {
             txtStatusLicenca.text = "⛔ Acesso bloqueado"
             txtStatusLicenca.setTextColor(Color.parseColor("#C9807E"))
         } else if (LicenseManager.estaLiberadoPorLicenca(this)) {
-            txtStatusLicenca.text = "✔ Licença ativada — uso liberado"
+            txtStatusLicenca.text = "✔ Acesso liberado"
             txtStatusLicenca.setTextColor(Color.parseColor("#2FB4A6"))
         } else {
-            val dias = TrialManager.diasRestantes(this)
-            if (dias > 0) {
-                txtStatusLicenca.text = "Teste gratuito — $dias dia(s) restante(s)"
-                txtStatusLicenca.setTextColor(Color.parseColor("#8A94A3"))
-            } else {
-                txtStatusLicenca.text = "⛔ Teste gratuito encerrado — envie o ID do aparelho abaixo pra liberar"
-                txtStatusLicenca.setTextColor(Color.parseColor("#C9807E"))
-            }
+            txtStatusLicenca.text = "⏳ Aguardando liberação — envie o ID do aparelho abaixo pro administrador"
+            txtStatusLicenca.setTextColor(Color.parseColor("#8A94A3"))
         }
     }
 
@@ -324,10 +318,6 @@ class ParametrosActivity : AppCompatActivity() {
         txtResumoCombustiveis.text = linhas.joinToString("\n")
     }
 
-    /** Só preenche o campo se o valor salvo for diferente de zero — assim
-     * ele começa VAZIO em vez de mostrar "0.0" (que exigiria apagar antes de
-     * digitar um valor novo). O hint "0" continua aparecendo como referência
-     * visual, sem ser um valor de verdade dentro do campo. */
     private fun preencherSeExistir(campo: EditText, chave: String) {
         if (prefs.contains(chave)) {
             val valor = prefs.getFloat(chave, 0f)
