@@ -15,22 +15,6 @@ data class ResultadoMetaMensal(
     val diasRestantes: Int
 )
 
-/** Soma os custos mensais que entram na meta diária:
- * - Custos Fixos de Parâmetros: Financiamento, Seguro, IPVA (rateado/12),
- *   Licenciamento (rateado/12) e Manutenção — SEM "Contas Pessoais", que
- *   fica de fora daqui pra não duplicar com "Minhas Contas"
- * - Total de "Minhas Contas"
- * - Combustível estimado (km médio mensal x custo por km)
- *
- * "Contas Pessoais" de Parâmetros continua entrando SÓ no cálculo de lucro
- * líquido do card de cada corrida (CalculationEngine) — não aqui, pra evitar
- * contar a mesma despesa duas vezes. Cabe ao usuário decidir: ou cadastra o
- * gasto pessoal ali, ou cadastra em "Minhas Contas" — nunca nos dois.
- *
- * A meta diária se reajusta sozinha dentro do mês corrente: se você ganhou
- * mais que a meta num dia, a meta dos próximos dias diminui; se ganhou
- * menos, aumenta — sempre dividindo o que falta pra bater a meta do mês
- * pelos dias de trabalho que ainda restam. O mês reinicia sozinho no dia 1. */
 object MetaMensalCalculator {
 
     private val formatoDia = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
@@ -47,10 +31,11 @@ object MetaMensalCalculator {
 
         val totalMinhasContas = ContaStorage.totalMensal(context)
 
-        val kmMes = prefs.getFloat(RideAccessibilityService.PREF_KM_MES, 3000f).toDouble()
+        val kmMes = prefs.getFloat(RideAccessibilityService.PREF_KM_MES, 0f).toDouble()
         val (preco, consumo) = when (prefs.getString(RideAccessibilityService.PREF_COMBUSTIVEL_ATIVO, "etanol")) {
             "gasolina" -> Pair(prefs.getFloat(RideAccessibilityService.PREF_PRECO_GASOLINA, 6.10f).toDouble(), prefs.getFloat(RideAccessibilityService.PREF_CONSUMO_GASOLINA, 10.0f).toDouble())
             "gnv" -> Pair(prefs.getFloat(RideAccessibilityService.PREF_PRECO_GNV, 4.50f).toDouble(), prefs.getFloat(RideAccessibilityService.PREF_CONSUMO_GNV, 12.0f).toDouble())
+            "eletrico" -> Pair(prefs.getFloat(RideAccessibilityService.PREF_PRECO_ELETRICO, 0.70f).toDouble(), prefs.getFloat(RideAccessibilityService.PREF_CONSUMO_ELETRICO, 6.0f).toDouble())
             else -> Pair(prefs.getFloat(RideAccessibilityService.PREF_PRECO_ETANOL, 4.20f).toDouble(), prefs.getFloat(RideAccessibilityService.PREF_CONSUMO_ETANOL, 7.0f).toDouble())
         }
         val custoPorKm = if (consumo > 0) preco / consumo else 0.0
