@@ -23,8 +23,11 @@ class ParametrosActivity : AppCompatActivity() {
     private lateinit var chipGasolina: TextView
     private lateinit var chipEtanol: TextView
     private lateinit var chipGnv: TextView
+    private lateinit var chipEletrico: TextView
     private lateinit var edtPrecoCombustivel: EditText
     private lateinit var edtConsumo: EditText
+    private lateinit var txtLabelPreco: TextView
+    private lateinit var txtLabelConsumo: TextView
     private lateinit var txtCustoPorKmPreview: TextView
     private lateinit var txtResumoCombustiveis: TextView
     private lateinit var edtDiasTrabalhoMes: EditText
@@ -40,8 +43,11 @@ class ParametrosActivity : AppCompatActivity() {
         chipGasolina = findViewById(R.id.chipGasolina)
         chipEtanol = findViewById(R.id.chipEtanol)
         chipGnv = findViewById(R.id.chipGnv)
+        chipEletrico = findViewById(R.id.chipEletrico)
         edtPrecoCombustivel = findViewById(R.id.edtPrecoCombustivel)
         edtConsumo = findViewById(R.id.edtConsumo)
+        txtLabelPreco = findViewById(R.id.txtLabelPrecoCombustivel)
+        txtLabelConsumo = findViewById(R.id.txtLabelConsumoCombustivel)
         txtCustoPorKmPreview = findViewById(R.id.txtCustoPorKmPreview)
         txtResumoCombustiveis = findViewById(R.id.txtResumoCombustiveis)
         edtDiasTrabalhoMes = findViewById(R.id.edtDiasTrabalhoMes)
@@ -89,7 +95,8 @@ class ParametrosActivity : AppCompatActivity() {
         preencherSeExistir(edtLimitePausa, RideAccessibilityService.PREF_LIMITE_PAUSA_HORAS)
         preencherSeExistir(edtMetaSemanal, RideAccessibilityService.PREF_META_SEMANAL)
         preencherSeExistir(edtMetaMensal, RideAccessibilityService.PREF_META_MENSAL)
-        edtDiasTrabalhoMes.setText(prefs.getInt(RideAccessibilityService.PREF_DIAS_TRABALHO_MES, 22).toString())
+        val diasSalvos = prefs.getInt(RideAccessibilityService.PREF_DIAS_TRABALHO_MES, 22)
+        edtDiasTrabalhoMes.setText(diasSalvos.toString())
 
         val watcherPreview = object : android.text.TextWatcher {
             override fun afterTextChanged(s: android.text.Editable?) { atualizarPreviewCustoPorKm() }
@@ -109,6 +116,7 @@ class ParametrosActivity : AppCompatActivity() {
         chipGasolina.setOnClickListener { trocarCombustivel("gasolina") }
         chipEtanol.setOnClickListener { trocarCombustivel("etanol") }
         chipGnv.setOnClickListener { trocarCombustivel("gnv") }
+        chipEletrico.setOnClickListener { trocarCombustivel("eletrico") }
 
         btnAtivarAcessibilidade.setOnClickListener {
             startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
@@ -122,6 +130,10 @@ class ParametrosActivity : AppCompatActivity() {
 
         findViewById<android.view.View>(R.id.btnAbrirBackup).setOnClickListener {
             startActivity(Intent(this, BackupActivity::class.java))
+        }
+
+        findViewById<android.view.View>(R.id.btnAbrirMaisConfiguracoes).setOnClickListener {
+            startActivity(Intent(this, MaisOpcoesActivity::class.java))
         }
 
         val acaoSalvarCombustivel = {
@@ -144,7 +156,7 @@ class ParametrosActivity : AppCompatActivity() {
                 putFloat(RideAccessibilityService.PREF_LICENCIAMENTO, edtLicenciamento.text.toString().toFloatOrNull() ?: 0f)
                 putFloat(RideAccessibilityService.PREF_MANUTENCAO, edtManutencao.text.toString().toFloatOrNull() ?: 0f)
                 putFloat(RideAccessibilityService.PREF_CONTAS_PESSOAIS, edtContasPessoais.text.toString().toFloatOrNull() ?: 0f)
-                putFloat(RideAccessibilityService.PREF_KM_MES, edtKmMes.text.toString().toFloatOrNull() ?: 3000f)
+                putFloat(RideAccessibilityService.PREF_KM_MES, edtKmMes.text.toString().toFloatOrNull() ?: 0f)
                 putFloat(RideAccessibilityService.PREF_LIMITE_PAUSA_HORAS, edtLimitePausa.text.toString().toFloatOrNull() ?: 3.0f)
                 putFloat(RideAccessibilityService.PREF_META_SEMANAL, edtMetaSemanal.text.toString().toFloatOrNull() ?: 0f)
                 putFloat(RideAccessibilityService.PREF_META_MENSAL, edtMetaMensal.text.toString().toFloatOrNull() ?: 0f)
@@ -179,7 +191,10 @@ class ParametrosActivity : AppCompatActivity() {
 
     private fun atualizarStatusLicenca() {
         val txtStatusLicenca = findViewById<TextView>(R.id.txtStatusLicenca)
-        if (LicenseManager.estaLiberadoPorLicenca(this)) {
+        if (LicenseManager.estaBloqueadoExplicitamente(this)) {
+            txtStatusLicenca.text = "⛔ Acesso bloqueado"
+            txtStatusLicenca.setTextColor(Color.parseColor("#C9807E"))
+        } else if (LicenseManager.estaLiberadoPorLicenca(this)) {
             txtStatusLicenca.text = "✔ Licença ativada — uso liberado"
             txtStatusLicenca.setTextColor(Color.parseColor("#2FB4A6"))
         } else {
@@ -232,12 +247,24 @@ class ParametrosActivity : AppCompatActivity() {
     private fun selecionarPill(tipo: String, carregarCampos: Boolean) {
         combustivelSelecionado = tipo
 
-        val pills = mapOf("gasolina" to chipGasolina, "etanol" to chipEtanol, "gnv" to chipGnv)
+        val pills = mapOf("gasolina" to chipGasolina, "etanol" to chipEtanol, "gnv" to chipGnv, "eletrico" to chipEletrico)
         for ((chaveTipo, chip) in pills) {
             val selecionado = chaveTipo == tipo
             chip.background = ContextCompat.getDrawable(this, if (selecionado) R.drawable.bg_chip_selected else R.drawable.bg_chip_unselected)
             chip.setTextColor(if (selecionado) Color.parseColor("#06231F") else Color.parseColor("#8A94A3"))
             chip.setTypeface(chip.typeface, if (selecionado) android.graphics.Typeface.BOLD else android.graphics.Typeface.NORMAL)
+        }
+
+        if (tipo == "eletrico") {
+            txtLabelPreco.text = "Preço por kWh"
+            txtLabelConsumo.text = "Consumo do veículo (km/kWh)"
+            edtPrecoCombustivel.hint = "R$/kWh"
+            edtConsumo.hint = "km/kWh"
+        } else {
+            txtLabelPreco.text = "Preço por litro"
+            txtLabelConsumo.text = "Consumo do veículo (km/l)"
+            edtPrecoCombustivel.hint = ""
+            edtConsumo.hint = ""
         }
 
         if (carregarCampos) {
@@ -251,18 +278,21 @@ class ParametrosActivity : AppCompatActivity() {
     private fun obterValoresPadrao(tipo: String): Pair<Float, Float> = when (tipo) {
         "gasolina" -> Pair(6.10f, 10.0f)
         "gnv" -> Pair(4.50f, 12.0f)
+        "eletrico" -> Pair(0.70f, 6.0f)
         else -> Pair(4.20f, 7.0f)
     }
 
     private fun chavePreco(tipo: String) = when (tipo) {
         "gasolina" -> RideAccessibilityService.PREF_PRECO_GASOLINA
         "gnv" -> RideAccessibilityService.PREF_PRECO_GNV
+        "eletrico" -> RideAccessibilityService.PREF_PRECO_ELETRICO
         else -> RideAccessibilityService.PREF_PRECO_ETANOL
     }
 
     private fun chaveConsumo(tipo: String) = when (tipo) {
         "gasolina" -> RideAccessibilityService.PREF_CONSUMO_GASOLINA
         "gnv" -> RideAccessibilityService.PREF_CONSUMO_GNV
+        "eletrico" -> RideAccessibilityService.PREF_CONSUMO_ELETRICO
         else -> RideAccessibilityService.PREF_CONSUMO_ETANOL
     }
 
@@ -283,7 +313,7 @@ class ParametrosActivity : AppCompatActivity() {
     }
 
     private fun atualizarResumoCombustiveis() {
-        val tipos = listOf("gasolina" to "Gasolina", "etanol" to "Etanol", "gnv" to "GNV")
+        val tipos = listOf("gasolina" to "Gasolina", "etanol" to "Etanol", "gnv" to "GNV", "eletrico" to "Elétrico")
         val linhas = tipos.map { (chave, nome) ->
             val (precoPadrao, consumoPadrao) = obterValoresPadrao(chave)
             val preco = prefs.getFloat(chavePreco(chave), precoPadrao)
@@ -294,9 +324,16 @@ class ParametrosActivity : AppCompatActivity() {
         txtResumoCombustiveis.text = linhas.joinToString("\n")
     }
 
+    /** Só preenche o campo se o valor salvo for diferente de zero — assim
+     * ele começa VAZIO em vez de mostrar "0.0" (que exigiria apagar antes de
+     * digitar um valor novo). O hint "0" continua aparecendo como referência
+     * visual, sem ser um valor de verdade dentro do campo. */
     private fun preencherSeExistir(campo: EditText, chave: String) {
         if (prefs.contains(chave)) {
-            campo.setText(prefs.getFloat(chave, 0f).toString())
+            val valor = prefs.getFloat(chave, 0f)
+            if (valor != 0f) {
+                campo.setText(valor.toString())
+            }
         }
     }
 
