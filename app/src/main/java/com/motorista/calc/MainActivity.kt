@@ -158,12 +158,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun iniciarJornada() {
-        if (LicenseManager.estaBloqueadoExplicitamente(this)) {
-            Toast.makeText(this, "Seu acesso foi bloqueado. Entre em contato para mais informações.", Toast.LENGTH_LONG).show()
-            return
-        }
-        if (TrialManager.expirou(this)) {
-            Toast.makeText(this, "Período de teste encerrado.", Toast.LENGTH_LONG).show()
+        if (!LicenseManager.estaLiberadoPorLicenca(this)) {
+            Toast.makeText(
+                this,
+                "Seu acesso ainda não foi liberado. Vá em Config, copie o ID do aparelho e envie pro administrador liberar seu uso.",
+                Toast.LENGTH_LONG
+            ).show()
             return
         }
 
@@ -237,9 +237,13 @@ class MainActivity : AppCompatActivity() {
         val cardAviso = findViewById<android.view.View>(R.id.cardAviso)
         val txtTeste = findViewById<TextView>(R.id.txtTeste)
 
-        if (TrialManager.expirou(this)) {
+        if (!LicenseManager.estaLiberadoPorLicenca(this)) {
             cardAviso.visibility = android.view.View.VISIBLE
-            txtTeste.text = if (LicenseManager.estaBloqueadoExplicitamente(this)) "⛔ Acesso bloqueado." else "⛔ Monitoramento desativado. Entre em contato pra reativar."
+            txtTeste.text = if (LicenseManager.estaBloqueadoExplicitamente(this)) {
+                "⛔ Acesso bloqueado."
+            } else {
+                "⏳ Aguardando liberação. Vá em Config, copie o ID do aparelho e envie pro administrador."
+            }
             prefs.edit().putBoolean(RideAccessibilityService.PREF_MONITORAMENTO_ATIVO, false).apply()
         } else {
             cardAviso.visibility = android.view.View.GONE
