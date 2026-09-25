@@ -394,6 +394,10 @@ class RideAccessibilityService : AccessibilityService() {
                 prefs.getFloat(PREF_PRECO_GNV, 4.50f).toDouble(),
                 prefs.getFloat(PREF_CONSUMO_GNV, 12.0f).toDouble()
             )
+            "eletrico" -> Pair(
+                prefs.getFloat(PREF_PRECO_ELETRICO, 0.70f).toDouble(),
+                prefs.getFloat(PREF_CONSUMO_ELETRICO, 6.0f).toDouble()
+            )
             else -> Pair(
                 prefs.getFloat(PREF_PRECO_ETANOL, 4.20f).toDouble(),
                 prefs.getFloat(PREF_CONSUMO_ETANOL, 7.0f).toDouble()
@@ -572,6 +576,8 @@ class RideAccessibilityService : AccessibilityService() {
         const val PREF_CONSUMO_ETANOL = "consumo_etanol"
         const val PREF_PRECO_GNV = "preco_gnv"
         const val PREF_CONSUMO_GNV = "consumo_gnv"
+        const val PREF_PRECO_ELETRICO = "preco_eletrico"
+        const val PREF_CONSUMO_ELETRICO = "consumo_eletrico"
         const val PREF_ULTIMO_LEMBRETE_META = "ultimo_lembrete_meta_millis"
         const val PREF_META_SEMANAL = "meta_semanal"
         const val PREF_META_MENSAL = "meta_mensal"
