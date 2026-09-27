@@ -119,6 +119,41 @@
             android:exported="false"
             android:label="Config" />
 
+        <activity
+            android:name=".LicencaActivity"
+            android:exported="false"
+            android:label="Licença" />
+
+        <activity
+            android:name=".MetasActivity"
+            android:exported="false"
+            android:label="Metas" />
+
+        <activity
+            android:name=".CombustivelActivity"
+            android:exported="false"
+            android:label="Combustível" />
+
+        <activity
+            android:name=".CustosFixosActivity"
+            android:exported="false"
+            android:label="Custos Fixos" />
+
+        <activity
+            android:name=".LimitesActivity"
+            android:exported="false"
+            android:label="Limites" />
+
+        <activity
+            android:name=".SegurancaActivity"
+            android:exported="false"
+            android:label="Segurança" />
+
+        <activity
+            android:name=".DiagnosticoActivity"
+            android:exported="false"
+            android:label="Diagnóstico" />
+
         <service
             android:name=".RideAccessibilityService"
             android:exported="true"
