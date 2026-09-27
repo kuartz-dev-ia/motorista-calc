@@ -88,17 +88,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginBottom="10dp">
+                android:layout_marginBottom="8dp">
 
                 <LinearLayout
                     android:id="@+id/btnAbrirMetas"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="86dp"
                     android:layout_weight="1"
                     android:orientation="vertical"
                     android:gravity="center"
                     android:background="@drawable/bg_card_dark"
-                    android:padding="18dp"
+                    android:padding="6dp"
                     android:layout_marginEnd="8dp"
                     android:clickable="true"
                     android:focusable="true">
@@ -107,27 +107,30 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="🎯"
-                        android:textSize="24sp" />
+                        android:textSize="22sp" />
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Metas"
                         android:textColor="#C7CDD6"
-                        android:textSize="10.5sp"
+                        android:textSize="9.5sp"
                         android:textStyle="bold"
-                        android:layout_marginTop="8dp" />
+                        android:gravity="center"
+                        android:singleLine="true"
+                        android:ellipsize="end"
+                        android:layout_marginTop="6dp" />
                 </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/btnAbrirCombustivel"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="86dp"
                     android:layout_weight="1"
                     android:orientation="vertical"
                     android:gravity="center"
                     android:background="@drawable/bg_card_dark"
-                    android:padding="18dp"
+                    android:padding="6dp"
                     android:layout_marginEnd="8dp"
                     android:clickable="true"
                     android:focusable="true">
@@ -136,27 +139,30 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="⛽"
-                        android:textSize="24sp" />
+                        android:textSize="22sp" />
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Combustível"
                         android:textColor="#C7CDD6"
-                        android:textSize="10.5sp"
+                        android:textSize="9.5sp"
                         android:textStyle="bold"
-                        android:layout_marginTop="8dp" />
+                        android:gravity="center"
+                        android:singleLine="true"
+                        android:ellipsize="end"
+                        android:layout_marginTop="6dp" />
                 </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/btnAbrirCustosFixos"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="86dp"
                     android:layout_weight="1"
                     android:orientation="vertical"
                     android:gravity="center"
                     android:background="@drawable/bg_card_dark"
-                    android:padding="18dp"
+                    android:padding="6dp"
                     android:clickable="true"
                     android:focusable="true">
 
@@ -164,16 +170,19 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="💰"
-                        android:textSize="24sp" />
+                        android:textSize="22sp" />
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Custos Fixos"
                         android:textColor="#C7CDD6"
-                        android:textSize="10.5sp"
+                        android:textSize="9.5sp"
                         android:textStyle="bold"
-                        android:layout_marginTop="8dp" />
+                        android:gravity="center"
+                        android:singleLine="true"
+                        android:ellipsize="end"
+                        android:layout_marginTop="6dp" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -181,17 +190,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginBottom="10dp">
+                android:layout_marginBottom="8dp">
 
                 <LinearLayout
                     android:id="@+id/btnAbrirLimites"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="86dp"
                     android:layout_weight="1"
                     android:orientation="vertical"
                     android:gravity="center"
                     android:background="@drawable/bg_card_dark"
-                    android:padding="18dp"
+                    android:padding="6dp"
                     android:layout_marginEnd="8dp"
                     android:clickable="true"
                     android:focusable="true">
@@ -200,27 +209,30 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="🎚️"
-                        android:textSize="24sp" />
+                        android:textSize="22sp" />
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Limites"
                         android:textColor="#C7CDD6"
-                        android:textSize="10.5sp"
+                        android:textSize="9.5sp"
                         android:textStyle="bold"
-                        android:layout_marginTop="8dp" />
+                        android:gravity="center"
+                        android:singleLine="true"
+                        android:ellipsize="end"
+                        android:layout_marginTop="6dp" />
                 </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/btnAbrirSeguranca"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="86dp"
                     android:layout_weight="1"
                     android:orientation="vertical"
                     android:gravity="center"
                     android:background="@drawable/bg_card_dark"
-                    android:padding="18dp"
+                    android:padding="6dp"
                     android:layout_marginEnd="8dp"
                     android:clickable="true"
                     android:focusable="true">
@@ -229,27 +241,30 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="🛡️"
-                        android:textSize="24sp" />
+                        android:textSize="22sp" />
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Segurança"
                         android:textColor="#C7CDD6"
-                        android:textSize="10.5sp"
+                        android:textSize="9.5sp"
                         android:textStyle="bold"
-                        android:layout_marginTop="8dp" />
+                        android:gravity="center"
+                        android:singleLine="true"
+                        android:ellipsize="end"
+                        android:layout_marginTop="6dp" />
                 </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/btnAbrirDiagnostico"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="86dp"
                     android:layout_weight="1"
                     android:orientation="vertical"
                     android:gravity="center"
                     android:background="@drawable/bg_card_dark"
-                    android:padding="18dp"
+                    android:padding="6dp"
                     android:clickable="true"
                     android:focusable="true">
 
@@ -257,16 +272,19 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="🔧"
-                        android:textSize="24sp" />
+                        android:textSize="22sp" />
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Diagnóstico"
                         android:textColor="#C7CDD6"
-                        android:textSize="10.5sp"
+                        android:textSize="9.5sp"
                         android:textStyle="bold"
-                        android:layout_marginTop="8dp" />
+                        android:gravity="center"
+                        android:singleLine="true"
+                        android:ellipsize="end"
+                        android:layout_marginTop="6dp" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -278,12 +296,12 @@
                 <LinearLayout
                     android:id="@+id/btnAbrirBackup"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="86dp"
                     android:layout_weight="1"
                     android:orientation="vertical"
                     android:gravity="center"
                     android:background="@drawable/bg_card_dark"
-                    android:padding="18dp"
+                    android:padding="6dp"
                     android:layout_marginEnd="8dp"
                     android:clickable="true"
                     android:focusable="true">
@@ -292,27 +310,30 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="💾"
-                        android:textSize="24sp" />
+                        android:textSize="22sp" />
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Backup"
                         android:textColor="#C7CDD6"
-                        android:textSize="10.5sp"
+                        android:textSize="9.5sp"
                         android:textStyle="bold"
-                        android:layout_marginTop="8dp" />
+                        android:gravity="center"
+                        android:singleLine="true"
+                        android:ellipsize="end"
+                        android:layout_marginTop="6dp" />
                 </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/btnAbrirMaisConfiguracoes"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="86dp"
                     android:layout_weight="1"
                     android:orientation="vertical"
                     android:gravity="center"
                     android:background="@drawable/bg_card_dark"
-                    android:padding="18dp"
+                    android:padding="6dp"
                     android:layout_marginEnd="8dp"
                     android:clickable="true"
                     android:focusable="true">
@@ -321,21 +342,24 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="⚙️"
-                        android:textSize="24sp" />
+                        android:textSize="22sp" />
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Mais Opções"
                         android:textColor="#C7CDD6"
-                        android:textSize="10.5sp"
+                        android:textSize="9.5sp"
                         android:textStyle="bold"
-                        android:layout_marginTop="8dp" />
+                        android:gravity="center"
+                        android:singleLine="true"
+                        android:ellipsize="end"
+                        android:layout_marginTop="6dp" />
                 </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="86dp"
                     android:layout_weight="1" />
             </LinearLayout>
 
