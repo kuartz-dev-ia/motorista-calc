@@ -70,21 +70,6 @@
                     android:textColor="#E7EAEE"
                     android:textSize="12.5sp"
                     android:textStyle="bold"
-                    android:layout_marginBottom="8dp"
-                    android:clickable="true"
-                    android:focusable="true" />
-
-                <TextView
-                    android:id="@+id/btnVerDebugLicenca"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/bg_input_verde"
-                    android:padding="12dp"
-                    android:gravity="center"
-                    android:text="🔍 Ver diagnóstico da licença"
-                    android:textColor="#9B6BF5"
-                    android:textSize="12.5sp"
-                    android:textStyle="bold"
                     android:clickable="true"
                     android:focusable="true" />
             </LinearLayout>
