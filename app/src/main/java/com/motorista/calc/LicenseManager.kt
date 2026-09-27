@@ -12,6 +12,7 @@ object LicenseManager {
     private const val PREF_ULTIMO_STATUS = "licenca_ultimo_status_liberado"
     private const val PREF_ULTIMA_VERIFICACAO = "licenca_ultima_verificacao_millis"
     private const val PREF_DOCUMENTO_EXISTE = "licenca_documento_existe"
+    private const val PREF_ULTIMO_ERRO = "licenca_ultimo_erro"
     private const val DIAS_TOLERANCIA_OFFLINE = 3
 
     @Volatile
@@ -27,10 +28,6 @@ object LicenseManager {
 
     private fun prefs(context: Context) = context.getSharedPreferences(RideAccessibilityService.PREFS_NAME, Context.MODE_PRIVATE)
 
-    /** Blindado com catch(Throwable) — não só Exception — porque uma falha de
-     * inicialização do Firebase (ex: biblioteca mal configurada) pode lançar
-     * um Error, não uma Exception, e isso derrubaria o app inteiro se
-     * chamado no Application.onCreate() sem essa proteção mais ampla. */
     fun iniciarEscutaEmTempoReal(context: Context) {
         if (listenerAtivo != null) return
         try {
@@ -40,14 +37,20 @@ object LicenseManager {
                 .document(id)
                 .addSnapshotListener { doc, erro ->
                     try {
-                        if (erro != null || doc == null) return@addSnapshotListener
+                        if (erro != null) {
+                            registrarErro(context, "Escuta em tempo real: ${erro.message}")
+                            return@addSnapshotListener
+                        }
+                        if (doc == null) return@addSnapshotListener
                         salvarResultado(context, doc.exists(), doc.getBoolean("liberado") ?: false)
+                        registrarErro(context, null)
                     } catch (t: Throwable) {
                         Log.e("LicenseManager", "Erro processando atualização da licença: ${t.message}")
                     }
                 }
         } catch (t: Throwable) {
             Log.e("LicenseManager", "Erro ao iniciar escuta do Firebase: ${t.message}")
+            registrarErro(context, "Erro ao iniciar escuta: ${t.message}")
         }
     }
 
@@ -61,11 +64,53 @@ object LicenseManager {
                 .addOnSuccessListener { doc ->
                     try {
                         salvarResultado(context, doc.exists(), doc.getBoolean("liberado") ?: false)
+                        registrarErro(context, null)
                     } catch (t: Throwable) { }
                 }
-                .addOnFailureListener { }
+                .addOnFailureListener { erro ->
+                    registrarErro(context, "Consulta pontual: ${erro.message}")
+                }
         } catch (t: Throwable) {
-            Log.e("LicenseManager", "Erro na verificação em segundo plano: ${t.message}")
+            registrarErro(context, "Erro na verificação: ${t.message}")
+        }
+    }
+
+    private fun registrarErro(context: Context, mensagem: String?) {
+        try {
+            if (mensagem == null) {
+                prefs(context).edit().remove(PREF_ULTIMO_ERRO).apply()
+            } else {
+                val hora = java.text.SimpleDateFormat("HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date())
+                prefs(context).edit().putString(PREF_ULTIMO_ERRO, "[$hora] $mensagem").apply()
+            }
+        } catch (t: Throwable) { }
+    }
+
+    fun obterUltimoErro(context: Context): String? {
+        return try { prefs(context).getString(PREF_ULTIMO_ERRO, null) } catch (t: Throwable) { null }
+    }
+
+    fun obterDiagnostico(context: Context): String {
+        val p = prefs(context)
+        val id = obterIdDispositivo(context)
+        val documentoExiste = try { p.getBoolean(PREF_DOCUMENTO_EXISTE, false) } catch (t: Throwable) { false }
+        val ultimoStatus = try { p.getBoolean(PREF_ULTIMO_STATUS, false) } catch (t: Throwable) { false }
+        val ultimaVerificacao = try { p.getLong(PREF_ULTIMA_VERIFICACAO, 0L) } catch (t: Throwable) { 0L }
+        val dataFormatada = if (ultimaVerificacao > 0) {
+            java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date(ultimaVerificacao))
+        } else "nunca"
+        val erro = obterUltimoErro(context)
+
+        return buildString {
+            append("ID do aparelho: $id\n\n")
+            append("Documento existe no Firebase: ${if (documentoExiste) "SIM" else "NÃO"}\n")
+            append("Campo 'liberado': ${if (ultimoStatus) "true" else "false"}\n")
+            append("Última verificação bem-sucedida: $dataFormatada\n\n")
+            if (erro != null) {
+                append("ÚLTIMO ERRO:\n$erro")
+            } else {
+                append("Nenhum erro registrado.")
+            }
         }
     }
 
