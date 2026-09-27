@@ -94,6 +94,10 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, PrintsActivity::class.java))
         }
 
+        findViewById<android.view.View>(R.id.btnAbrirGravacoes).setOnClickListener {
+            startActivity(Intent(this, RecordingsActivity::class.java))
+        }
+
         findViewById<android.view.View>(R.id.navInicio).setOnClickListener { }
         findViewById<android.view.View>(R.id.navRelatorios).setOnClickListener { startActivity(Intent(this, WeeklyActivity::class.java)) }
         findViewById<android.view.View>(R.id.navHistorico).setOnClickListener { startActivity(Intent(this, HistoricoActivity::class.java)) }
