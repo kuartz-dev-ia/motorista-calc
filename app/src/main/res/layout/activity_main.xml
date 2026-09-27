@@ -766,24 +766,67 @@
                 </LinearLayout>
 
                 <LinearLayout
-                    android:id="@+id/btnAbrirPrints"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:gravity="center"
-                    android:background="@drawable/bg_card_dark"
-                    android:padding="16dp"
-                    android:layout_marginBottom="18dp"
-                    android:clickable="true"
-                    android:focusable="true">
+                    android:layout_marginBottom="18dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:id="@+id/btnAbrirPrints"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="🖼️  Prints"
-                        android:textColor="#E7EAEE"
-                        android:textSize="13sp"
-                        android:textStyle="bold" />
+                        android:layout_weight="1"
+                        android:layout_marginEnd="10dp"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:background="@drawable/bg_card_dark"
+                        android:padding="16dp"
+                        android:clickable="true"
+                        android:focusable="true">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="🖼️"
+                            android:textSize="20sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Prints"
+                            android:textColor="#E7EAEE"
+                            android:textSize="11.5sp"
+                            android:textStyle="bold"
+                            android:layout_marginTop="6dp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/btnAbrirGravacoes"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:background="@drawable/bg_card_dark"
+                        android:padding="16dp"
+                        android:clickable="true"
+                        android:focusable="true">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="🎬"
+                            android:textSize="20sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Gravações"
+                            android:textColor="#E7EAEE"
+                            android:textSize="11.5sp"
+                            android:textStyle="bold"
+                            android:layout_marginTop="6dp" />
+                    </LinearLayout>
                 </LinearLayout>
 
                 <LinearLayout
