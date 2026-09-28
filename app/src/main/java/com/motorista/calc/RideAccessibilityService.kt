@@ -583,6 +583,7 @@ class RideAccessibilityService : AccessibilityService() {
         const val PREF_META_MENSAL = "meta_mensal"
         const val PREF_ULTIMA_NOTIFICACAO_JORNADA = "ultima_notificacao_jornada_millis"
         const val PREF_DIAS_TRABALHO_MES = "dias_trabalho_mes"
+        const val PREF_TUTORIAL_VISTO = "tutorial_visto"
         private const val VALOR_MAXIMO_PLAUSIVEL = 300.0
         private const val VALOR_MAXIMO_PLAUSIVEL_RESUMO = 3000.0
         private const val CANAL_PAUSA_ID = "lembrete_pausa"
