@@ -93,7 +93,6 @@ class MainActivity : AppCompatActivity() {
         findViewById<android.view.View>(R.id.btnAbrirPrints).setOnClickListener {
             startActivity(Intent(this, PrintsActivity::class.java))
         }
-
         findViewById<android.view.View>(R.id.btnAbrirGravacoes).setOnClickListener {
             startActivity(Intent(this, RecordingsActivity::class.java))
         }
@@ -260,7 +259,7 @@ class MainActivity : AppCompatActivity() {
         val labelGravar = findViewById<TextView>(R.id.labelGravar)
         if (RideRecorderService.emGravacao) {
             iconeGravar.text = "⏺️"
-            labelGravar.text = "Gravando… toque p/ parar"
+            labelGravar.text = "Parar gravação"
             btnGravar.background = ContextCompat.getDrawable(this, R.drawable.bg_cta_stop)
             labelGravar.setTextColor(Color.parseColor("#C9807E"))
         } else {
