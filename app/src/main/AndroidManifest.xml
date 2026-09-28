@@ -150,9 +150,9 @@
             android:label="Segurança" />
 
         <activity
-            android:name=".DiagnosticoActivity"
+            android:name=".OnboardingActivity"
             android:exported="false"
-            android:label="Diagnóstico" />
+            android:label="Tutorial" />
 
         <service
             android:name=".RideAccessibilityService"
