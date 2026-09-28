@@ -246,6 +246,27 @@
                         android:gravity="center"
                         android:layout_marginTop="8dp" />
                 </LinearLayout>
+                
+                <LinearLayout
+                android:id="@+id/btnTutorial"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:background="@drawable/bg_card_dark"
+                android:padding="16dp"
+                android:layout_margin="4dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="❓  Ver tutorial novamente"
+                    android:textColor="#E7EAEE"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
             </LinearLayout>
 
         </LinearLayout>
