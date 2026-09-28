@@ -101,6 +101,11 @@ class MainActivity : AppCompatActivity() {
         findViewById<android.view.View>(R.id.navRelatorios).setOnClickListener { startActivity(Intent(this, WeeklyActivity::class.java)) }
         findViewById<android.view.View>(R.id.navHistorico).setOnClickListener { startActivity(Intent(this, HistoricoActivity::class.java)) }
         findViewById<android.view.View>(R.id.navConfig).setOnClickListener { startActivity(Intent(this, ParametrosActivity::class.java)) }
+
+        if (!prefs.getBoolean(RideAccessibilityService.PREF_TUTORIAL_VISTO, false)) {
+            startActivity(Intent(this, OnboardingActivity::class.java))
+        }
+    }
     }
 
     override fun onResume() {
