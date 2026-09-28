@@ -644,13 +644,14 @@
                     <LinearLayout
                         android:id="@+id/btnGravar"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="88dp"
                         android:layout_weight="1"
-                        android:layout_marginEnd="10dp"
+                        android:layout_marginEnd="5dp"
                         android:orientation="vertical"
                         android:gravity="center"
+                        android:paddingStart="6dp"
+                        android:paddingEnd="6dp"
                         android:background="@drawable/bg_cta_start"
-                        android:padding="16dp"
                         android:clickable="true"
                         android:focusable="true">
 
@@ -669,18 +670,22 @@
                             android:textColor="#06231F"
                             android:textSize="11.5sp"
                             android:textStyle="bold"
+                            android:maxLines="1"
+                            android:gravity="center"
                             android:layout_marginTop="6dp" />
                     </LinearLayout>
 
                     <LinearLayout
                         android:id="@+id/btnAdicionarCorridaHome"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="88dp"
                         android:layout_weight="1"
+                        android:layout_marginStart="5dp"
                         android:orientation="vertical"
                         android:gravity="center"
+                        android:paddingStart="6dp"
+                        android:paddingEnd="6dp"
                         android:background="@drawable/bg_card_dark"
-                        android:padding="16dp"
                         android:clickable="true"
                         android:focusable="true">
 
@@ -697,6 +702,8 @@
                             android:textColor="#E7EAEE"
                             android:textSize="11.5sp"
                             android:textStyle="bold"
+                            android:maxLines="1"
+                            android:gravity="center"
                             android:layout_marginTop="6dp" />
                     </LinearLayout>
                 </LinearLayout>
@@ -710,13 +717,14 @@
                     <LinearLayout
                         android:id="@+id/btnVerCorridas"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="88dp"
                         android:layout_weight="1"
-                        android:layout_marginEnd="10dp"
+                        android:layout_marginEnd="5dp"
                         android:orientation="vertical"
                         android:gravity="center"
+                        android:paddingStart="6dp"
+                        android:paddingEnd="6dp"
                         android:background="@drawable/bg_card_dark"
-                        android:padding="16dp"
                         android:clickable="true"
                         android:focusable="true">
 
@@ -733,18 +741,22 @@
                             android:textColor="#E7EAEE"
                             android:textSize="11.5sp"
                             android:textStyle="bold"
+                            android:maxLines="1"
+                            android:gravity="center"
                             android:layout_marginTop="6dp" />
                     </LinearLayout>
 
                     <LinearLayout
                         android:id="@+id/btnEncerrarJornada"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="88dp"
                         android:layout_weight="1"
+                        android:layout_marginStart="5dp"
                         android:orientation="vertical"
                         android:gravity="center"
+                        android:paddingStart="6dp"
+                        android:paddingEnd="6dp"
                         android:background="@drawable/bg_cta_stop"
-                        android:padding="16dp"
                         android:clickable="true"
                         android:focusable="true">
 
@@ -761,6 +773,8 @@
                             android:textColor="#C9807E"
                             android:textSize="11.5sp"
                             android:textStyle="bold"
+                            android:maxLines="1"
+                            android:gravity="center"
                             android:layout_marginTop="6dp" />
                     </LinearLayout>
                 </LinearLayout>
@@ -774,13 +788,14 @@
                     <LinearLayout
                         android:id="@+id/btnAbrirPrints"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="88dp"
                         android:layout_weight="1"
-                        android:layout_marginEnd="10dp"
+                        android:layout_marginEnd="5dp"
                         android:orientation="vertical"
                         android:gravity="center"
+                        android:paddingStart="6dp"
+                        android:paddingEnd="6dp"
                         android:background="@drawable/bg_card_dark"
-                        android:padding="16dp"
                         android:clickable="true"
                         android:focusable="true">
 
@@ -797,18 +812,22 @@
                             android:textColor="#E7EAEE"
                             android:textSize="11.5sp"
                             android:textStyle="bold"
+                            android:maxLines="1"
+                            android:gravity="center"
                             android:layout_marginTop="6dp" />
                     </LinearLayout>
 
                     <LinearLayout
                         android:id="@+id/btnAbrirGravacoes"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="88dp"
                         android:layout_weight="1"
+                        android:layout_marginStart="5dp"
                         android:orientation="vertical"
                         android:gravity="center"
+                        android:paddingStart="6dp"
+                        android:paddingEnd="6dp"
                         android:background="@drawable/bg_card_dark"
-                        android:padding="16dp"
                         android:clickable="true"
                         android:focusable="true">
 
@@ -825,6 +844,8 @@
                             android:textColor="#E7EAEE"
                             android:textSize="11.5sp"
                             android:textStyle="bold"
+                            android:maxLines="1"
+                            android:gravity="center"
                             android:layout_marginTop="6dp" />
                     </LinearLayout>
                 </LinearLayout>
