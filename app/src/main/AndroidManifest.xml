@@ -150,6 +150,11 @@
             android:label="Segurança" />
 
         <activity
+            android:name=".DiagnosticoActivity"
+            android:exported="false"
+            android:label="Diagnóstico" />
+
+        <activity
             android:name=".OnboardingActivity"
             android:exported="false"
             android:label="Tutorial" />
