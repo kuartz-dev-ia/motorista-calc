@@ -43,6 +43,7 @@
                     android:id="@+id/txtStatus"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:text="Verificando..."
                     android:textColor="#C7CDD6"
                     android:layout_marginBottom="12dp" />
 
