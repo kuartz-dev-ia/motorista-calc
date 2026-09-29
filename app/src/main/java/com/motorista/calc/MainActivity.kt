@@ -106,7 +106,6 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, OnboardingActivity::class.java))
         }
     }
-    }
 
     override fun onResume() {
         super.onResume()
