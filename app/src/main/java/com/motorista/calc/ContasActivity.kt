@@ -86,9 +86,6 @@ class ContasActivity : AppCompatActivity() {
             },
             cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)
         )
-        // O DatePickerDialog nem sempre herda a cor certa dos botões "OK" e
-        // "Cancelar" só pelo tema — forçamos a cor certa igual fazemos nos
-        // outros diálogos do app.
         dialog.setOnShowListener { DialogUtils.aplicarCoresBotoes(dialog) }
         dialog.show()
     }
@@ -248,7 +245,7 @@ class ContasActivity : AppCompatActivity() {
     }
 
     private fun confirmarExclusao(conta: Conta) {
-        AlertDialog.Builder(this, R.style.DialogTemaEscuro)
+        val dialog = AlertDialog.Builder(this, R.style.DialogTemaEscuro)
             .setTitle("Excluir conta")
             .setMessage("Tem certeza que quer excluir \"${conta.nome}\"?")
             .setPositiveButton("Excluir") { _, _ ->
@@ -258,5 +255,6 @@ class ContasActivity : AppCompatActivity() {
             }
             .setNegativeButton("Cancelar", null)
             .show()
+        DialogUtils.aplicarCoresBotoes(dialog)
     }
 }
