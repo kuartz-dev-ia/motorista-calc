@@ -57,7 +57,7 @@ class HistoricoActivity : AppCompatActivity() {
         val cal = Calendar.getInstance()
         cal.timeInMillis = if (ehInicio) dataInicioMillis else dataFimMillis
 
-        DatePickerDialog(
+        val dialog = DatePickerDialog(
             this,
             R.style.DialogTemaEscuro,
             { _, ano, mes, dia ->
@@ -67,7 +67,10 @@ class HistoricoActivity : AppCompatActivity() {
                 atualizarConteudo()
             },
             cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)
-        ).show()
+        )
+        dialog.window?.setBackgroundDrawableResource(R.drawable.bg_card_dark)
+        dialog.setOnShowListener { DialogUtils.aplicarCoresBotoes(dialog) }
+        dialog.show()
     }
 
     private fun atualizarTextoDatas() {
@@ -228,8 +231,10 @@ class HistoricoActivity : AppCompatActivity() {
                             atualizarConteudo()
                         }
                         .setNegativeButton("Cancelar", null)
-                        .show()
-                    DialogUtils.aplicarCoresBotoes(dialog)
+                        .create()
+                    dialog.window?.setBackgroundDrawableResource(R.drawable.bg_card_dark)
+                    dialog.setOnShowListener { DialogUtils.aplicarCoresBotoes(dialog) }
+                    dialog.show()
                 }
             }
             card.addView(btnExcluir)
