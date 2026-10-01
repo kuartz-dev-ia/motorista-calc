@@ -8,6 +8,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.PixelFormat
 import android.graphics.Typeface
+import android.graphics.drawable.GradientDrawable
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
@@ -88,6 +89,19 @@ class ChatHeadService : Service() {
 
     private fun dp(v: Int) = (v * resources.displayMetrics.density).toInt()
 
+    /** Fundo do painel desenhado inteiramente no código (não depende de
+     * nenhum arquivo de drawable), pra garantir que a janela de
+     * sobreposição sempre mostre um fundo sólido escuro com a bordinha
+     * verde, mesmo em aparelhos onde carregar um drawable externo numa
+     * janela de overlay falha silenciosamente. */
+    private fun fundoPainel(): GradientDrawable {
+        return GradientDrawable().apply {
+            setColor(Color.parseColor("#12161D"))
+            setStroke(dp(1), Color.parseColor("#2FB4A6"))
+            cornerRadius = dp(16).toFloat()
+        }
+    }
+
     private fun tipoJanela() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
         WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
     else @Suppress("DEPRECATION") WindowManager.LayoutParams.TYPE_SYSTEM_ALERT
@@ -101,7 +115,11 @@ class ChatHeadService : Service() {
 
         val circulo = LinearLayout(this).apply {
             gravity = Gravity.CENTER
-            background = ContextCompat.getDrawable(this@ChatHeadService, R.drawable.bg_bubble_circle)
+            background = GradientDrawable().apply {
+                shape = GradientDrawable.OVAL
+                setColor(Color.parseColor("#2FB4A6"))
+                setStroke(dp(2), Color.parseColor("#0A0D12"))
+            }
         }
         val emoji = TextView(this).apply {
             text = "🚗"
@@ -189,7 +207,7 @@ class ChatHeadService : Service() {
 
         val raiz = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            background = ContextCompat.getDrawable(this@ChatHeadService, R.drawable.bg_card_dark)
+            background = fundoPainel()
             setPadding(dp(16), dp(16), dp(16), dp(16))
         }
 
@@ -223,18 +241,18 @@ class ChatHeadService : Service() {
         raiz.addView(txtTempo)
 
         val grid1 = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
-        grid1.addView(criarMiniCard("💲 Faturamento", ID_TXT_GANHO, R.drawable.bg_tint_green, "#1FE7A0"))
-        grid1.addView(criarMiniCard("💧 Lucro líquido", ID_TXT_LUCRO, R.drawable.bg_tint_green, "#1FE7A0"))
+        grid1.addView(criarMiniCard("💲 Faturamento", ID_TXT_GANHO, "#12161D", "#1FE7A0"))
+        grid1.addView(criarMiniCard("💧 Lucro líquido", ID_TXT_LUCRO, "#12161D", "#1FE7A0"))
         raiz.addView(grid1)
 
         val grid2 = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; setPadding(0, dp(6), 0, 0) }
-        grid2.addView(criarMiniCard("🕐 R$/hora", ID_TXT_RHORA, R.drawable.bg_tint_blue, "#3DB8F5"))
-        grid2.addView(criarMiniCard("📍 R$/km", ID_TXT_RKM, R.drawable.bg_tint_purple, "#9B6BF5"))
+        grid2.addView(criarMiniCard("🕐 R$/hora", ID_TXT_RHORA, "#12161D", "#3DB8F5"))
+        grid2.addView(criarMiniCard("📍 R$/km", ID_TXT_RKM, "#12161D", "#9B6BF5"))
         raiz.addView(grid2)
 
         val grid3 = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; setPadding(0, dp(6), 0, dp(10)) }
-        grid3.addView(criarMiniCard("🚗 Corridas / Km", ID_TXT_CORRIDAS_KM, R.drawable.bg_card_dark, "#FFFFFF"))
-        grid3.addView(criarMiniCard("⛽ Gastos do dia", ID_TXT_GASTOS, R.drawable.bg_tint_red, "#F5576B"))
+        grid3.addView(criarMiniCard("🚗 Corridas / Km", ID_TXT_CORRIDAS_KM, "#12161D", "#FFFFFF"))
+        grid3.addView(criarMiniCard("⛽ Gastos do dia", ID_TXT_GASTOS, "#12161D", "#F5576B"))
         raiz.addView(grid3)
 
         val txtConsumo = TextView(this).apply {
@@ -253,18 +271,26 @@ class ChatHeadService : Service() {
             textSize = 12f
             setTypeface(typeface, Typeface.BOLD)
             gravity = Gravity.CENTER
-            background = ContextCompat.getDrawable(this@ChatHeadService, R.drawable.bg_input_verde)
+            background = GradientDrawable().apply {
+                setColor(Color.parseColor("#141920"))
+                setStroke(dp(1), Color.parseColor("#2FB4A6"))
+                cornerRadius = dp(10).toFloat()
+            }
             setPadding(dp(10), dp(10), dp(10), dp(10))
             layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f).apply { marginEnd = dp(6) }
             setOnClickListener { alternarPausa() }
         }
         val btnFinalizar = TextView(this).apply {
             text = "⏹ Finalizar"
-            setTextColor(Color.parseColor("#2E1500"))
+            setTextColor(Color.parseColor("#F5576B"))
             textSize = 12f
             setTypeface(typeface, Typeface.BOLD)
             gravity = Gravity.CENTER
-            background = ContextCompat.getDrawable(this@ChatHeadService, R.drawable.bg_cta_stop)
+            background = GradientDrawable().apply {
+                setColor(Color.parseColor("#1F1516"))
+                setStroke(dp(1), Color.parseColor("#3A2A2A"))
+                cornerRadius = dp(10).toFloat()
+            }
             setPadding(dp(10), dp(10), dp(10), dp(10))
             layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
             setOnClickListener {
@@ -281,7 +307,7 @@ class ChatHeadService : Service() {
 
         val btnAbrirApp = TextView(this).apply {
             text = "Abrir Motorista Calc →"
-            setTextColor(Color.parseColor("#1FE7C4"))
+            setTextColor(Color.parseColor("#2FB4A6"))
             textSize = 12f
             setTypeface(typeface, Typeface.BOLD)
             setPadding(0, 0, 0, dp(10))
@@ -309,8 +335,13 @@ class ChatHeadService : Service() {
                 text = "$n"
                 textSize = 10.5f
                 gravity = Gravity.CENTER
-                setTextColor(if (n == limiteHistorico) Color.parseColor("#08131A") else Color.parseColor("#8B96AC"))
-                background = ContextCompat.getDrawable(this@ChatHeadService, if (n == limiteHistorico) R.drawable.bg_chip_selected else R.drawable.bg_chip_unselected)
+                val selecionado = n == limiteHistorico
+                setTextColor(if (selecionado) Color.parseColor("#08131A") else Color.parseColor("#8B96AC"))
+                background = GradientDrawable().apply {
+                    setColor(Color.parseColor(if (selecionado) "#2FB4A6" else "#12161D"))
+                    setStroke(dp(1), Color.parseColor("#2FB4A6"))
+                    cornerRadius = dp(20).toFloat()
+                }
                 setPadding(dp(10), dp(6), dp(10), dp(6))
                 layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f).apply { marginEnd = dp(4) }
                 setOnClickListener { limiteHistorico = n; atualizarPainel() }
@@ -347,10 +378,14 @@ class ChatHeadService : Service() {
         } catch (e: Exception) { }
     }
 
-    private fun criarMiniCard(rotulo: String, id: Int, fundoRes: Int, corValor: String): LinearLayout {
+    private fun criarMiniCard(rotulo: String, id: Int, corFundo: String, corValor: String): LinearLayout {
         return LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            background = ContextCompat.getDrawable(this@ChatHeadService, fundoRes)
+            background = GradientDrawable().apply {
+                setColor(Color.parseColor(corFundo))
+                setStroke(dp(1), Color.parseColor("#2FB4A6"))
+                cornerRadius = dp(10).toFloat()
+            }
             setPadding(dp(10), dp(8), dp(10), dp(8))
             layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f).apply { marginEnd = dp(6) }
             addView(TextView(this@ChatHeadService).apply {
@@ -419,9 +454,10 @@ class ChatHeadService : Service() {
         val (preco, consumo) = when (prefs.getString(RideAccessibilityService.PREF_COMBUSTIVEL_ATIVO, "etanol")) {
             "gasolina" -> Pair(prefs.getFloat(RideAccessibilityService.PREF_PRECO_GASOLINA, 6.10f), prefs.getFloat(RideAccessibilityService.PREF_CONSUMO_GASOLINA, 10.0f))
             "gnv" -> Pair(prefs.getFloat(RideAccessibilityService.PREF_PRECO_GNV, 4.50f), prefs.getFloat(RideAccessibilityService.PREF_CONSUMO_GNV, 12.0f))
+            "eletrico" -> Pair(prefs.getFloat(RideAccessibilityService.PREF_PRECO_ELETRICO, 0.70f), prefs.getFloat(RideAccessibilityService.PREF_CONSUMO_ELETRICO, 6.0f))
             else -> Pair(prefs.getFloat(RideAccessibilityService.PREF_PRECO_ETANOL, 4.20f), prefs.getFloat(RideAccessibilityService.PREF_CONSUMO_ETANOL, 7.0f))
         }
-        raiz.findViewById<TextView>(ID_TXT_CONSUMO)?.text = "Consumo: R$ %.2f/L  •  %.1f km/L".format(preco, consumo)
+        raiz.findViewById<TextView>(ID_TXT_CONSUMO)?.text = "Consumo: R$ %.2f/un  •  %.1f km/un".format(preco, consumo)
 
         val pausado = !prefs.getBoolean(RideAccessibilityService.PREF_MONITORAMENTO_ATIVO, true)
         raiz.findViewById<TextView>(ID_BTN_PAUSAR)?.text = if (pausado) "▶ Retomar" else "⏸ Pausar"
@@ -465,29 +501,30 @@ class ChatHeadService : Service() {
         }
     }
 
-    override fun onBind(intent: Intent?) = null
-
     override fun onDestroy() {
         super.onDestroy()
         handler.removeCallbacks(tickerRunnable)
-        fecharPainel()
-        bolha?.let { try { windowManager?.removeView(it) } catch (e: Exception) { } }
-        bolha = null
+        try {
+            bolha?.let { windowManager?.removeView(it) }
+            painel?.let { windowManager?.removeView(it) }
+        } catch (e: Exception) { }
     }
+
+    override fun onBind(intent: Intent?): android.os.IBinder? = null
 
     companion object {
         private const val CANAL_ID = "bolha_flutuante"
-        private const val NOTIFICACAO_ID = 881
-        private const val PREF_CORRIDAS_VISTAS = "corridas_vistas_bolha"
-        private const val ID_TXT_TEMPO = 90001
-        private const val ID_TXT_GANHO = 90002
-        private const val ID_TXT_LUCRO = 90003
-        private const val ID_TXT_RHORA = 90004
-        private const val ID_TXT_RKM = 90005
-        private const val ID_TXT_CORRIDAS_KM = 90006
-        private const val ID_TXT_GASTOS = 90007
-        private const val ID_TXT_CONSUMO = 90008
-        private const val ID_BTN_PAUSAR = 90009
-        private const val ID_LISTA_CORRIDAS = 90010
+        private const val NOTIFICACAO_ID = 775
+        private const val PREF_CORRIDAS_VISTAS = "corridas_vistas_badge"
+        private const val ID_TXT_TEMPO = 9001
+        private const val ID_TXT_GANHO = 9002
+        private const val ID_TXT_LUCRO = 9003
+        private const val ID_TXT_RHORA = 9004
+        private const val ID_TXT_RKM = 9005
+        private const val ID_TXT_CORRIDAS_KM = 9006
+        private const val ID_TXT_GASTOS = 9007
+        private const val ID_TXT_CONSUMO = 9008
+        private const val ID_BTN_PAUSAR = 9009
+        private const val ID_LISTA_CORRIDAS = 9010
     }
 }
