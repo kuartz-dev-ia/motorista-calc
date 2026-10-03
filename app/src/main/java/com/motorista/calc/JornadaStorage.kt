@@ -107,6 +107,39 @@ object JornadaStorage {
         }
     }
 
+    /** Cria uma jornada inteira "do zero" pra um dia que já passou, sem
+     * precisar ter aberto o app naquele dia — útil quando o motorista
+     * esqueceu de iniciar a jornada mas quer que aquele dia conte no
+     * histórico e nas médias. A data é escolhida pelo usuário; o horário de
+     * início fica fixado nas 08:00 só como referência, e o horário de fim
+     * é calculado somando as horas trabalhadas informadas. */
+    fun adicionarManual(
+        context: Context,
+        dataMillis: Long,
+        horasTrabalhadas: Double,
+        valorUber: Double,
+        valor99: Double,
+        kmTotal: Double
+    ): Jornada {
+        val lista = listarTodas(context).toMutableList()
+        val dataFim = dataMillis + (horasTrabalhadas * 3_600_000L).toLong()
+        val nova = Jornada(
+            id = System.currentTimeMillis(),
+            dataInicioMillis = dataMillis,
+            dataFimMillis = dataFim,
+            metaDiaria = 0.0,
+            cargaHorariaHoras = horasTrabalhadas,
+            odometroInicial = 0.0,
+            odometroFinal = null,
+            valorFinalUber = valorUber,
+            valorFinal99 = valor99,
+            kmFinalInformado = kmTotal
+        )
+        lista.add(nova)
+        salvarTudo(context, lista)
+        return nova
+    }
+
     fun apagar(context: Context, id: Long) {
         salvarTudo(context, listarTodas(context).filter { it.id != id })
     }
@@ -120,6 +153,10 @@ object JornadaStorage {
             "gnv" -> Pair(
                 prefs.getFloat(RideAccessibilityService.PREF_PRECO_GNV, 4.50f).toDouble(),
                 prefs.getFloat(RideAccessibilityService.PREF_CONSUMO_GNV, 12.0f).toDouble()
+            )
+            "eletrico" -> Pair(
+                prefs.getFloat(RideAccessibilityService.PREF_PRECO_ELETRICO, 0.70f).toDouble(),
+                prefs.getFloat(RideAccessibilityService.PREF_CONSUMO_ELETRICO, 6.0f).toDouble()
             )
             else -> Pair(
                 prefs.getFloat(RideAccessibilityService.PREF_PRECO_ETANOL, 4.20f).toDouble(),
