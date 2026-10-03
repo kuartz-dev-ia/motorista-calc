@@ -68,8 +68,7 @@ class HistoricoActivity : AppCompatActivity() {
             },
             cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)
         )
-        dialog.window?.setBackgroundDrawableResource(R.drawable.bg_card_dark)
-        dialog.setOnShowListener { DialogUtils.aplicarCoresBotoes(dialog) }
+        dialog.setOnShowListener { DialogUtils.aplicarTemaCompleto(dialog) }
         dialog.show()
     }
 
@@ -232,8 +231,7 @@ class HistoricoActivity : AppCompatActivity() {
                         }
                         .setNegativeButton("Cancelar", null)
                         .create()
-                    dialog.window?.setBackgroundDrawableResource(R.drawable.bg_card_dark)
-                    dialog.setOnShowListener { DialogUtils.aplicarCoresBotoes(dialog) }
+                    dialog.setOnShowListener { DialogUtils.aplicarTemaCompleto(dialog) }
                     dialog.show()
                 }
             }
