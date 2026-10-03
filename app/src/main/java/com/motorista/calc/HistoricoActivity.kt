@@ -154,4 +154,297 @@ class HistoricoActivity : AppCompatActivity() {
         barraGastos.requestLayout()
 
         findViewById<TextView>(R.id.txtLegendaLucro).text = "Lucro %.0f%%".format(percLucro)
-        findViewById<TextView>(R.id.txtLegendaGastos).text = "Gast
+        findViewById<TextView>(R.id.txtLegendaGastos).text = "Gastos %.0f%%".format(percGastos)
+    }
+
+    private fun montarMetas(stats: List<Pair<Jornada, JornadaStats>>) {
+        val container = findViewById<LinearLayout>(R.id.containerJornadas)
+        container.removeAllViews()
+
+        val btnAdicionarManual = TextView(this).apply {
+            text = "➕ Adicionar dia trabalhado manualmente"
+            setTextColor(Color.parseColor("#2FB4A6"))
+            textSize = 12.5f
+            setTypeface(typeface, Typeface.BOLD)
+            gravity = Gravity.CENTER
+            background = ContextCompat.getDrawable(this@HistoricoActivity, R.drawable.bg_input_verde)
+            setPadding(20, 24, 20, 24)
+            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT).apply { bottomMargin = 16 }
+            setOnClickListener { abrirDialogoDiaManual() }
+        }
+        container.addView(btnAdicionarManual)
+
+        if (stats.isEmpty()) {
+            container.addView(TextView(this).apply {
+                text = "Nenhuma jornada concluída nesse período."
+                setTextColor(Color.parseColor("#8B96AC"))
+                textSize = 13f
+            })
+            return
+        }
+
+        val formatoHora = SimpleDateFormat("HH:mm", Locale.getDefault())
+
+        for ((jornada, stat) in stats.sortedByDescending { it.first.dataInicioMillis }) {
+            val card = LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL
+                background = ContextCompat.getDrawable(this@HistoricoActivity, R.drawable.bg_card_dark)
+                setPadding(28, 28, 28, 28)
+                layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT).apply { bottomMargin = 16 }
+            }
+
+            val cabecalho = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = Gravity.CENTER_VERTICAL
+                isClickable = true
+                isFocusable = true
+            }
+            val textoCabecalho = TextView(this).apply {
+                text = "${formatoData.format(Date(jornada.dataInicioMillis))} • ${formatoHora.format(Date(jornada.dataInicioMillis))} • %.1f km".format(stat.kmRodados)
+                setTextColor(Color.parseColor("#FFFFFF"))
+                textSize = 12.5f
+                setTypeface(typeface, Typeface.BOLD)
+                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+            }
+            val badgeMeta = TextView(this).apply {
+                text = "%.0f%%".format(stat.percentualMeta)
+                textSize = 11f
+                setTypeface(typeface, Typeface.BOLD)
+                setPadding(16, 6, 16, 6)
+                if (stat.percentualMeta >= 100) {
+                    background = ContextCompat.getDrawable(this@HistoricoActivity, R.drawable.bg_chip_selected)
+                    setTextColor(Color.parseColor("#08131A"))
+                } else {
+                    background = ContextCompat.getDrawable(this@HistoricoActivity, R.drawable.bg_chip_unselected)
+                    setTextColor(Color.parseColor("#F5A623"))
+                }
+            }
+            cabecalho.addView(textoCabecalho)
+            cabecalho.addView(badgeMeta)
+            card.addView(cabecalho)
+
+            val linhaMetricas = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; setPadding(0, 16, 0, 12) }
+            linhaMetricas.addView(criarMiniCard("💲 Ganho", "R$ %.2f".format(stat.ganhoBruto), R.drawable.bg_tint_green, "#1FE7A0"))
+            linhaMetricas.addView(criarMiniCard("🕐 R$/h", "R$ %.2f".format(stat.valorPorHora), R.drawable.bg_tint_blue, "#3DB8F5"))
+            linhaMetricas.addView(criarMiniCard("💧 Lucro", "R$ %.2f".format(stat.lucroLiquido), R.drawable.bg_tint_green, if (stat.lucroLiquido >= 0) "#1FE7A0" else "#F5576B"))
+            card.addView(linhaMetricas)
+
+            val btnExcluir = TextView(this).apply {
+                text = "🗑️ Excluir jornada"
+                setTextColor(Color.parseColor("#F55757"))
+                textSize = 12f
+                setTypeface(typeface, Typeface.BOLD)
+                setOnClickListener {
+                    val dialog = AlertDialog.Builder(this@HistoricoActivity, R.style.DialogTemaEscuro)
+                        .setTitle("Excluir jornada")
+                        .setMessage("Tem certeza que quer excluir esta jornada?")
+                        .setPositiveButton("Excluir") { _, _ ->
+                            JornadaStorage.apagar(this@HistoricoActivity, jornada.id)
+                            atualizarConteudo()
+                        }
+                        .setNegativeButton("Cancelar", null)
+                        .create()
+                    dialog.setOnShowListener { DialogUtils.aplicarTemaCompleto(dialog) }
+                    dialog.show()
+                }
+            }
+            card.addView(btnExcluir)
+
+            container.addView(card)
+        }
+    }
+
+    private fun abrirDialogoDiaManual() {
+        var dataEscolhida = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, 8); set(Calendar.MINUTE, 0); set(Calendar.SECOND, 0)
+        }.timeInMillis
+
+        val scrollView = android.widget.ScrollView(this)
+        val raiz = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(40, 16, 40, 8)
+        }
+        scrollView.addView(raiz)
+
+        fun campoLabel(texto: String) = TextView(this).apply {
+            text = texto
+            setTextColor(Color.parseColor("#8B96AC"))
+            textSize = 11f
+            setPadding(0, 20, 0, 6)
+        }
+
+        fun campoEditText(): EditText = EditText(this).apply {
+            setHintTextColor(Color.parseColor("#5D6773"))
+            setTextColor(Color.WHITE)
+            background = ContextCompat.getDrawable(this@HistoricoActivity, R.drawable.bg_input_verde)
+            inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
+            setPadding(24, 22, 24, 22)
+        }
+
+        raiz.addView(campoLabel("Data do dia trabalhado"))
+        val btnData = TextView(this).apply {
+            text = "📅 ${formatoData.format(Date(dataEscolhida))}"
+            setTextColor(Color.WHITE)
+            textSize = 14f
+            setTypeface(typeface, Typeface.BOLD)
+            background = ContextCompat.getDrawable(this@HistoricoActivity, R.drawable.bg_input_verde)
+            setPadding(24, 24, 24, 24)
+            gravity = Gravity.CENTER
+        }
+        raiz.addView(btnData)
+
+        raiz.addView(campoLabel("Horas trabalhadas"))
+        val edtHoras = campoEditText().apply { hint = "Ex: 8" }
+        raiz.addView(edtHoras)
+
+        raiz.addView(campoLabel("Valor feito na Uber (R$)"))
+        val edtUber = campoEditText().apply { hint = "0" }
+        raiz.addView(edtUber)
+
+        raiz.addView(campoLabel("Valor feito na 99 (R$)"))
+        val edt99 = campoEditText().apply { hint = "0" }
+        raiz.addView(edt99)
+
+        raiz.addView(campoLabel("Km total rodado no dia"))
+        val edtKm = campoEditText().apply { hint = "0" }
+        raiz.addView(edtKm)
+
+        btnData.setOnClickListener {
+            val cal = Calendar.getInstance().apply { timeInMillis = dataEscolhida }
+            val dp = DatePickerDialog(
+                this,
+                R.style.DialogTemaEscuro,
+                { _, ano, mes, dia ->
+                    dataEscolhida = Calendar.getInstance().apply { set(ano, mes, dia, 8, 0, 0) }.timeInMillis
+                    btnData.text = "📅 ${formatoData.format(Date(dataEscolhida))}"
+                },
+                cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)
+            )
+            dp.setOnShowListener { DialogUtils.aplicarTemaCompleto(dp) }
+            dp.show()
+        }
+
+        val dialog = AlertDialog.Builder(this, R.style.DialogTemaEscuro)
+            .setTitle("➕ Adicionar dia trabalhado")
+            .setView(scrollView)
+            .setPositiveButton("Salvar", null)
+            .setNegativeButton("Cancelar", null)
+            .create()
+
+        dialog.setOnShowListener {
+            DialogUtils.aplicarTemaCompleto(dialog)
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+                val horas = edtHoras.text.toString().toDoubleOrNull()
+                val valorUber = edtUber.text.toString().toDoubleOrNull() ?: 0.0
+                val valor99 = edt99.text.toString().toDoubleOrNull() ?: 0.0
+                val km = edtKm.text.toString().toDoubleOrNull() ?: 0.0
+
+                if (horas == null || horas <= 0) {
+                    Toast.makeText(this, "Preencha as horas trabalhadas", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+                if (valorUber <= 0 && valor99 <= 0) {
+                    Toast.makeText(this, "Informe pelo menos um valor ganho (Uber ou 99)", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+
+                JornadaStorage.adicionarManual(this, dataEscolhida, horas, valorUber, valor99, km)
+                Toast.makeText(this, "Dia adicionado ao histórico", Toast.LENGTH_SHORT).show()
+                atualizarConteudo()
+                dialog.dismiss()
+            }
+        }
+        dialog.show()
+    }
+
+    private fun montarMedias(jornadas: List<Jornada>, stats: List<Pair<Jornada, JornadaStats>>) {
+        val diasTrabalhados = jornadas.map { formatoData.format(Date(it.dataInicioMillis)) }.distinct().size
+        val faturamentoBruto = stats.sumOf { it.second.ganhoBruto }
+        val kmRodados = stats.sumOf { it.second.kmRodados }
+        val totalMin = stats.sumOf { it.second.tempoTrabalhadoMin }
+        val horasTrabalhadas = totalMin / 60.0
+
+        val mediaGanhoDia = if (diasTrabalhados > 0) faturamentoBruto / diasTrabalhados else 0.0
+        val mediaKmDia = if (diasTrabalhados > 0) kmRodados / diasTrabalhados else 0.0
+        val mediaHorasDia = if (diasTrabalhados > 0) horasTrabalhadas / diasTrabalhados else 0.0
+        val mediaRPorHora = if (horasTrabalhadas > 0) faturamentoBruto / horasTrabalhadas else 0.0
+
+        findViewById<TextView>(R.id.txtMediaGanhoDia).text = "R$ %.2f".format(mediaGanhoDia)
+        findViewById<TextView>(R.id.txtMediaKmDia).text = "%.1f".format(mediaKmDia)
+        findViewById<TextView>(R.id.txtMediaHorasDia).text = "%.1f".format(mediaHorasDia)
+        findViewById<TextView>(R.id.txtMediaRPorHora).text = "R$ %.2f".format(mediaRPorHora)
+    }
+
+    private fun montarPorViagem(jornadas: List<Jornada>) {
+        val container = findViewById<LinearLayout>(R.id.containerPorViagem)
+        container.removeAllViews()
+
+        val corridas = jornadas.flatMap { j ->
+            HistoricoStorage.listarEntre(this, j.dataInicioMillis, j.dataFimMillis ?: System.currentTimeMillis())
+                .filter { it.aceita && !it.cancelada }
+        }.sortedByDescending { it.dataHora }
+
+        if (corridas.isEmpty()) {
+            container.addView(TextView(this).apply {
+                text = "Nenhuma corrida individual registrada nesse período."
+                setTextColor(Color.parseColor("#8B96AC"))
+                textSize = 13f
+            })
+            return
+        }
+
+        val formatoDataHora = SimpleDateFormat("dd/MM HH:mm", Locale.getDefault())
+
+        for (corrida in corridas) {
+            val emoji = when (corrida.plataforma) {
+                "Uber" -> "⬛"
+                "99" -> "🟡"
+                else -> "🚗"
+            }
+
+            val linha = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = Gravity.CENTER_VERTICAL
+                background = ContextCompat.getDrawable(this@HistoricoActivity, R.drawable.bg_card_dark)
+                setPadding(20, 16, 20, 16)
+                layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT).apply { bottomMargin = 8 }
+            }
+
+            linha.addView(TextView(this).apply {
+                text = "$emoji ${formatoDataHora.format(Date(corrida.dataHora))} — %.1f km".format(corrida.distanciaTotalKm)
+                setTextColor(Color.parseColor("#E4E7EC"))
+                textSize = 12f
+                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+            })
+
+            linha.addView(TextView(this).apply {
+                text = "R$ %.2f".format(corrida.valorTotal)
+                setTextColor(Color.parseColor("#1FE7A0"))
+                textSize = 13f
+                setTypeface(typeface, Typeface.BOLD)
+            })
+
+            container.addView(linha)
+        }
+    }
+
+    private fun criarMiniCard(rotulo: String, valor: String, fundoRes: Int, corValor: String): LinearLayout {
+        return LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            background = ContextCompat.getDrawable(this@HistoricoActivity, fundoRes)
+            setPadding(16, 14, 16, 14)
+            layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f).apply { marginEnd = 8 }
+            addView(TextView(this@HistoricoActivity).apply {
+                text = rotulo
+                setTextColor(Color.parseColor("#8B96AC"))
+                textSize = 9f
+            })
+            addView(TextView(this@HistoricoActivity).apply {
+                text = valor
+                setTextColor(Color.parseColor(corValor))
+                textSize = 13f
+                setTypeface(typeface, Typeface.BOLD)
+            })
+        }
+    }
+}
