@@ -10,12 +10,16 @@ import android.os.Bundle
 import android.provider.Settings
 import android.view.accessibility.AccessibilityManager
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.getSystemService
 
 class DiagnosticoActivity : AppCompatActivity() {
 
     private lateinit var prefs: android.content.SharedPreferences
+
+    private var contadorToquesTitulo = 0
+    private var ultimoToqueTituloEm = 0L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,6 +36,21 @@ class DiagnosticoActivity : AppCompatActivity() {
         }
 
         findViewById<TextView>(R.id.btnVerDebugOcr).setOnClickListener { mostrarDebugOcr() }
+
+        // Toca 7x seguidas no título "🔧 Diagnóstico" (em menos de 2s entre
+        // cada toque) pra revelar o botão de debug do OCR — não aparece
+        // pro usuário comum.
+        findViewById<TextView>(R.id.txtTituloDiagnostico).setOnClickListener {
+            val agora = System.currentTimeMillis()
+            if (agora - ultimoToqueTituloEm > 2000) contadorToquesTitulo = 0
+            ultimoToqueTituloEm = agora
+            contadorToquesTitulo++
+            if (contadorToquesTitulo >= 7) {
+                contadorToquesTitulo = 0
+                findViewById<TextView>(R.id.btnVerDebugOcr).visibility = android.view.View.VISIBLE
+                Toast.makeText(this, "Debug OCR liberado", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     override fun onResume() {
@@ -79,10 +98,11 @@ class DiagnosticoActivity : AppCompatActivity() {
             .setPositiveButton("Copiar tudo") { _, _ ->
                 val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
                 clipboard.setPrimaryClip(ClipData.newPlainText("debug_ocr", conteudoCompleto))
-                android.widget.Toast.makeText(this, "Copiado! Cole numa mensagem pra me enviar.", android.widget.Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Copiado! Cole numa mensagem pra me enviar.", Toast.LENGTH_LONG).show()
             }
             .setNegativeButton("Fechar", null)
-            .show()
-        DialogUtils.aplicarCoresBotoes(dialog)
+            .create()
+        dialog.setOnShowListener { DialogUtils.aplicarTemaCompleto(dialog) }
+        dialog.show()
     }
 }
