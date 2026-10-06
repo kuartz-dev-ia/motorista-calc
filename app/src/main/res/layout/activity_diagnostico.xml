@@ -17,12 +17,15 @@
             android:paddingBottom="10dp">
 
             <TextView
+                android:id="@+id/txtTituloDiagnostico"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="🔧 Diagnóstico"
                 android:textColor="#E7EAEE"
                 android:textSize="18sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:clickable="true"
+                android:focusable="true" />
         </LinearLayout>
 
         <LinearLayout
@@ -73,7 +76,6 @@
                     android:textColor="#E7EAEE"
                     android:textSize="12.5sp"
                     android:textStyle="bold"
-                    android:layout_marginBottom="8dp"
                     android:clickable="true"
                     android:focusable="true" />
 
@@ -88,6 +90,8 @@
                     android:textColor="#E7EAEE"
                     android:textSize="12.5sp"
                     android:textStyle="bold"
+                    android:layout_marginTop="8dp"
+                    android:visibility="gone"
                     android:clickable="true"
                     android:focusable="true" />
             </LinearLayout>
