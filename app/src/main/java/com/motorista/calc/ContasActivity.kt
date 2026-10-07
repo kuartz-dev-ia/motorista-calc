@@ -227,6 +227,14 @@ class ContasActivity : AppCompatActivity() {
                     }
                 }
             })
+            if (conta.dataVencimentoMillis != null) {
+                linhaBaixo.addView(TextView(this).apply {
+                    text = "⏭️"
+                    textSize = 14f
+                    setPadding(0, 0, 24, 0)
+                    setOnClickListener { confirmarPassarMes(conta) }
+                })
+            }
             linhaBaixo.addView(TextView(this).apply {
                 text = "✏️"
                 textSize = 14f
@@ -242,6 +250,27 @@ class ContasActivity : AppCompatActivity() {
 
             containerLista.addView(card)
         }
+    }
+
+    private fun confirmarPassarMes(conta: Conta) {
+        val dataAtual = conta.dataVencimentoMillis ?: return
+        val novaData = Calendar.getInstance().apply {
+            timeInMillis = dataAtual
+            add(Calendar.MONTH, 1)
+        }.timeInMillis
+
+        val dialog = AlertDialog.Builder(this, R.style.DialogTemaEscuro)
+            .setTitle("Passar pro próximo mês")
+            .setMessage("\"${conta.nome}\" vai passar de ${formatoData.format(java.util.Date(dataAtual))} para ${formatoData.format(java.util.Date(novaData))}, mantendo o valor de R$ %.2f. Confirma?".format(conta.valorMensal))
+            .setPositiveButton("Confirmar") { _, _ ->
+                ContaStorage.passarParaProximoMes(this, conta.id)
+                atualizarLista()
+                Toast.makeText(this, "Conta passada pro próximo mês", Toast.LENGTH_SHORT).show()
+            }
+            .setNegativeButton("Cancelar", null)
+            .create()
+        dialog.setOnShowListener { DialogUtils.aplicarTemaCompleto(dialog) }
+        dialog.show()
     }
 
     private fun confirmarExclusao(conta: Conta) {
