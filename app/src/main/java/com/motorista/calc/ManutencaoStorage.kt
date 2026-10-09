@@ -58,19 +58,25 @@ object ManutencaoStorage {
         prefs(context).edit().putString(CHAVE_LISTA, array.toString()).apply()
     }
 
+    /** dataHora é opcional — se não informada, usa o momento atual (igual
+     * antes). Quando uma data passada é informada, a "próxima data prevista"
+     * do lembrete também é calculada a partir dessa data escolhida, não de
+     * hoje — assim o lembrete continua fazendo sentido mesmo registrando
+     * uma manutenção feita há tempos. */
     fun adicionar(
         context: Context,
         tipo: String,
         kmRegistrado: Double,
         custo: Double,
         intervaloKm: Double?,
-        intervaloDias: Int?
+        intervaloDias: Int?,
+        dataHora: Long = System.currentTimeMillis()
     ) {
         val lista = listarTodos(context).toMutableList()
         val proximaKm = intervaloKm?.let { kmRegistrado + it }
-        val proximaData = intervaloDias?.let { System.currentTimeMillis() + it.toLong() * 24 * 60 * 60 * 1000 }
+        val proximaData = intervaloDias?.let { dataHora + it.toLong() * 24 * 60 * 60 * 1000 }
 
-        lista.add(0, Manutencao(System.currentTimeMillis(), tipo, System.currentTimeMillis(), kmRegistrado, custo, proximaKm, proximaData))
+        lista.add(0, Manutencao(System.currentTimeMillis(), tipo, dataHora, kmRegistrado, custo, proximaKm, proximaData))
         val limitada = if (lista.size > MAX_REGISTROS) lista.take(MAX_REGISTROS) else lista
         salvarTudo(context, limitada)
     }
