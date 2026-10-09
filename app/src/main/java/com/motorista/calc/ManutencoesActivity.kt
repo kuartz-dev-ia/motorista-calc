@@ -1,5 +1,6 @@
 package com.motorista.calc
 
+import android.app.DatePickerDialog
 import android.graphics.Color
 import android.os.Bundle
 import android.view.Gravity
@@ -7,6 +8,9 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 class ManutencoesActivity : AppCompatActivity() {
 
@@ -15,8 +19,12 @@ class ManutencoesActivity : AppCompatActivity() {
     private lateinit var edtCusto: android.widget.EditText
     private lateinit var edtIntervaloKm: android.widget.EditText
     private lateinit var edtIntervaloDias: android.widget.EditText
+    private lateinit var btnEscolherData: TextView
     private lateinit var containerPendencias: LinearLayout
     private lateinit var containerHistorico: LinearLayout
+
+    private var dataSelecionada: Long = System.currentTimeMillis()
+    private val formatoData = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,9 +36,11 @@ class ManutencoesActivity : AppCompatActivity() {
             edtCusto = findViewById(R.id.edtCustoManutencao)
             edtIntervaloKm = findViewById(R.id.edtIntervaloKm)
             edtIntervaloDias = findViewById(R.id.edtIntervaloDias)
+            btnEscolherData = findViewById(R.id.btnEscolherDataManutencao)
             containerPendencias = findViewById(R.id.containerPendencias)
             containerHistorico = findViewById(R.id.containerHistoricoManutencoes)
 
+            btnEscolherData.setOnClickListener { abrirSeletorData() }
             findViewById<android.view.View>(R.id.btnSalvarManutencao).setOnClickListener { salvarManutencao() }
         } catch (e: Exception) {
             mostrarErro("Erro ao abrir a tela: ${e.message}")
@@ -44,6 +54,21 @@ class ManutencoesActivity : AppCompatActivity() {
         } catch (e: Exception) {
             mostrarErro("Erro ao carregar manutenções: ${e.message}")
         }
+    }
+
+    private fun abrirSeletorData() {
+        val cal = Calendar.getInstance().apply { timeInMillis = dataSelecionada }
+        val dialog = DatePickerDialog(
+            this,
+            R.style.DialogTemaEscuro,
+            { _, ano, mes, dia ->
+                dataSelecionada = Calendar.getInstance().apply { set(ano, mes, dia, 12, 0, 0) }.timeInMillis
+                btnEscolherData.text = "📅 ${formatoData.format(java.util.Date(dataSelecionada))}"
+            },
+            cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)
+        )
+        dialog.setOnShowListener { DialogUtils.aplicarTemaCompleto(dialog) }
+        dialog.show()
     }
 
     private fun mostrarErro(mensagem: String) {
@@ -76,12 +101,14 @@ class ManutencoesActivity : AppCompatActivity() {
                 return
             }
 
-            ManutencaoStorage.adicionar(this, tipo, km, custo, intervaloKm, intervaloDias)
+            ManutencaoStorage.adicionar(this, tipo, km, custo, intervaloKm, intervaloDias, dataSelecionada)
             edtTipo.text.clear()
             edtKm.text.clear()
             edtCusto.text.clear()
             edtIntervaloKm.text.clear()
             edtIntervaloDias.text.clear()
+            dataSelecionada = System.currentTimeMillis()
+            btnEscolherData.text = "📅 Hoje"
             Toast.makeText(this, "Manutenção salva", Toast.LENGTH_SHORT).show()
             atualizarTela()
         } catch (e: Exception) {
