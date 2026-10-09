@@ -1,5 +1,6 @@
 package com.motorista.calc
 
+import android.app.DatePickerDialog
 import android.graphics.Color
 import android.os.Bundle
 import android.view.Gravity
@@ -10,6 +11,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -18,8 +20,12 @@ class AbastecimentosActivity : AppCompatActivity() {
     private lateinit var edtLitros: EditText
     private lateinit var edtValor: EditText
     private lateinit var edtKm: EditText
+    private lateinit var btnEscolherData: TextView
     private lateinit var txtConsumoMedio: TextView
     private lateinit var containerLista: LinearLayout
+
+    private var dataSelecionada: Long = System.currentTimeMillis()
+    private val formatoData = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,8 +34,11 @@ class AbastecimentosActivity : AppCompatActivity() {
         edtLitros = findViewById(R.id.edtLitros)
         edtValor = findViewById(R.id.edtValorAbastecimento)
         edtKm = findViewById(R.id.edtKmAtual)
+        btnEscolherData = findViewById(R.id.btnEscolherDataAbastecimento)
         txtConsumoMedio = findViewById(R.id.txtConsumoMedio)
         containerLista = findViewById(R.id.containerAbastecimentos)
+
+        btnEscolherData.setOnClickListener { abrirSeletorData() }
 
         findViewById<android.view.View>(R.id.btnSalvarAbastecimento).setOnClickListener {
             salvarAbastecimento()
@@ -45,6 +54,21 @@ class AbastecimentosActivity : AppCompatActivity() {
         atualizarTela()
     }
 
+    private fun abrirSeletorData() {
+        val cal = Calendar.getInstance().apply { timeInMillis = dataSelecionada }
+        val dialog = DatePickerDialog(
+            this,
+            R.style.DialogTemaEscuro,
+            { _, ano, mes, dia ->
+                dataSelecionada = Calendar.getInstance().apply { set(ano, mes, dia, 12, 0, 0) }.timeInMillis
+                btnEscolherData.text = "📅 ${formatoData.format(Date(dataSelecionada))}"
+            },
+            cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)
+        )
+        dialog.setOnShowListener { DialogUtils.aplicarTemaCompleto(dialog) }
+        dialog.show()
+    }
+
     private fun salvarAbastecimento() {
         val litros = edtLitros.text.toString().toDoubleOrNull()
         val valor = edtValor.text.toString().toDoubleOrNull()
@@ -55,10 +79,12 @@ class AbastecimentosActivity : AppCompatActivity() {
             return
         }
 
-        AbastecimentoStorage.adicionar(this, litros, valor, km)
+        AbastecimentoStorage.adicionar(this, litros, valor, km, dataSelecionada)
         edtLitros.text.clear()
         edtValor.text.clear()
         edtKm.text.clear()
+        dataSelecionada = System.currentTimeMillis()
+        btnEscolherData.text = "📅 Hoje"
         Toast.makeText(this, "Abastecimento salvo", Toast.LENGTH_SHORT).show()
         atualizarTela()
     }
