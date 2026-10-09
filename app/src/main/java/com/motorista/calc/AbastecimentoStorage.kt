@@ -52,9 +52,12 @@ object AbastecimentoStorage {
         prefs(context).edit().putString(CHAVE_LISTA, array.toString()).apply()
     }
 
-    fun adicionar(context: Context, litros: Double, valorTotal: Double, kmAtual: Double) {
+    /** dataHora é opcional — se não informada, usa o momento atual (igual
+     * antes). Permite registrar um abastecimento com data passada, caso o
+     * motorista tenha esquecido de anotar na hora. */
+    fun adicionar(context: Context, litros: Double, valorTotal: Double, kmAtual: Double, dataHora: Long = System.currentTimeMillis()) {
         val lista = listarTodos(context).toMutableList()
-        lista.add(Abastecimento(System.currentTimeMillis(), System.currentTimeMillis(), litros, valorTotal, kmAtual))
+        lista.add(Abastecimento(System.currentTimeMillis(), dataHora, litros, valorTotal, kmAtual))
         val limitada = if (lista.size > MAX_REGISTROS) lista.takeLast(MAX_REGISTROS) else lista
         salvarTudo(context, limitada)
     }
