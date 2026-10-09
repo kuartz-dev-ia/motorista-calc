@@ -84,6 +84,29 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
+                    android:text="DATA DA MANUTENÇÃO"
+                    android:textColor="#1FE7A0"
+                    android:textSize="10.5sp"
+                    android:textStyle="bold"
+                    android:paddingBottom="4dp" />
+                <TextView
+                    android:id="@+id/btnEscolherDataManutencao"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@drawable/bg_input_verde"
+                    android:gravity="center"
+                    android:text="📅 Hoje"
+                    android:textColor="#FFFFFF"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="10dp"
+                    android:clickable="true"
+                    android:focusable="true" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
                     android:text="TIPO (ex: troca de óleo, pneu, freio)"
                     android:textColor="#1FE7A0"
                     android:textSize="10.5sp"
