@@ -92,10 +92,7 @@ object ContaStorage {
 
     /** Avança a data de vencimento da conta em exatamente 1 mês (mantendo o
      * mesmo dia do mês) e limpa a marcação de "paga", já que o novo mês
-     * ainda não foi pago. O valor mensal continua o mesmo — se mudou (ex:
-     * cartão de crédito, conta de luz), o usuário ajusta manualmente
-     * depois, tocando no lápis de editar. Isso evita ter que recadastrar a
-     * conta inteira todo mês só porque ela se repete. */
+     * ainda não foi pago. */
     fun passarParaProximoMes(context: Context, id: Long) {
         val lista = listarTodos(context).toMutableList()
         val idx = lista.indexOfFirst { it.id == id }
@@ -112,14 +109,35 @@ object ContaStorage {
         salvarTudo(context, lista)
     }
 
-    fun totalMensal(context: Context): Double = listarTodos(context).sumOf { it.valorMensal }
+    /** true se essa conta já foi marcada como paga referente ao mês do seu
+     * vencimento atual. Contas sem data de vencimento nunca são
+     * consideradas pagas (não têm como marcar). */
+    private fun estaPagaNoMesAtual(conta: Conta): Boolean {
+        val dataVencimento = conta.dataVencimentoMillis ?: return false
+        val chaveMes = SimpleDateFormat("yyyy-MM", Locale.getDefault()).format(java.util.Date(dataVencimento))
+        return conta.pagoMesReferencia == chaveMes
+    }
+
+    /** Soma só as contas AINDA NÃO PAGAS nesse mês — assim que você marca
+     * uma como "Paga", ela some dessa conta na hora, e junto com ela some
+     * também da Meta Bruta Necessária (tela inicial e Config → Metas),
+     * já que essa meta usa exatamente essa função pra calcular quanto você
+     * ainda precisa faturar. É assim que o app te mostra, em tempo real,
+     * quanto falta faturar depois de já ter pago parte das contas do mês. */
+    fun totalMensal(context: Context): Double {
+        return listarTodos(context).filterNot { estaPagaNoMesAtual(it) }.sumOf { it.valorMensal }
+    }
+
+    /** Soma das contas já pagas nesse mês — útil só pra exibição informativa. */
+    fun totalMensalPago(context: Context): Double {
+        return listarTodos(context).filter { estaPagaNoMesAtual(it) }.sumOf { it.valorMensal }
+    }
 
     /** Retorna (texto do status, cor hexadecimal) pra exibir na lista. */
     fun statusDaConta(conta: Conta): Pair<String, String> {
         val dataVencimento = conta.dataVencimentoMillis ?: return Pair("Sem data de vencimento", "#8B96AC")
 
-        val chaveMes = SimpleDateFormat("yyyy-MM", Locale.getDefault()).format(java.util.Date(dataVencimento))
-        if (conta.pagoMesReferencia == chaveMes) {
+        if (estaPagaNoMesAtual(conta)) {
             return Pair("Paga", "#1FE7A0")
         }
 
