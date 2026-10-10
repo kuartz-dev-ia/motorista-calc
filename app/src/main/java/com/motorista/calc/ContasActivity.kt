@@ -155,7 +155,14 @@ class ContasActivity : AppCompatActivity() {
 
     private fun atualizarLista() {
         val contas = ContaStorage.listarTodos(this)
-        txtTotalMensal.text = "Total mensal: R$ %.2f".format(ContaStorage.totalMensal(this))
+        val totalAPagar = ContaStorage.totalMensal(this)
+        val totalPago = ContaStorage.totalMensalPago(this)
+
+        txtTotalMensal.text = if (totalPago > 0) {
+            "Ainda a pagar: R$ %.2f  •  Já pago: R$ %.2f".format(totalAPagar, totalPago)
+        } else {
+            "Total mensal a pagar: R$ %.2f".format(totalAPagar)
+        }
 
         containerLista.removeAllViews()
         if (contas.isEmpty()) {
